@@ -8,13 +8,12 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd">
     
-    <http:listener-config name="HTTP_Listener_Configuration" host="${http.binding.host}" port="${http.binding.port}" basePath="${boxtv_metadata_app.http.path}" doc:name="HTTP Listener Configuration"/>
+    
       
-    <flow name="mule-configFlow">
+    <flow name="s3-service">
         <http:listener config-ref="HTTP_Listener_Configuration" path="${boxtv_metadata_app.s3.path}" doc:name="HTTP"/>
-        <custom-transformer class="com.iterativesolution.s3.S3ListObjectToJSon" doc:name="Custom"/>
-        <logger message="#[payload.class.toString()]" level="INFO" doc:name="Logger"/>
-        
+        <custom-transformer class="com.iterativesolution.mule.transformers.S3ListObjectToJSon" doc:name="Custom"/>
+        <logger message="#[payload.class.toString()]" level="INFO" doc:name="Logger"/>        
          		
     </flow>
 </mule>
