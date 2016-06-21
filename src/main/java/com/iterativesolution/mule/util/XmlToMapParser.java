@@ -13,7 +13,43 @@ import org.dom4j.Element;
 
 
 public class XmlToMapParser {
+	public static Element getElementByPaths(Document document, String paths[]){
+		  Element rootElement=document.getRootElement();
+		  if(rootElement.getName().equals(paths[0])){
+			  if(paths.length==1){
+				  return rootElement;
+			  }
+			  else{
+				  return getElementByPaths(rootElement, paths,1);
+			  }
+		  }
+		  else
+			   return null;
+	}
 	
+	public static Element getElementByPaths(Element element, String paths[], int depths){
+		for ( Iterator<Element> i = element.elementIterator(); i.hasNext(); ) {
+	          Element elem = (Element) i.next();
+	          if(elem.getName().equals((paths[depths]))){
+	        	  if((depths+1)>=paths.length){
+	        		  return elem;
+	        	  }
+	        	  else{
+	        		  return getElementByPaths(elem,paths,depths+1);
+	        	  }
+	          }	          
+	     }
+		return null;		
+	}
+	
+	public static String getElementContentByPaths(Element element, String path){
+		Element foundElement=getElementByPaths(element,path.split("/"),0);
+		if(foundElement!=null){
+			return foundElement.getTextTrim();			
+		}
+		else
+			return null;
+	}
 	@SuppressWarnings("unchecked")
 	private void addToMap(String name,Object content, Map<String,Object> parent){
 		if(content==null){
@@ -35,13 +71,14 @@ public class XmlToMapParser {
 	    	array.add(content);
 	    	parent.put(name, array);
 	    }
-	}
+	}	
 	public Map<String,Object> toMap(Document document){
 		  Element element=document.getRootElement();
 		  Map map=new TreeMap<String, Object>();
 		  addToMap(element.getName(),toMap(element),map);		  		  
 		  return map;	  
-	  }
+	}
+	
 	  
 	  private Object toMap(Element element){		  		  
           Map content=new TreeMap();                    
@@ -67,5 +104,6 @@ public class XmlToMapParser {
 	      }
 	      return content;		  
 	  }
+	  
 
 }

@@ -27,20 +27,22 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                </spring:property>  
          </spring:bean>               
         <spring:bean id="loadSchedule" class="com.iterativesolution.mule.components.LoadResourceAsInputStream">
-                <spring:property name="file" value="data/schedule/s1/response.xml"/>
+                <spring:property name="file" value="data/schedule/s2/response.xml"/>
          </spring:bean>
                 
           <spring:bean id="loadCertification" class="com.iterativesolution.mule.components.LoadResourceAsInputStream">
                 <spring:property name="file" value="data/certification/c1/response.xml"/>
          </spring:bean>
          
-         <spring:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-			<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-			<property name="url" value="jdbc:mysql://mule:3306/mkyongjava" />
-			<property name="username" value="root" />
-			<property name="password" value="password" />
+        
+ 		<spring:bean id="dataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+    		<spring:property name="driverName" value="com.mysql.jdbc.Driver"/>
+    		<spring:property name="url" value="jdbc:mysql://192.168.99.100:3306/boxmetadata"/>
+    		<spring:property name="user" value="boxmetadata"/>
+    		<spring:property name="password" value="boxmetadata"/>
 		</spring:bean>
- 
+ 		  
+ 		  <spring:bean id="xmlToMapParser" class="com.iterativesolution.mule.util.XmlToMapParser"/>
            
     </spring:beans>    
 <mulexml:jaxb-context name="jaxbContext" packageNames="com.iterativesolution.video.metadata"/>

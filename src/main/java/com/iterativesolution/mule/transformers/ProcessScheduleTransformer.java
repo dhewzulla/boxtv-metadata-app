@@ -4,27 +4,41 @@ import java.io.ByteArrayInputStream;
 import java.io.CharArrayReader;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.xml.sax.InputSource;
 
+import com.iterativesolution.mule.util.ScheduleEventProcessor;
 import com.iterativesolution.mule.util.XmlToMapParser;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-
-
-
-public class XMLToMapTransformer extends AbstractMessageTransformer{
-	private XmlToMapParser xmlToMapParser;
-	public void setXmlToMapParser(XmlToMapParser xmlToMapParser) {
-		this.xmlToMapParser = xmlToMapParser;
+public class ProcessScheduleTransformer extends AbstractMessageTransformer{
+	private String schedulepath[]={"Envelope","Body","GetSchedulesByParamsResponse","GetSchedulesByParamsResult","ScheduleEventGroups"};
+	private static final Logger logger=LoggerFactory.getLogger(ProcessScheduleTransformer.class);
+	
+	private NamedParameterJdbcTemplate jdbcTemplate; 
+	
+	
+	public void setDataSource(DataSource  datasource) {		
+		this.jdbcTemplate =new NamedParameterJdbcTemplate(datasource);
+		
 	}
-	@Override
+
+
 	public Object transformMessage(MuleMessage message, String outputEncoding)
-			throws TransformerException {		
+			throws TransformerException {
 		try {
 			SAXReader reader = new SAXReader();
 			Object payload=message.getPayload();
@@ -46,7 +60,15 @@ public class XMLToMapTransformer extends AbstractMessageTransformer{
 			}
 			else
 				throw new TransformerException(this,new Exception("payload is not the expected type:"+payload.getClass()));
-			return xmlToMapParser.toMap(document);
+			
+			Element shceduleEvenGroups=XmlToMapParser.getElementByPaths(document,schedulepath);
+			
+			for ( Iterator<Element> i = shceduleEvenGroups.elementIterator(); i.hasNext(); ) {
+					Element elem = (Element) i.next();
+					ScheduleEventProcessor scheduleEventProcess=new ScheduleEventProcessor(jdbcTemplate);
+					scheduleEventProcess.processScheduleEventGroup(elem);				    
+			}
+			return message.getPayload();
 	        
 	    } catch (Exception e) {
 	        System.out.println("Error: " + e);

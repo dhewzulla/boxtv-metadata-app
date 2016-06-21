@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+ <flow name="pull-data-from-schedule">
+          <http:listener config-ref="HTTP_Listener_Configuration" path="${boxtv_metadata_app.ingest.metadata}" doc:name="HTTP"/>
+                
+         
+           <http:outbound-endpoint exchange-pattern="request-response" host="${c4.schedule.host}" port="${c4.schedule.port}" path="${boxtv_metadata_app.http.path}${c4.schedule.path}?#[header:inbound:http.query.string?]" method="GET" responseTimeout="600000" doc:name="Call Linear Service"/>
+        <logger message="*****invoked the schedule servoce ****" level="INFO" doc:name="Logger"/>        
+                      
+        	<object-to-string-transformer doc:name="Object to String"/>
+        	<custom-transformer class="com.iterativesolution.mule.transformers.ProcessScheduleTransformer" doc:name="Input Parameters are valid">          		              
+          		              <spring:property name="dataSource" ref="dataSource"/>
+                </custom-transformer>
+        <response>
+            <message-properties-transformer doc:name="Message Properties">
+                <add-message-property key="Content-Type" value="application/xml"/>
+            </message-properties-transformer>
+        </response>
+         		
+    </flow>
+
+
+
+</mule>

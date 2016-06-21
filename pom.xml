@@ -14,23 +14,8 @@
 
 		<mule.version>3.8.0</mule.version>
     	<mule.tools.version>1.2</mule.tools.version>
-       <jackson.version>1.8.9</jackson.version>
-       
-       
-       
-       
-		
-		
-		
-		
-		
-	    
-	    
-	    
-       
-       
-       
-       
+       <jackson.version>1.8.9</jackson.version>       
+	  <spring-data.version>Gosling-RELEASE</spring-data.version>
 	</properties>
 
 
@@ -85,7 +70,19 @@
 			</plugin>
 		</plugins>
 	</build>
+<dependencyManagement>
+  <dependencies>
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-releasetrain</artifactId>
+				<version>${spring-data.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
 
+		</dependencies>
+  
+  </dependencyManagement>
 	<!-- Mule Dependencies -->
 	<dependencies>
 	<dependency>
@@ -204,11 +201,24 @@
       
     </dependency>
     
-    <dependency>
+      <dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
-	    <version>6.0.2</version>
+	    <version>5.1.36</version>
 	   </dependency>
+	
+	 <!--   
+	<dependency>
+    	<groupId>commons-dbcp</groupId>
+    	<artifactId>commons-dbcp</artifactId>
+    	<version>1.2.2</version>
+	</dependency>
+	    -->
+	    
+	     <dependency>
+    <groupId>org.springframework.data</groupId>
+    <artifactId>spring-data-jpa</artifactId>
+  </dependency>
     </dependencies>
 
 	<repositories>
