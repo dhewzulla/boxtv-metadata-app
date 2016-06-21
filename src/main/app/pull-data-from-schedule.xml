@@ -17,6 +17,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <logger message="*****invoked the schedule servoce ****" level="INFO" doc:name="Logger"/>        
                       
         	<object-to-string-transformer doc:name="Object to String"/>
+        <logger message="*****Tryying read from the memmory*****" level="INFO" doc:name="Logger"/>
         	<custom-transformer class="com.iterativesolution.mule.transformers.ProcessScheduleTransformer" doc:name="Input Parameters are valid">          		              
           		              <spring:property name="dataSource" ref="dataSource"/>
                 </custom-transformer>
@@ -25,6 +26,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
                 <add-message-property key="Content-Type" value="application/xml"/>
             </message-properties-transformer>
         </response>
+        <logger message="****database access successful********" level="INFO" doc:name="Logger"/>
          		
     </flow>
 
