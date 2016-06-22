@@ -1,12 +1,12 @@
 package com.iterativesolution.mule.box.model;
 
 
-import javax.persistence.Column;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+
 @Entity(name="asset")
 @NamedQuery(name = "asset.findAssetByName", query = "from asset a where a.name = ?1")
 
