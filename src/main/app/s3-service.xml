@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/cu
     
       
     <flow name="s3-service">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="${boxtv_metadata_app.s3.path}" doc:name="HTTP"/>
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.s3.path}" doc:name="HTTP"/>
         <custom-transformer class="com.iterativesolution.mule.transformers.S3ListObjectToJSon" doc:name="Custom"/>
         <logger message="#[payload.class.toString()]" level="INFO" doc:name="Logger"/>        
          		

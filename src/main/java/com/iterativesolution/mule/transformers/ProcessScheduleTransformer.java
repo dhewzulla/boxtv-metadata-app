@@ -7,6 +7,8 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 
 import org.dom4j.Document;
@@ -17,9 +19,13 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.xml.sax.InputSource;
 
+import com.iterativesolution.mule.box.model.Asset;
+import com.iterativesolution.mule.box.repository.AssetDAO;
+import com.iterativesolution.mule.box.repository.AssetRepository;
 import com.iterativesolution.mule.util.ScheduleEventProcessor;
 import com.iterativesolution.mule.util.XmlToMapParser;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -29,13 +35,26 @@ public class ProcessScheduleTransformer extends AbstractMessageTransformer{
 	private static final Logger logger=LoggerFactory.getLogger(ProcessScheduleTransformer.class);
 	
 	private NamedParameterJdbcTemplate jdbcTemplate; 
+	private AssetDAO assetDAO;
 	
 	
+	
+	
+	public AssetDAO getAssetDAO() {
+		return assetDAO;
+	}
+
+
+	public void setAssetDAO(AssetDAO assetDAO) {
+		this.assetDAO = assetDAO;
+	}
+
+
 	public void setDataSource(DataSource  datasource) {		
 		this.jdbcTemplate =new NamedParameterJdbcTemplate(datasource);
 		
 	}
-
+  
 
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
@@ -63,11 +82,13 @@ public class ProcessScheduleTransformer extends AbstractMessageTransformer{
 			
 			Element shceduleEvenGroups=XmlToMapParser.getElementByPaths(document,schedulepath);
 			
-			for ( Iterator<Element> i = shceduleEvenGroups.elementIterator(); i.hasNext(); ) {
-					Element elem = (Element) i.next();
-					ScheduleEventProcessor scheduleEventProcess=new ScheduleEventProcessor(jdbcTemplate);
-					scheduleEventProcess.processScheduleEventGroup(elem);				    
-			}
+//			for ( Iterator<Element> i = shceduleEvenGroups.elementIterator(); i.hasNext(); ) {
+//					Element elem = (Element) i.next();
+//					ScheduleEventProcessor scheduleEventProcess=new ScheduleEventProcessor(jdbcTemplate);
+//					scheduleEventProcess.processScheduleEventGroup(elem);				    
+//			}
+			assetDAO.createAsset();
+			
 			return message.getPayload();
 	        
 	    } catch (Exception e) {

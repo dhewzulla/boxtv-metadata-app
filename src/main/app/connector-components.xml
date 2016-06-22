@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
+<mule xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:management="http://www.mulesoft.org/schema/mule/management"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
 	 xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd 
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd 
 http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd 
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd 
@@ -14,6 +17,8 @@ http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mu
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
+http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-2.5.xsd
+http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
  
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd ">
@@ -35,18 +40,54 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          </spring:bean>
          
         
+<context:component-scan base-package="com.iterativesolution.mule.box.model.*" />
+	
  		<spring:bean id="dataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
     		<spring:property name="driverName" value="com.mysql.jdbc.Driver"/>
     		<spring:property name="url" value="jdbc:mysql://mysql:3306/boxmetadata"/>
     		<spring:property name="user" value="boxmetadata"/>
     		<spring:property name="password" value="boxmetadata"/>
 		</spring:bean>
- 		  
+	<spring:bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<spring:property name="packagesToScan" value="com.iterativesolution.mule.box.model"/>
+ 		 <spring:property name="dataSource" ref="dataSource"/>
+  		<spring:property name="loadTimeWeaver">
+    			<spring:bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+ 		 </spring:property>
+ 		 <spring:property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+ 		 <spring:property name="jpaProperties">
+    		<spring:props>
+      			<spring:prop key="hibernate.show_sql">true</spring:prop>
+      			<spring:prop key="hibernate.hbm2dll.auto">create</spring:prop>
+    		</spring:props>
+  			</spring:property>
+ </spring:bean>
+ 
+ <spring:bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+  <spring:property name="showSql" value="true"/>
+  <spring:property name="generateDdl" value="true"/>
+  <spring:property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"/>
+</spring:bean>
+   <spring:bean id="entityManager"
+	class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+	<spring:property name="entityManagerFactory" ref="entityManagerFactory" />
+</spring:bean>
  		  <spring:bean id="xmlToMapParser" class="com.iterativesolution.mule.util.XmlToMapParser"/>
-           
-    </spring:beans>    
+ 		  <spring:bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+				<spring:constructor-arg ref="entityManagerFactory" />
+		</spring:bean>
+	
+		 <spring:bean id="assetDAO" class="com.iterativesolution.mule.box.repository.AssetDAO">
+				<spring:property name="entityManager" ref="entityManager" />
+		</spring:bean>
+	
+		<tx:annotation-driven transaction-manager="transactionManager" />           
+    </spring:beans>
+    
+        
 <mulexml:jaxb-context name="jaxbContext" packageNames="com.iterativesolution.video.metadata"/>
 
-<http:listener-config name="HTTP_Listener_Configuration" host="${http.binding.host}" port="${http.binding.port}" basePath="${boxtv_metadata_app.http.path}" doc:name="HTTP Listener Configuration"/>
+<http:listener-config name="http_metadata_inbound_listener" host="${http.binding.host}" port="${http.binding.port}" basePath="${boxtv_metadata_app.http.path}" doc:name="HTTP Listener Configuration"/>
+<http:request-config name="http_schedule_service" host="${c4.schedule.host}"  port="${c4.schedule.port}"/>
         
 </mule>
