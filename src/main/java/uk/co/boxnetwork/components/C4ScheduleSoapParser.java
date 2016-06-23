@@ -10,10 +10,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 
-import com.iterativesolution.mule.util.XmlToMapParser;
+
 
 import uk.co.boxnetwork.data.C4Metadata;
 import uk.co.boxnetwork.model.Asset;
+import uk.co.boxnetwork.mule.util.XmlToMapParser;
 
 @Component
 public class C4ScheduleSoapParser {

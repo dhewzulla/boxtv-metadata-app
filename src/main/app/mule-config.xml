@@ -72,19 +72,15 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 		
 		
 		
-		<spring:bean id="scheduleReceiver" class="uk.co.boxnetwork.services.C4ScheduleReceiver"/>
+		
                     
-        <spring:bean id="loadSchedule" class="com.iterativesolution.mule.components.LoadResourceAsInputStream">
+        <spring:bean id="loadSchedule" class="uk.co.boxnetwork.mule.components.LoadResourceAsInputStream">
                 <spring:property name="file" value="data/schedule/s2/response.xml"/>
          </spring:bean>
                 
-          <spring:bean id="loadCertification" class="com.iterativesolution.mule.components.LoadResourceAsInputStream">
+          <spring:bean id="loadCertification" class="uk.co.boxnetwork.mule.components.LoadResourceAsInputStream">
                 <spring:property name="file" value="data/certification/c1/response.xml"/>
          </spring:bean>
-         
- 		 <spring:bean id="xmlToMapParser" class="com.iterativesolution.mule.util.XmlToMapParser"/>
- 		 
-		
 		           
  </spring:beans>
     

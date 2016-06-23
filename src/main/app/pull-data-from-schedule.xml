@@ -19,9 +19,9 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         	<object-to-string-transformer doc:name="Object to String"/>
         <logger message="*****Tryying read from the memmory*****" level="INFO" doc:name="Logger"/>
         <transactional action="ALWAYS_BEGIN" doc:name="Transactional">
-            <custom-transformer class="com.iterativesolution.mule.transformers.ProcessScheduleTransformer" doc:name="Input Parameters are valid">
-                <spring:property name="scheduleReceiver" ref="scheduleReceiver"/>                
-            </custom-transformer>
+            <custom-transformer class="uk.co.boxnetwork.mule.transformers.ProcessScheduleTransformer" doc:name="Input Parameters are valid"/>
+                                
+            
             
         </transactional>
         <response>
