@@ -1,4 +1,4 @@
-package com.iterativesolution.mule.box.model;
+package uk.co.boxnetwork.model;
 
 
 

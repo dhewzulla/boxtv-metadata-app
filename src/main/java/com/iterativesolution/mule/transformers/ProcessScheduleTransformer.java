@@ -22,6 +22,9 @@ import com.iterativesolution.mule.box.repository.AssetDAO;
 
 
 import com.iterativesolution.mule.util.XmlToMapParser;
+
+import uk.co.boxnetwork.model.Asset;
+
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class ProcessScheduleTransformer extends AbstractMessageTransformer{
@@ -81,7 +84,11 @@ public class ProcessScheduleTransformer extends AbstractMessageTransformer{
 //					ScheduleEventProcessor scheduleEventProcess=new ScheduleEventProcessor(jdbcTemplate);
 //					scheduleEventProcess.processScheduleEventGroup(elem);				    
 //			}
-			assetDAO.createAsset();
+			Asset asset=new Asset();
+			asset.setId(String.valueOf(System.currentTimeMillis()));
+			asset.setName("test");
+			asset.setType("dd");
+			assetDAO.createAsset(asset);
 			
 			return message.getPayload();
 	        
