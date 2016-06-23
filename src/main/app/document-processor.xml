@@ -9,3 +9,5 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <http:static-resource-handler resourceBase="${user.home}/bdocker/bnginx/var/www/html" defaultFile="index.html"/>
 </flow>
 </mule>
+
+

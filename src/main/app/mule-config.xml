@@ -48,8 +48,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
     		<spring:property name="user" value="boxmetadata"/>
     		<spring:property name="password" value="boxmetadata"/>
 		</spring:bean>
-	<spring:bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-		<spring:property name="packagesToScan" value="com.iterativesolution.mule.box.model"/>
+	<spring:bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">		
  		 <spring:property name="dataSource" ref="dataSource"/>
   		<spring:property name="loadTimeWeaver">
     			<spring:bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
