@@ -30,7 +30,56 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                     <spring:value>file:///${mule.home}/box-config/metadata-config/*.properties</spring:value>   
                 </spring:list>  
                </spring:property>  
-         </spring:bean>               
+         </spring:bean>
+         
+        <spring:bean id="dataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+    		<spring:property name="driverName" value="com.mysql.jdbc.Driver"/>
+    		<spring:property name="url" value="jdbc:mysql://mysql:3306/boxmetadata"/>
+    		<spring:property name="user" value="boxmetadata"/>
+    		<spring:property name="password" value="boxmetadata"/>
+		</spring:bean>
+	
+         
+         <context:component-scan base-package="uk.co.boxnetwork.model.*" />    
+         
+         <spring:bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">		
+ 		 	<spring:property name="dataSource" ref="dataSource"/>
+  		  	<spring:property name="loadTimeWeaver">    	  
+    	 			<spring:bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+ 		 	</spring:property>
+ 		 	<spring:property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+ 		 	<spring:property name="jpaProperties">
+	    		<spring:props>
+	      			<spring:prop key="hibernate.show_sql">true</spring:prop>
+	      			<spring:prop key="hibernate.hbm2dll.auto">create</spring:prop>
+	    		</spring:props>
+  			</spring:property>
+         </spring:bean>
+ 
+ 		<spring:bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+  			<spring:property name="showSql" value="true"/>
+  			<spring:property name="generateDdl" value="true"/>
+  			<spring:property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"/>
+		</spring:bean>
+		
+   		<spring:bean id="entityManager" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+			<spring:property name="entityManagerFactory" ref="entityManagerFactory" />
+		</spring:bean>
+		
+		<spring:bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+				<spring:constructor-arg ref="entityManagerFactory" />
+		</spring:bean>
+		
+		<tx:annotation-driven transaction-manager="transactionManager" />
+		
+		<spring:bean id="assetDAO" class="com.iterativesolution.mule.box.repository.AssetDAO">
+				<spring:property name="entityManager" ref="entityManager" />
+		</spring:bean>
+		
+		
+		
+		
+                    
         <spring:bean id="loadSchedule" class="com.iterativesolution.mule.components.LoadResourceAsInputStream">
                 <spring:property name="file" value="data/schedule/s2/response.xml"/>
          </spring:bean>
@@ -39,49 +88,11 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                 <spring:property name="file" value="data/certification/c1/response.xml"/>
          </spring:bean>
          
-        
-<context:component-scan base-package="uk.co.boxnetwork.model.*" />
-	
- 		<spring:bean id="dataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
-    		<spring:property name="driverName" value="com.mysql.jdbc.Driver"/>
-    		<spring:property name="url" value="jdbc:mysql://mysql:3306/boxmetadata"/>
-    		<spring:property name="user" value="boxmetadata"/>
-    		<spring:property name="password" value="boxmetadata"/>
-		</spring:bean>
-	<spring:bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">		
- 		 <spring:property name="dataSource" ref="dataSource"/>
-  		<spring:property name="loadTimeWeaver">
-    			<spring:bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
- 		 </spring:property>
- 		 <spring:property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
- 		 <spring:property name="jpaProperties">
-    		<spring:props>
-      			<spring:prop key="hibernate.show_sql">true</spring:prop>
-      			<spring:prop key="hibernate.hbm2dll.auto">create</spring:prop>
-    		</spring:props>
-  			</spring:property>
- </spring:bean>
- 
- <spring:bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-  <spring:property name="showSql" value="true"/>
-  <spring:property name="generateDdl" value="true"/>
-  <spring:property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"/>
-</spring:bean>
-   <spring:bean id="entityManager"
-	class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
-	<spring:property name="entityManagerFactory" ref="entityManagerFactory" />
-</spring:bean>
- 		  <spring:bean id="xmlToMapParser" class="com.iterativesolution.mule.util.XmlToMapParser"/>
- 		  <spring:bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-				<spring:constructor-arg ref="entityManagerFactory" />
-		</spring:bean>
-	
-		 <spring:bean id="assetDAO" class="com.iterativesolution.mule.box.repository.AssetDAO">
-				<spring:property name="entityManager" ref="entityManager" />
-		</spring:bean>
-	
-		<tx:annotation-driven transaction-manager="transactionManager" />           
-    </spring:beans>
+ 		 <spring:bean id="xmlToMapParser" class="com.iterativesolution.mule.util.XmlToMapParser"/>
+ 		 
+		
+		           
+ </spring:beans>
     
         
 <mulexml:jaxb-context name="jaxbContext" packageNames="com.iterativesolution.video.metadata"/>
