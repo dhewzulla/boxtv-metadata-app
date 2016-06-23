@@ -1,4 +1,4 @@
-package com.iterativesolution.video.metadata;
+package uk.co.boxnetwork.data;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

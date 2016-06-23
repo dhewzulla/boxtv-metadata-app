@@ -10,7 +10,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
- <flow name="pull-data-from-schedule">
+ <flow name="c4-ingegration">
           <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.ingest.metadata}" doc:name="HTTP"/>
                 
           <http:request config-ref="http_schedule_service" path="${boxtv_metadata_app.http.path}${c4.schedule.path}?#[header:inbound:http.query.string?]" method="GET" doc:name="NEW HTTP Connector"/>

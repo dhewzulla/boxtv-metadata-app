@@ -1,4 +1,4 @@
-package com.iterativesolution.s3.model;
+package uk.co.boxnetwork.data;
 
 public class FileItem {
   private  String file;

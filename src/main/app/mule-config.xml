@@ -85,7 +85,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
  </spring:beans>
     
         
-<mulexml:jaxb-context name="jaxbContext" packageNames="com.iterativesolution.video.metadata"/>
+<mulexml:jaxb-context name="jaxbContext" packageNames="uk.co.boxnetwork.data"/>
 
 <http:listener-config name="http_metadata_inbound_listener" host="${http.binding.host}" port="${http.binding.port}" basePath="${boxtv_metadata_app.http.path}" doc:name="HTTP Listener Configuration"/>
 <http:request-config name="http_schedule_service" host="${c4.schedule.host}"  port="${c4.schedule.port}"/>

@@ -33,7 +33,9 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.iterativesolution.s3.model.FileItem;
+
+import uk.co.boxnetwork.data.FileItem;
+
 
 
 
