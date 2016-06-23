@@ -20,8 +20,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <logger message="*****Tryying read from the memmory*****" level="INFO" doc:name="Logger"/>
         <transactional action="ALWAYS_BEGIN" doc:name="Transactional">
             <custom-transformer class="com.iterativesolution.mule.transformers.ProcessScheduleTransformer" doc:name="Input Parameters are valid">
-                <spring:property name="dataSource" ref="dataSource"/>
-                <spring:property name="assetDAO" ref="assetDAO"/>
+                <spring:property name="scheduleReceiver" ref="scheduleReceiver"/>                
             </custom-transformer>
             
         </transactional>

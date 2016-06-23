@@ -38,9 +38,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
     		<spring:property name="user" value="boxmetadata"/>
     		<spring:property name="password" value="boxmetadata"/>
 		</spring:bean>
-	
-         
-         <context:component-scan base-package="uk.co.boxnetwork.model.*" />    
+        <context:component-scan base-package="uk.co.boxnetwork.components" />    
          
          <spring:bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">		
  		 	<spring:property name="dataSource" ref="dataSource"/>
@@ -72,13 +70,9 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 		
 		<tx:annotation-driven transaction-manager="transactionManager" />
 		
-		<spring:bean id="assetDAO" class="com.iterativesolution.mule.box.repository.AssetDAO">
-				<spring:property name="entityManager" ref="entityManager" />
-		</spring:bean>
 		
 		
-		
-		
+		<spring:bean id="scheduleReceiver" class="uk.co.boxnetwork.services.C4ScheduleReceiver"/>
                     
         <spring:bean id="loadSchedule" class="com.iterativesolution.mule.components.LoadResourceAsInputStream">
                 <spring:property name="file" value="data/schedule/s2/response.xml"/>

@@ -18,40 +18,44 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 
-import com.iterativesolution.mule.box.repository.AssetDAO;
+
 
 
 import com.iterativesolution.mule.util.XmlToMapParser;
 
+import uk.co.boxnetwork.components.BoxMedataRepository;
 import uk.co.boxnetwork.model.Asset;
+import uk.co.boxnetwork.services.C4ScheduleReceiver;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class ProcessScheduleTransformer extends AbstractMessageTransformer{
-	private String schedulepath[]={"Envelope","Body","GetSchedulesByParamsResponse","GetSchedulesByParamsResult","ScheduleEventGroups"};
+	
 	private static final Logger logger=LoggerFactory.getLogger(ProcessScheduleTransformer.class);
 	
-	private NamedParameterJdbcTemplate jdbcTemplate; 
-	private AssetDAO assetDAO;
+	
+	private C4ScheduleReceiver scheduleReceiver;
 	
 	
 	
 	
-	public AssetDAO getAssetDAO() {
-		return assetDAO;
-	}
+	
 
-
-	public void setAssetDAO(AssetDAO assetDAO) {
-		this.assetDAO = assetDAO;
-	}
-
-
-	public void setDataSource(DataSource  datasource) {		
-		this.jdbcTemplate =new NamedParameterJdbcTemplate(datasource);
-		
-	}
+	
   
+
+	public void setScheduleReceiver(C4ScheduleReceiver scheduleReceiver) {
+		this.scheduleReceiver = scheduleReceiver;
+	}
+
+
+
+
+
+
+
+
 
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
@@ -76,19 +80,7 @@ public class ProcessScheduleTransformer extends AbstractMessageTransformer{
 			}
 			else
 				throw new TransformerException(this,new Exception("payload is not the expected type:"+payload.getClass()));
-			
-			Element shceduleEvenGroups=XmlToMapParser.getElementByPaths(document,schedulepath);
-			
-//			for ( Iterator<Element> i = shceduleEvenGroups.elementIterator(); i.hasNext(); ) {
-//					Element elem = (Element) i.next();
-//					ScheduleEventProcessor scheduleEventProcess=new ScheduleEventProcessor(jdbcTemplate);
-//					scheduleEventProcess.processScheduleEventGroup(elem);				    
-//			}
-			Asset asset=new Asset();
-			asset.setId(String.valueOf(System.currentTimeMillis()));
-			asset.setName("test");
-			asset.setType("dd");
-			assetDAO.createAsset(asset);
+			scheduleReceiver.process(document);			
 			
 			return message.getPayload();
 	        
