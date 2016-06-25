@@ -1,0 +1,1 @@
+mysql -uboxmetadata -pboxmetadata -hmysql boxmetadata< test/sql/episode.sql

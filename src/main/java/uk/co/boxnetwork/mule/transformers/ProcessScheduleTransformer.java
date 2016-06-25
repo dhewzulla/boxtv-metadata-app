@@ -4,11 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.CharArrayReader;
 import java.io.InputStream;
 import java.io.Reader;
-
-import javax.sql.DataSource;
-
 import org.dom4j.Document;
-import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -23,13 +19,13 @@ import org.xml.sax.InputSource;
 
 
 
-import uk.co.boxnetwork.components.BoxMedataRepository;
+
 import uk.co.boxnetwork.components.C4ScheduleReceiver;
-import uk.co.boxnetwork.model.Asset;
+
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
 
 public class ProcessScheduleTransformer extends AbstractMessageTransformer{
 	
