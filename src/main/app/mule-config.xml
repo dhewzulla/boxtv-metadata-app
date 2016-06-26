@@ -84,9 +84,13 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          
          
          <spring:bean id="programmeComponent"  class="uk.co.boxnetwork.mule.components.metadata.ProgrammeComponent"/>
-         <spring:bean id="episodesComponent"  class="uk.co.boxnetwork.mule.components.metadata.EpisodeComponent"/>
+         
 		           
  </spring:beans>
+   
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.EpisodeTransformer" name="episodeService" doc:name="Logging"/>
+      
+    
     
         
 <mulexml:jaxb-context name="jaxbContext" packageNames="uk.co.boxnetwork.data"/>

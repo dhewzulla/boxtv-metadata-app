@@ -225,6 +225,9 @@ public class BoxMedataRepository {
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title=:title", Episode.class);
 		   return query.setParameter("title",title).getResultList();
 	   }
+	   public Episode findEpisodeById(Long id){
+		   return entityManager.find(Episode.class, id);		   
+	   }
 	   public List<Episode> findAllEpisodes(){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);
 		   return query.getResultList();

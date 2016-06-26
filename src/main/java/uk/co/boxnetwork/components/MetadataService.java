@@ -29,6 +29,9 @@ public class MetadataService {
 	public List<Episode> getAllEpisodes(){
 		return boxMetadataRepository.findAllEpisodes();
 	}
+	public Episode getAllEpisodeById(Long id){
+		return boxMetadataRepository.findEpisodeById(id);
+	}
 		
 	
 }
