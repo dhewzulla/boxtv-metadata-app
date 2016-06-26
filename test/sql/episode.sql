@@ -1,1 +1,0 @@
-select episode.id, episode.asset_id, episode.ctr_prg, episode.title,episode.primary_id,episode.name,episode.series_id, episode.programme_id, programme.title, series.name, series.asset_id, episode.number from (episode left join programme on episode.programme_id=programme.id) left join series on episode.series_id=series.id  order by ctr_prg;

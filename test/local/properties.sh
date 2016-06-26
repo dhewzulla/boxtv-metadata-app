@@ -1,0 +1,1 @@
+export mulebaseurl=http://localhost:9081/mule/boxtv
