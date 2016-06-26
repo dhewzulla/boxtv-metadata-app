@@ -81,6 +81,10 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
           <spring:bean id="loadCertification" class="uk.co.boxnetwork.mule.components.LoadResourceAsInputStream">
                 <spring:property name="file" value="data/certification/c1/response.xml"/>
          </spring:bean>
+         
+         
+         <spring:bean id="programmeComponent"  class="uk.co.boxnetwork.mule.components.metadata.ProgrammeComponent"/>
+         <spring:bean id="episodesComponent"  class="uk.co.boxnetwork.mule.components.metadata.EpisodeComponent"/>
 		           
  </spring:beans>
     
