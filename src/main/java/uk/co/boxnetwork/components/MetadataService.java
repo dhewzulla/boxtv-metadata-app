@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import uk.co.boxnetwork.data.Programme;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.ScheduleEvent;
 
 @Service
 public class MetadataService {
@@ -33,5 +34,12 @@ public class MetadataService {
 		return boxMetadataRepository.findEpisodeById(id);
 	}
 		
+	public List<ScheduleEvent> getAllScheduleEvent(){
+		return boxMetadataRepository.findAllScheduleEvent();
+	}
+	public ScheduleEvent getScheduleEventById(Long id){
+		return boxMetadataRepository.findScheduleEventById(id);
+	}
+	
 	
 }

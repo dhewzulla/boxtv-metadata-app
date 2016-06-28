@@ -203,7 +203,13 @@ public class BoxMedataRepository {
 			   			return returnExistingSeriesOrPersist(series,matchedSeries,"primaryId="+series.getPrimaryId());			   						   
 		   }
 	   }
-	   
+	   public ScheduleEvent findScheduleEventById(Long id){
+		   return entityManager.find(ScheduleEvent.class, id);		   
+	   }
+	   public List<ScheduleEvent> findAllScheduleEvent(){
+		   TypedQuery<ScheduleEvent> query=entityManager.createQuery("SELECT s FROM schedule_event s", ScheduleEvent.class);
+		   return query.getResultList();
+	   }
 	   public List<ScheduleEvent> findScheduleEventByScheduleEventId(String scheduleEventID){
 		   TypedQuery<ScheduleEvent> query=entityManager.createQuery("SELECT s FROM schedule_event s where s.scheduleEventID=:scheduleEventID", ScheduleEvent.class);
 		   return query.setParameter("scheduleEventID",scheduleEventID).getResultList();

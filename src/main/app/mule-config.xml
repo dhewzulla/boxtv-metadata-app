@@ -88,7 +88,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 		           
  </spring:beans>
    
-   <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.EpisodeTransformer" name="episodeService" doc:name="Logging"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.EpisodeTransformer" name="episodeService" doc:name="EpisodeService"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.ScheduleTransformer" name="scheduleService" doc:name="ScheduleService"/>
       
     
     
