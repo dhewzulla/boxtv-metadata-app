@@ -210,6 +210,11 @@ public class BoxMedataRepository {
 		   TypedQuery<ScheduleEvent> query=entityManager.createQuery("SELECT s FROM schedule_event s", ScheduleEvent.class);
 		   return query.getResultList();
 	   }
+	   public List<ScheduleEvent> findScheduleEventByEpisode(Episode episode){		   
+		   TypedQuery<ScheduleEvent> query=entityManager.createQuery("SELECT s FROM schedule_event s where s.episode=:episode", ScheduleEvent.class);
+		   return query.setParameter("episode",episode).getResultList();
+	   }
+
 	   public List<ScheduleEvent> findScheduleEventByScheduleEventId(String scheduleEventID){
 		   TypedQuery<ScheduleEvent> query=entityManager.createQuery("SELECT s FROM schedule_event s where s.scheduleEventID=:scheduleEventID", ScheduleEvent.class);
 		   return query.setParameter("scheduleEventID",scheduleEventID).getResultList();
@@ -233,6 +238,10 @@ public class BoxMedataRepository {
 	   }
 	   public Episode findEpisodeById(Long id){
 		   return entityManager.find(Episode.class, id);		   
+	   }
+	   
+	   public void update(Episode episode){
+		   entityManager.merge(episode);
 	   }
 	   public List<Episode> findAllEpisodes(){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);

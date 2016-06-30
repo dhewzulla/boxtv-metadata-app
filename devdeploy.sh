@@ -1,5 +1,4 @@
 muleapp=boxtv-metadata-app-1.0.0-SNAPSHOT.zip
-mvn install
 cd ~/box-config
 git add . --all
 git commit -m "developing"

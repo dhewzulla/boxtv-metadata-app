@@ -13,6 +13,9 @@ public class Programme {
 		synopsis=prg.getSynopsis();
 		contentType=prg.getContentType();		
 	}
+	public Programme(){
+		
+	}
 	public Long getId() {
 		return id;
 	}

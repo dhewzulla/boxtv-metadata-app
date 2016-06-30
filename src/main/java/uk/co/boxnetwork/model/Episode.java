@@ -42,7 +42,7 @@ public class Episode {
 	private CertType certType;
 	
 	@Column(name="warning_text")
-	private CertType warningText;
+	private String warningText;
 	
 	
 	private String tags;
@@ -131,11 +131,12 @@ public class Episode {
 		this.certType = certType;
 	}
 
-	public CertType getWarningText() {
+	
+	public String getWarningText() {
 		return warningText;
 	}
 
-	public void setWarningText(CertType warningText) {
+	public void setWarningText(String warningText) {
 		this.warningText = warningText;
 	}
 
