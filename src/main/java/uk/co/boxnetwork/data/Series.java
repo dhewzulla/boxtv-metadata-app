@@ -21,6 +21,12 @@ public class Series {
 		this.contractNumber = series.getContractNumber();
 		this.programme = new Programme(series.getProgramme());
 	}
+	public void update(uk.co.boxnetwork.model.Series series){		
+		series.setAssetId(this.assetId);
+		series.setPrimaryId(this.primaryId);
+		series.setName(this.name);
+		series.setContractNumber(this.contractNumber);	
+	}
 	public Series(){
 		
 	}

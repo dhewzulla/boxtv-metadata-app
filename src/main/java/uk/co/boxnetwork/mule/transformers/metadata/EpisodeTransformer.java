@@ -1,12 +1,7 @@
 package uk.co.boxnetwork.mule.transformers.metadata;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;

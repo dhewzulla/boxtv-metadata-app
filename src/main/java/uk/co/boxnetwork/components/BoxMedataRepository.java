@@ -220,6 +220,17 @@ public class BoxMedataRepository {
 		   return query.setParameter("scheduleEventID",scheduleEventID).getResultList();
 	   }
 	   
+	   public void update(Series series){
+		   entityManager.merge(series);
+	   }
+	   public Series findSeriesById(Long id){
+		   return entityManager.find(Series.class, id);		   
+	   }
+	   public List<Series> findAllSeries(){
+		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s", Series.class);
+		   return query.getResultList();
+	   }
+	   
 	   public List<Programme> findProgrammeByTitle(String title){		   
 		   TypedQuery<Programme> query=entityManager.createQuery("SELECT p FROM programme p where p.title=:title", Programme.class);
 		   return query.setParameter("title",title).getResultList();
@@ -243,6 +254,7 @@ public class BoxMedataRepository {
 	   public void update(Episode episode){
 		   entityManager.merge(episode);
 	   }
+	  
 	   public List<Episode> findAllEpisodes(){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);
 		   return query.getResultList();

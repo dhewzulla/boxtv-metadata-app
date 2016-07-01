@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:context="http://www.springframework.org/schema/context"
+<mule xmlns:https="http://www.mulesoft.org/schema/mule/https"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:management="http://www.mulesoft.org/schema/mule/management"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
 	 xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd 
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd 
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd 
 http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd 
@@ -84,12 +86,21 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          
          
          <spring:bean id="programmeComponent"  class="uk.co.boxnetwork.mule.components.metadata.ProgrammeComponent"/>
-         
+         <spring:bean id="bcConfiguration"  class="uk.co.boxnetwork.data.BCConfiguration">
+                            <spring:property name="oauthurl" value="${brightcove.oauth.url}"/>
+                            <spring:property name="cmsurl" value="${brightcove.cms.url}"/>
+                            <spring:property name="ingesturl" value="${brightcove.ingest.url}"/>
+                            <spring:property name="accountId" value="${brightcove.account_id}"/>
+                            <spring:property name="clientId" value="${brightcove.client_id}"/>
+                            <spring:property name="clientSecret" value="${brightcove.client_secret}"/>
+         </spring:bean>
 		           
  </spring:beans>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.EpisodeTransformer" name="episodeService" doc:name="EpisodeService"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.ScheduleTransformer" name="scheduleService" doc:name="ScheduleService"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.SeriesTransformer" name="seriesService" doc:name="SeriesService"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
    
       
     
@@ -99,5 +110,10 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 
 <http:listener-config name="http_metadata_inbound_listener" host="${http.binding.host}" port="${http.binding.port}" basePath="${boxtv_metadata_app.http.path}" doc:name="HTTP Listener Configuration"/>
 <http:request-config name="http_schedule_service" host="${c4.schedule.host}"  port="${c4.schedule.port}"/>
+ 
+ <https:connector name="httpsConnector">
+     <https:tls-key-store path="${mule.home}/conf/keystore.jks" keyPassword="boxmedia39" storePassword="boxmedia39"/>
+ </https:connector>
+ 
         
 </mule>
