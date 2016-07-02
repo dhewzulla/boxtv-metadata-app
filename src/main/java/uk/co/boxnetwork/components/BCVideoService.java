@@ -107,28 +107,37 @@ public class BCVideoService {
 		
 	    
    }
-	
-	public BCVideoData  getVideo(String videoid){			
-	    String videoInJson=getViodeInJson(videoid);
-	    ObjectMapper objectMapper=new ObjectMapper();	    
+	private BCVideoData jsonToBCVideoData(String videoInJson){
+		ObjectMapper objectMapper=new ObjectMapper();	    
 	    BCVideoData video;
 		try {
 			video = objectMapper.readValue(videoInJson, BCVideoData.class);
+			return video;			
 		} catch (IOException e) {
 			logger.error("error while parsing the brightcove video data",e);
 			logger.error(videoInJson);
 			return null;
-		}		
-	    return video;
+		}
+	}
+	public BCVideoData  getVideo(String videoid){			
+	    String videoInJson=getViodeInJson(videoid);
+	    return jsonToBCVideoData(videoInJson);		
+	    
    }
-	public String publishEpisodeToBrightcove(long episodeid){
+	public BCVideoData publishEpisodeToBrightcove(long episodeid){
 		  Episode  episode=metadataRepository.findEpisodeById(episodeid);		  
 		  if(episode==null){
 			  throw new RuntimeException("The episodeid is not found in the database"); 
 		  }
 		  if(episode.getBrightcoveId()==null){
 			  BCVideoData bcVideoData=new BCVideoData(episode);
-			  return createNewVideo(bcVideoData);
+			  String reponse=createNewVideo(bcVideoData);
+			  logger.info("create video respomse:"+reponse);
+			  BCVideoData createdVideo=jsonToBCVideoData(reponse);
+			  logger.info("created video:"+createdVideo);
+			  episode.setBrightcoveId(createdVideo.getId());
+			  metadataRepository.update(episode);
+			  return createdVideo;
 		  }
 		  return null;
 		  

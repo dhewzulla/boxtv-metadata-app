@@ -24,7 +24,7 @@ public class BCVideoPublisher extends BoxRestTransformer{
 	BCVideoService bcVideoService;
 	
 	@Override
-	protected Object processGET(MuleMessage message, String outputEncoding){		
+	protected Object processPOST(MuleMessage message, String outputEncoding){		
 		String episodeid=MuleRestUtil.getPathPath(message);
 		if(episodeid==null||episodeid.length()==0){
 			   return new ErrorMessage("The episodeid is missing in POST");

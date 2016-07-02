@@ -219,6 +219,19 @@ public class BCVideoData {
 		public void setDuration(Integer duration) {
 			this.duration = duration;
 		}
+
+		@Override
+		public String toString() {
+			return "BCVideoData [id=" + id + ", account_id=" + account_id + ", ad_keys=" + ad_keys + ", complete="
+					+ complete + ", created_at=" + created_at + ", cue_points=" + Arrays.toString(cue_points)
+					+ ", custom_fields=" + custom_fields + ", description=" + description + ", digital_master_id="
+					+ digital_master_id + ", duration=" + duration + ", economics=" + economics + ", folder_id="
+					+ folder_id + ", geo=" + geo + ", images=" + images + ", link=" + link + ", long_description="
+					+ long_description + ", name=" + name + ", original_filename=" + original_filename
+					+ ", published_at=" + published_at + ", reference_id=" + reference_id + ", schedule=" + schedule
+					+ ", sharing=" + sharing + ", state=" + state + ", tags=" + Arrays.toString(tags) + ", text_tracks="
+					+ Arrays.toString(text_tracks) + ", updated_at=" + updated_at + "]";
+		}
 		
 		 
 }
