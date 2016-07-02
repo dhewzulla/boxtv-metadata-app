@@ -86,7 +86,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          
          
          <spring:bean id="programmeComponent"  class="uk.co.boxnetwork.mule.components.metadata.ProgrammeComponent"/>
-         <spring:bean id="bcConfiguration"  class="uk.co.boxnetwork.data.BCConfiguration">
+         <spring:bean id="bcConfiguration"  class="uk.co.boxnetwork.data.bc.BCConfiguration">
                             <spring:property name="oauthurl" value="${brightcove.oauth.url}"/>
                             <spring:property name="cmsurl" value="${brightcove.cms.url}"/>
                             <spring:property name="ingesturl" value="${brightcove.ingest.url}"/>
@@ -101,6 +101,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.ScheduleTransformer" name="scheduleService" doc:name="ScheduleService"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.SeriesTransformer" name="seriesService" doc:name="SeriesService"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoPublisher" name="bcVideoPublisher" doc:name="BC Video Publisher"/>
    
       
     

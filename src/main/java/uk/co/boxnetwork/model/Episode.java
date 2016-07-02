@@ -73,7 +73,8 @@ public class Episode {
 	private String primaryId;
 
 	
-	
+	@Column(name="brightcove_id")
+	private String brightcoveId;
 	
 	public Long getId() {
 		return id;
@@ -216,6 +217,15 @@ public class Episode {
 		if(series!=null){
 			series.setProgramme(programme);
 		}
+	}
+	
+
+	public String getBrightcoveId() {
+		return brightcoveId;
+	}
+
+	public void setBrightcoveId(String brightcoveId) {
+		this.brightcoveId = brightcoveId;
 	}
 
 	public void merge(Episode episode){

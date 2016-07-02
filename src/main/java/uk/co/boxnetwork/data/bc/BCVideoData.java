@@ -1,8 +1,14 @@
-package uk.co.boxnetwork.data;
+package uk.co.boxnetwork.data.bc;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import uk.co.boxnetwork.model.Episode;
+
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BCVideoData {
@@ -12,15 +18,15 @@ public class BCVideoData {
 		  private String ad_keys;
 		  private boolean complete;
 		  private String created_at;
-		  private String[] cue_points;
-		  private String[] custom_fields;
+		  private String[] cue_points;		  
+		  private BCCustomFields custom_fields;
 		  private String description;
 		  private String digital_master_id;
-		  private int duration;
+		  private Integer duration;
 		  private String economics;
 		  private String folder_id;
 		  private String geo;
-		  private String[] images;
+		  private BCImages images;
 		  private String link;
 		  private String long_description;
 		  private String name;
@@ -34,6 +40,24 @@ public class BCVideoData {
 		  private String[] tags;
 		  private String[] text_tracks;
 		  private String updated_at;
+		 public BCVideoData(){
+			 
+		 }
+		 
+		 public BCVideoData(Episode episode){			 	
+			 this.name=episode.getTitle();		
+			 if(episode.getTags()!=null){
+				 this.tags=episode.getTags().split(",");
+			 }
+			 
+			 if(episode.getMaterialId()!=null){
+				 this.reference_id=episode.getMaterialId();
+			 }
+			 else {
+				 this.reference_id="box/media/episode/"+episode.getId();				 
+			 }
+			 
+		 }
 		public String getId() {
 			return id;
 		}
@@ -70,12 +94,7 @@ public class BCVideoData {
 		public void setCue_points(String[] cue_points) {
 			this.cue_points = cue_points;
 		}
-		public String[] getCustom_fields() {
-			return custom_fields;
-		}
-		public void setCustom_fields(String[] custom_fields) {
-			this.custom_fields = custom_fields;
-		}
+		
 		public String getDescription() {
 			return description;
 		}
@@ -88,12 +107,7 @@ public class BCVideoData {
 		public void setDigital_master_id(String digital_master_id) {
 			this.digital_master_id = digital_master_id;
 		}
-		public int getDuration() {
-			return duration;
-		}
-		public void setDuration(int duration) {
-			this.duration = duration;
-		}
+		
 		public String getEconomics() {
 			return economics;
 		}
@@ -112,12 +126,7 @@ public class BCVideoData {
 		public void setGeo(String geo) {
 			this.geo = geo;
 		}
-		public String[] getImages() {
-			return images;
-		}
-		public void setImages(String[] images) {
-			this.images = images;
-		}
+		
 		public String getLink() {
 			return link;
 		}
@@ -190,18 +199,26 @@ public class BCVideoData {
 		public void setUpdated_at(String updated_at) {
 			this.updated_at = updated_at;
 		}
-		@Override
-		public String toString() {
-			return "BCVideoData [id=" + id + ", account_id=" + account_id + ", ad_keys=" + ad_keys + ", complete="
-					+ complete + ", created_at=" + created_at + ", cue_points=" + Arrays.toString(cue_points)
-					+ ", custom_fields=" + Arrays.toString(custom_fields) + ", description=" + description
-					+ ", digital_master_id=" + digital_master_id + ", duration=" + duration + ", economics=" + economics
-					+ ", folder_id=" + folder_id + ", geo=" + geo + ", images=" + Arrays.toString(images) + ", link="
-					+ link + ", long_description=" + long_description + ", name=" + name + ", original_filename="
-					+ original_filename + ", published_at=" + published_at + ", reference_id=" + reference_id
-					+ ", schedule=" + schedule + ", sharing=" + sharing + ", state=" + state + ", tags="
-					+ Arrays.toString(tags) + ", text_tracks=" + Arrays.toString(text_tracks) + ", updated_at="
-					+ updated_at + "]";
+		public BCCustomFields getCustom_fields() {
+			return custom_fields;
 		}
+		public void setCustom_fields(BCCustomFields custom_fields) {
+			this.custom_fields = custom_fields;
+		}
+		public BCImages getImages() {
+			return images;
+		}
+		public void setImages(BCImages images) {
+			this.images = images;
+		}
+
+		public Integer getDuration() {
+			return duration;
+		}
+
+		public void setDuration(Integer duration) {
+			this.duration = duration;
+		}
+		
 		 
 }

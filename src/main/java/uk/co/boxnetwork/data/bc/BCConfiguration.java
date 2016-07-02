@@ -1,4 +1,4 @@
-package uk.co.boxnetwork.data;
+package uk.co.boxnetwork.data.bc;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -40,6 +40,9 @@ public class BCConfiguration {
 	}
 	public String videoURL(){
 		return cmsurl+"/accounts/"+accountId+"/videos";
+	}
+	public String videoURL(String videoid){
+		return cmsurl+"/accounts/"+accountId+"/videos/"+videoid;
 	}
 	
 	public String getClientId() {

@@ -1,4 +1,4 @@
-package uk.co.boxnetwork.data;
+package uk.co.boxnetwork.data.bc;
 
 public class BCAccessToken {
 	private String access_token;

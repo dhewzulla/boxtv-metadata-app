@@ -1,8 +1,5 @@
 package uk.co.boxnetwork.components;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import uk.co.boxnetwork.data.BCAccessToken;
-import uk.co.boxnetwork.data.BCConfiguration;
-import uk.co.boxnetwork.util.RestResponseHandler;
+import uk.co.boxnetwork.data.bc.BCAccessToken;
+import uk.co.boxnetwork.data.bc.BCConfiguration;
+
 
 @Service
 public class BCAccessTokenService {
@@ -24,6 +21,7 @@ public class BCAccessTokenService {
 	
 	@Autowired
     private BCConfiguration configuration;
+	
 	
 	static private long requestedAt=0;
 	static private BCAccessToken currentToken=null;

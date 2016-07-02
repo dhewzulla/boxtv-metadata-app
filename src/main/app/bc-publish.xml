@@ -8,9 +8,10 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-    <flow name="bc-video">
-        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.bc.videos}/*" doc:name="HTTP"/>
-        <transformer ref="bcVideoService" doc:name="BC Video Service"/>
+    <flow name="bc-publish">
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.bc.publish}/*" doc:name="HTTP"/>
+        
+        <transformer ref="bcVideoPublisher" doc:name="BC Video Publusher"/>
          
         <choice doc:name="Choice">
            <when expression="#[payload == null]">

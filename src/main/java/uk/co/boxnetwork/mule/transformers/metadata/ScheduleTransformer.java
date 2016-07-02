@@ -12,17 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;
+import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
 
-public class ScheduleTransformer extends AbstractMessageTransformer{
-	private static final Logger logger=LoggerFactory.getLogger(ScheduleTransformer.class);
+public class ScheduleTransformer extends BoxRestTransformer{
+	
 	@Autowired
 	MetadataService metadataService;
 			
 	@Override
-	public Object transformMessage(MuleMessage message, String outputEncoding)
-			throws TransformerException {
-		
+	protected Object processGET(MuleMessage message, String outputEncoding){
 		String schduleid=MuleRestUtil.getPathPath(message);
 		
 		if(schduleid==null){			

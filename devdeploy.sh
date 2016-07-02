@@ -4,5 +4,5 @@ git add . --all
 git commit -m "developing"
 git push origin master
 cd -
-ssh davran@dev.boxnetwork.co.uk 'cd ~/box-config && git pull origin'
-scp target/$muleapp davran@dev.boxnetwork.co.uk:bdocker/bmule/opt/mule/apps/
+ssh davran@userver 'cd ~/box-config && git pull origin'
+scp target/$muleapp davran@userver:bdocker/bmule/opt/mule/apps/

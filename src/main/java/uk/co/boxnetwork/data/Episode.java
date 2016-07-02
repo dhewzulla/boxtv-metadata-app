@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
+
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.ScheduleEvent;
@@ -60,7 +62,12 @@ public class Episode {
 	
 	private Programme programme;
 	
+	 
+	
+	private String brightcoveId;
+	
 	private List<ScheduleEvent> scheduleEvents=new ArrayList<ScheduleEvent>();
+	
 	
 
 	public Long getId() {
@@ -232,7 +239,17 @@ public class Episode {
 		this.scheduleEvents = scheduleEvents;
 	}
 
-   public Episode(){
+   public String getBrightcoveId() {
+		return brightcoveId;
+	}
+
+
+	public void setBrightcoveId(String brightcoveId) {
+		this.brightcoveId = brightcoveId;
+	}
+
+
+public Episode(){
 	   
    }
 	public Episode(uk.co.boxnetwork.model.Episode episode) {
@@ -251,8 +268,10 @@ public class Episode {
 		this.adsupport = episode.getAdsupport();
 		this.startDate = episode.getStartDate();
 		this.endDate = episode.getEndDate();
+		this.brightcoveId=episode.getBrightcoveId();
 		this.series = new Series(episode.getSeries());
 		this.programme = new Programme(episode.getProgramme());
+		
 	}
 	public void update(uk.co.boxnetwork.model.Episode episode) {
 		
@@ -266,7 +285,8 @@ public class Episode {
 		episode.setCertType(this.certType);
 		episode.setWarningText(this.warningText);
 		episode.setTags(this.tags);
-		episode.setAdsupport(this.adsupport);		
+		episode.setAdsupport(this.adsupport);	
+		episode.setBrightcoveId(this.brightcoveId);
 	}
 	
 	
