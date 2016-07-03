@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.MediaTag;
 import uk.co.boxnetwork.model.Programme;
 import uk.co.boxnetwork.model.ProgrammeContentType;
 import uk.co.boxnetwork.model.ScheduleEvent;
@@ -96,8 +97,9 @@ public class BoxMedataRepository {
 	   
 	   private Episode createNewEpisode(Episode episode){
 		   episode.setSeries(saveSeries(episode.getSeries()));
-		   logger.info("creating new episode");
+		   logger.info("creating new episode");		   		   
 		   	entityManager.persist(episode);
+		   	saveTags(episode.getTags());
 		   	return episode;
 	   }
 	   
@@ -113,12 +115,7 @@ public class BoxMedataRepository {
 			   			   
 			   
 			   existingEpisode.setSeries(saveSeries(episode.getSeries()));
-			   
-			   existingEpisode.merge(episode);
-			   
-			   
-			   logger.info("merging the existing episode");			   
-			   entityManager.merge(existingEpisode);
+			   update(existingEpisode);
 			   return existingEpisode;
 		   }		   
 	   }
@@ -253,6 +250,7 @@ public class BoxMedataRepository {
 	   
 	   public void update(Episode episode){
 		   entityManager.merge(episode);
+		   saveTags(episode.getTags());
 	   }
 	  
 	   public List<Episode> findAllEpisodes(){
@@ -280,8 +278,53 @@ public class BoxMedataRepository {
 		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s where s.name=:name", Series.class);
 		   return query.setParameter("name",name).getResultList();
 	   }
-	  
-	  
+	   public void saveTags(String tagCommaSeparated){
+		   
+		   if(tagCommaSeparated==null){
+			   return;
+		   }
+		   tagCommaSeparated=tagCommaSeparated.trim();
+		   if(tagCommaSeparated.length()==0){
+			   return;
+		   }
+		   String tagvalue[]= tagCommaSeparated.split(",");
+		   for(int i=0;i<tagvalue.length;i++){
+			   saveTag(tagvalue[i]);
+		   }
+		   
+	   }
+	   
+	   
+	   @Transactional
+	   public void saveTag(String tag){
+		   if(tag==null){
+			   return;			   
+		   }
+		   tag=tag.trim();
+		   if(tag.length()<2){
+			   return;			   
+		   }
+		   tag=tag.toLowerCase();
+		   TypedQuery<MediaTag> query=entityManager.createQuery("SELECT t FROM tag t where t.name=:name", MediaTag.class);
+		   List<MediaTag> tags=query.setParameter("name",tag).getResultList();
+		   if(tags.size()==0){
+			   MediaTag mediaTag=new MediaTag();
+			   mediaTag.setName(tag);
+			   entityManager.persist(mediaTag);
+		   }
+	   }
+	   public String[] getAllTags(){
+		   TypedQuery<MediaTag> query=entityManager.createQuery("SELECT t FROM tag t", MediaTag.class);
+		   List<MediaTag> tags=query.getResultList();
+		   if(tags.size()==0){
+			   return null;
+		   }
+		   String[] ret=new String[tags.size()];
+		   for(int i=0;i<ret.length;i++){
+			   ret[i]=tags.get(i).getName();
+		   }
+		   return ret;		   
+	   }
 	   
 	   
 	   

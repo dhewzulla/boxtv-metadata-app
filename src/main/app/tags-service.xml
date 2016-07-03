@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <flow name="tags-service">
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.tags}/*" doc:name="HTTP"/>
+        <transformer ref="tagsService" doc:name="Tags Service"/>
+         
+        <choice doc:name="Choice">
+           <when expression="#[payload == null]">
+             <processor-chain doc:name="Processor Chain">
+                    
+                        
+                          <set-payload value='{"code":404, "error":"Series not found"}' doc:name="Tags Not Found"/>
+            			<set-property propertyName="http.status" value="404" doc:name="404 response"/>
+                                         
+             </processor-chain>
+          </when>
+            <otherwise>
+                <processor-chain doc:name="Processor Chain">                    
+        				<json:object-to-json-transformer doc:name="Object to JSON"/>           
+                         
+                   
+                </processor-chain>
+            </otherwise>
+         
+        </choice>      
+
+    </flow>
+    
+    
+</mule>
