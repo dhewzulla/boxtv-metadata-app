@@ -1,5 +1,8 @@
 package uk.co.boxnetwork.components;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,38 +30,44 @@ public class ImportC4ScheduleService {
  @Autowired
  @Qualifier("c4CertificationConfiguration")
  private BasicAuthenticatedURLConfiguration c4CertificationConfiguration;
+
+ @Autowired
+ private C4ScheduleReceiver c4scheduleReceiver;
  
- public String requestSchedulService(String request){	
+ public String requestSchedulService(ImportScheduleRequest request){	
 		RestTemplate rest=new RestTemplate();
+		
+		logger.info("c4ScheduleConfiguration="+c4ScheduleConfiguration+" c4CertificationConfiguration=["+c4CertificationConfiguration+"]request="+request);
+		 String requestContent=GenericUtilities.readFileContent("data/schedule/request.xml");
+		 requestContent=requestContent.replace("${channelId}",request.getChannelId());
+		 requestContent=requestContent.replace("${fromDate}",request.getFromDate());
+		 requestContent=requestContent.replace("${toDate}",request.getToDate());
+		 requestContent=requestContent.replace("${type}",request.getType());
+		 requestContent=requestContent.replace("${info}",request.getInfo());
+		 
+		 logger.info("*******requestContent**************:"+requestContent);
+		 
+		
+		
 		//rest.setErrorHandler(new RestResponseHandler());
 		HttpHeaders headers=new HttpHeaders();
 		headers.add("Content-Type", "text/xml;charset=UTF-8");	    
 		headers.add("Authorization", "Basic " + c4ScheduleConfiguration.basicAuthentication());
 		
-		HttpEntity<String> requestEntity = new HttpEntity<String>(request, headers);		
+		HttpEntity<String> requestEntity = new HttpEntity<String>(requestContent, headers);		
 	    ResponseEntity<String> responseEntity = rest.exchange(c4ScheduleConfiguration.getUrl(), HttpMethod.POST, requestEntity, String.class);
 	    
 	    HttpStatus statusCode=responseEntity.getStatusCode();
 	    logger.info(":::::::::statuscode:"+statusCode);
-	    return responseEntity.getBody();
+	    return responseEntity.getBody();	    	
 	}
  
  
  
- public void importSchedule(ImportScheduleRequest request){
-	 
-	 logger.info("c4ScheduleConfiguration="+c4ScheduleConfiguration+" c4CertificationConfiguration=["+c4CertificationConfiguration+"]request="+request);
-	 String requestContent=GenericUtilities.readFileContent("data/schedule/request.xml");
-	 requestContent=requestContent.replace("${channelId}",request.getChannelId());
-	 requestContent=requestContent.replace("${fromDate}",request.getFromDate());
-	 requestContent=requestContent.replace("${toDate}",request.getToDate());
-	 requestContent=requestContent.replace("${type}",request.getType());
-	 requestContent=requestContent.replace("${info}",request.getInfo());
-	 
-	 logger.info("*******requestContent**************:"+requestContent);
-	 
-	 String schedule=requestSchedulService(requestContent);
-	 
+ 
+ public void importSchedule(ImportScheduleRequest request){	 	 
+	 String schedule=requestSchedulService(request);	 
+	 c4scheduleReceiver.process(schedule);	 
  }
  
 	
