@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.bc.BCAccessToken;
 import uk.co.boxnetwork.data.bc.BCConfiguration;
@@ -124,6 +125,7 @@ public class BCVideoService {
 	    return jsonToBCVideoData(videoInJson);		
 	    
    }
+	@Transactional
 	public BCVideoData publishEpisodeToBrightcove(long episodeid){
 		  Episode  episode=metadataRepository.findEpisodeById(episodeid);		  
 		  if(episode==null){

@@ -76,13 +76,6 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 		
 		
                     
-        <spring:bean id="loadSchedule" class="uk.co.boxnetwork.mule.components.LoadResourceAsInputStream">
-                <spring:property name="file" value="data/schedule/s2/response.xml"/>
-         </spring:bean>
-                
-          <spring:bean id="loadCertification" class="uk.co.boxnetwork.mule.components.LoadResourceAsInputStream">
-                <spring:property name="file" value="data/certification/c1/response.xml"/>
-         </spring:bean>
          
          
          <spring:bean id="programmeComponent"  class="uk.co.boxnetwork.mule.components.metadata.ProgrammeComponent"/>
@@ -94,6 +87,16 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                             <spring:property name="clientId" value="${brightcove.client_id}"/>
                             <spring:property name="clientSecret" value="${brightcove.client_secret}"/>
          </spring:bean>
+         <spring:bean id="c4ScheduleConfiguration"  class="uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration">
+                            <spring:property name="url" value="${c4.schedule.get.url}"/>
+                            <spring:property name="user" value="${c4.schedule.get.user}"/>
+                            <spring:property name="password" value="${c4.schedule.get.password}"/>                            
+         </spring:bean>
+         <spring:bean id="c4CertificationConfiguration"  class="uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration">
+                            <spring:property name="url" value="${c4.certification.get.url}"/>
+                            <spring:property name="user" value="${c4.schedule.get.user}"/>
+                            <spring:property name="password" value="${c4.schedule.get.password}"/>                            
+         </spring:bean>
 		           
  </spring:beans>
    
@@ -102,6 +105,19 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.SeriesTransformer" name="seriesService" doc:name="SeriesService"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoPublisher" name="bcVideoPublisher" doc:name="BC Video Publisher"/>
+   
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.c4.ImportC4ScheduleTransformer" name="importScheduleService" doc:name="Import Schedules"/>
+   
+
+   
+   
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="mockC4Schedule" doc:name="MockeC4Schedule">
+   		<spring:property name="file" value="data/schedule/s2/response.xml"/>
+   </custom-transformer>
+
+	<custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="mockCertification" doc:name="MockeC4Schedule">
+   		<spring:property name="file" value="data/certification/c1/response.xml"/>
+   </custom-transformer>
    
       
     

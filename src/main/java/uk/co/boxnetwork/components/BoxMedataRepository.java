@@ -25,7 +25,7 @@ public class BoxMedataRepository {
       @Autowired	
 	  private EntityManager entityManager;
 
-	   @Transactional 
+	    
 	   public void createEvent(ScheduleEvent newEvent){		    		   
 		    Programme programme=createProgrammeFromScheduleEvent(newEvent);
 		    if(programme!=null){

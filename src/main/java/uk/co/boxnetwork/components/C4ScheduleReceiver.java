@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.components.BoxMedataRepository;
 import uk.co.boxnetwork.components.C4ScheduleSoapParser;
@@ -21,6 +22,7 @@ public class C4ScheduleReceiver {
 	@Autowired
 	C4ScheduleSoapParser c4SchedulerParser;
 	
+	@Transactional
 	public void process(Document document){
 		C4Metadata c4metadata=c4SchedulerParser.parse(document);
 		for(ScheduleEvent event: c4metadata.getScheduleEvents()){

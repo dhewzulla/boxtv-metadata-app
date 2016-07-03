@@ -18,12 +18,12 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
                       
         	<object-to-string-transformer doc:name="Load the schedule into the memory"/>
         
-        <transactional action="ALWAYS_BEGIN" doc:name="Transactional">
+        
             <custom-transformer class="uk.co.boxnetwork.mule.transformers.ProcessScheduleTransformer" doc:name="Save the schedule into the database"/>
                                 
             
             
-        </transactional>
+        
         <response>
             <message-properties-transformer doc:name="Set the response">
                 <add-message-property key="Content-Type" value="application/json"/>
