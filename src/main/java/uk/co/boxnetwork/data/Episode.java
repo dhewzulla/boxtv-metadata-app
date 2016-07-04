@@ -44,7 +44,7 @@ public class Episode {
 	private String warningText;
 	
 	
-	private String tags;
+	private String tags[];
 	
 	
 	private AdSuport adsupport;
@@ -170,15 +170,7 @@ public class Episode {
 	}
 
 
-	public String getTags() {
-		return tags;
-	}
-
-
-	public void setTags(String tags) {
-		this.tags = tags;
-	}
-
+	
 
 	public AdSuport getAdsupport() {
 		return adsupport;
@@ -264,7 +256,16 @@ public Episode(){
 		this.materialId = episode.getMaterialId();
 		this.certType = episode.getCertType();
 		this.warningText = episode.getWarningText();
-		this.tags = episode.getTags();
+		
+		if(episode.getTags()==null){
+			this.tags =null;			
+		}
+		else{
+			this.tags=episode.getTags().split(",");
+			for(int i=0;i<this.tags.length;i++){
+				this.tags[i]=this.tags[i].trim();				
+			}
+		}
 		this.adsupport = episode.getAdsupport();
 		this.startDate = episode.getStartDate();
 		this.endDate = episode.getEndDate();
@@ -282,11 +283,44 @@ public Episode(){
 		episode.setNumber(this.number);
 		episode.setSynopsis(this.synopsis);
 		episode.setMaterialId(this.materialId);
+		if("".equals(this.certType)){
+			this.certType=null;
+		}
 		episode.setCertType(this.certType);
 		episode.setWarningText(this.warningText);
-		episode.setTags(this.tags);
+		if(this.tags==null ||this.tags.length==0){
+			episode.setTags(null);	
+		}
+		else{
+			String v=this.tags[0].trim();
+			List<String> added=new ArrayList<String>();
+			added.add(v);			
+			for(int i=1;i<this.tags.length;i++){
+				this.tags[i]=this.tags[i].trim();
+				if(added.contains(this.tags[i])){
+					continue;					
+				}
+				v=v+", ";
+				v=v+this.tags[i];		
+			}
+			episode.setTags(v);
+		}
+		
+		if("".equals(this.adsupport)){
+			this.adsupport=null;	
+		}
 		episode.setAdsupport(this.adsupport);	
 		episode.setBrightcoveId(this.brightcoveId);
+	}
+
+
+	public String[] getTags() {
+		return tags;
+	}
+
+
+	public void setTags(String[] tags) {
+		this.tags = tags;
 	}
 	
 	
