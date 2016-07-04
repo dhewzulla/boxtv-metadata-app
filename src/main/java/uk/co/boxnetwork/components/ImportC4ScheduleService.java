@@ -66,8 +66,14 @@ public class ImportC4ScheduleService {
  
  
  public void importSchedule(ImportScheduleRequest request){	 	 
-	 String schedule=requestSchedulService(request);	 
-	 c4scheduleReceiver.process(schedule);	 
+	 String schedule=requestSchedulService(request);
+	 try{
+		 c4scheduleReceiver.process(schedule);
+	 }
+	 catch(Exception ex){
+		 logger.error("error is parsing the schedule", ex);
+		 logger.error("response returned from the pirate:"+schedule);		 
+	 }
  }
  
 	

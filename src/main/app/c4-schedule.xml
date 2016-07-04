@@ -10,9 +10,9 @@ http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/cu
     
     
       
-    <flow name="mock-c4-schdule">
-        <http:listener config-ref="http_metadata_inbound_listener" path="${mock.c4.schedule}" doc:name="HTTP"/>
-        <transformer ref="mockC4Schedule" />
+    <flow name="c4-schdule">
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.c4.schedule}" doc:name="HTTP"/>
+        <transformer ref="c4Schedule" />
         <logger message="#[payload.class.toString()]" level="INFO" doc:name="Logger"/>        
       
          		

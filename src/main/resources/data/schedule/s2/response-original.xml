@@ -1,3 +1,5 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+   <s:Body>
       <GetSchedulesByParamsResponse xmlns="http://tempuri.org/">
          <GetSchedulesByParamsResult xmlns:a="http://schemas.datacontract.org/2004/07/C4.Pirate.BusinessServices.Schedule.Contracts.Dtos" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
             <a:Duration i:nil="true" xmlns:b="http://www.channel4.co.uk/ProgrammeArea/Services/Media/xsd/GetSchedules-v1.1"/>
@@ -4191,4 +4193,5 @@
             <a:Start i:nil="true" xmlns:b="http://www.channel4.co.uk/ProgrammeArea/Services/Media/xsd/GetSchedules-v1.1"/>
          </GetSchedulesByParamsResult>
       </GetSchedulesByParamsResponse>
-   
+   </s:Body>
+</s:Envelope>

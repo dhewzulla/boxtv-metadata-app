@@ -110,14 +110,17 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.c4.ImportC4ScheduleTransformer" name="importScheduleService" doc:name="Import Schedules"/>
    
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.c4.C4ScheduleTransformer" name="c4Schedule" doc:name="C4 Schedules"/>
+   
 
    
    
-   <custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="mockC4Schedule" doc:name="MockeC4Schedule">
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="mockC4Schedule" doc:name="c4Schedule">
    		<spring:property name="file" value="data/schedule/s2/response.xml"/>
    </custom-transformer>
+   
 
-	<custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="mockCertification" doc:name="MockeC4Schedule">
+	<custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="c4Certification" doc:name="c4Schedule">
    		<spring:property name="file" value="data/certification/c1/response.xml"/>
    </custom-transformer>
    

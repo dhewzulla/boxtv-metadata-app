@@ -18,7 +18,7 @@ import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
 
 public class ImportC4ScheduleTransformer extends BoxRestTransformer{
-	private static final Logger logger=LoggerFactory.getLogger(ImportC4ScheduleTransformer.class);
+	
 	
 	@Autowired
 	ImportC4ScheduleService importC4ScheduleService;

@@ -22,7 +22,7 @@ import uk.co.boxnetwork.util.GenericUtilities;
 @Component
 public class C4ScheduleSoapParser {
 	private static final Logger logger=LoggerFactory.getLogger(C4ScheduleSoapParser.class);
-	private String schedulepath[]={"Envelope","Body","GetSchedulesByParamsResponse","GetSchedulesByParamsResult","ScheduleEventGroups"};
+	private String schedulepath[]={"GetSchedulesByParamsResponse","GetSchedulesByParamsResult","ScheduleEventGroups"};
 	
 	@Autowired
 	private XMLDocumentParser xmlparser;
