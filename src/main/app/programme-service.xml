@@ -19,7 +19,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         </component>
          
         
-        <json:object-to-json-transformer doc:name="Object to JSON"/>
+      
           
         
         

@@ -9,6 +9,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import uk.co.boxnetwork.mule.transformers.MapPayloadValidator;
 
 
@@ -22,7 +24,10 @@ public class MapPayloadConfig {
 	  }
 		try{
 			
-			ObjectMapper objectMapper=new ObjectMapper();
+			com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+			
+			
+			objectMapper.setSerializationInclusion(Include.NON_NULL);
 			try{
 			     return objectMapper.readValue(input, MapPayloadConfig.class);
 			}

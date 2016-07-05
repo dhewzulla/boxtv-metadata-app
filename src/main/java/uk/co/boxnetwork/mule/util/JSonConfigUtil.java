@@ -10,6 +10,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 public class JSonConfigUtil {
 private static final Logger logger=LoggerFactory.getLogger(JSonConfigUtil.class);
 	@SuppressWarnings("unchecked")
@@ -20,7 +22,10 @@ private static final Logger logger=LoggerFactory.getLogger(JSonConfigUtil.class)
 		  }
 			try{
 				
-				ObjectMapper objectMapper=new ObjectMapper();
+				com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+				
+				
+				objectMapper.setSerializationInclusion(Include.NON_NULL);
 				try{
 								 
 					return (Map<String, Object>)objectMapper.readValue(input, Map.class);

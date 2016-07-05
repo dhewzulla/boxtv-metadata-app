@@ -12,25 +12,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
         <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.epsiodes}/*" doc:name="HTTP"/>
         <transformer ref="episodeService" doc:name="Transformer Episode Service"/>
          
-        <choice doc:name="Choice">
-           <when expression="#[payload == null]">
-             <processor-chain doc:name="Processor Chain">
-                    
-                        
-                          <set-payload value='{"code":404, "error":"Episode not found"}' doc:name="Set Payload"/>
-            			<set-property propertyName="http.status" value="404" doc:name="Property"/>
-                                         
-             </processor-chain>
-          </when>
-            <otherwise>
-                <processor-chain doc:name="Processor Chain">                    
-        				<json:object-to-json-transformer doc:name="Object to JSON"/>           
-                         
-                   
-                </processor-chain>
-            </otherwise>
-         
-        </choice>      
+            
 
     </flow>
     

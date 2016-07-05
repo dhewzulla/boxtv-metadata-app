@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import uk.co.boxnetwork.components.BCVideoService;
 import uk.co.boxnetwork.components.ImportC4ScheduleService;
 import uk.co.boxnetwork.data.ErrorMessage;
@@ -30,7 +32,10 @@ public class ImportC4ScheduleTransformer extends BoxRestTransformer{
 			payload = message.getPayloadAsString();
 			logger.info("recived the import schedule request:"+payload);
 			
-			ObjectMapper objectMapper=new ObjectMapper();	    
+			com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+			
+			
+			objectMapper.setSerializationInclusion(Include.NON_NULL);	    
 			ImportScheduleRequest request;
 			
 			request = objectMapper.readValue(payload, ImportScheduleRequest.class);

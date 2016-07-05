@@ -16,11 +16,18 @@ public class MuleRestUtil {
 		  listenerPath=listenerPath.substring(0,ind);		  		  
 	  }
 	  String requesturi=message.getInboundProperty("http.request.uri");
+	  
 	  if(requesturi.length()<=listenerPath.length()){
 		  return null;		  
 	  }
 	  else{
-		  return requesturi.substring(listenerPath.length());		  
+		  String restpath=requesturi.substring(listenerPath.length());
+		  ind=requesturi.indexOf("?");
+		  if(ind==-1){
+			 return restpath;			  
+		  }
+		  else
+			  return null;
 	  }
   }
   public static void printAllInboundProperties(MuleMessage message){

@@ -69,6 +69,12 @@ public class ScheduleEvent {
 	@JoinColumn( name = "programme_id", nullable = true )
 	private Programme programme;
 	
+	@Column(name="last_modified_at")
+	private Date lastModifiedAt;
+	
+	
+	@Column(name="created_at")
+	private Date createdAt;
 	
 	public Long getId() {
 		return id;
@@ -221,7 +227,28 @@ public class ScheduleEvent {
 			this.episode.setProgramme(programme);
 		}
 	}
-    public void merge(ScheduleEvent event){
+	
+    public Date getLastModifiedAt() {
+		return lastModifiedAt;
+	}
+
+
+	public void setLastModifiedAt(Date lastModifiedAt) {
+		this.lastModifiedAt = lastModifiedAt;
+	}
+
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+
+	public void merge(ScheduleEvent event){
     	if(GenericUtilities.isNotValidTitle(this.groupName)){
 			this.groupName=event.getGroupName();
 		}

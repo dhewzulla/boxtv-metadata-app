@@ -1,5 +1,6 @@
 package uk.co.boxnetwork.components;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -27,12 +28,61 @@ public class BoxMedataRepository {
 	  private EntityManager entityManager;
 
 	    
+       public void persisEvent(ScheduleEvent newEvent){
+    	   Date lastModifiedAt=new Date();
+			newEvent.setLastModifiedAt(lastModifiedAt);
+			newEvent.setCreatedAt(lastModifiedAt);
+			entityManager.persist(newEvent);
+       }
+       public void mergeEvent(ScheduleEvent event){
+    	   Date lastModifiedAt=new Date();
+    	   event.setLastModifiedAt(lastModifiedAt);			
+    	   entityManager.merge(event);
+       }
+       public void persisProgramme(Programme programme){
+    	    Date lastModifiedAt=new Date();
+   			programme.setLastModifiedAt(lastModifiedAt);
+   			programme.setCreatedAt(lastModifiedAt);
+   			entityManager.persist(programme);
+       }
+       public void persisEpisode(Episode episode){
+    	   Date lastModifiedAt=new Date();
+    	   episode.setLastModifiedAt(lastModifiedAt);
+    	   episode.setCreatedAt(lastModifiedAt);
+		   entityManager.persist(episode);
+       }
+       public void mergeEpisode(Episode episode){
+    	   Date lastModifiedAt=new Date();
+    	   episode.setLastModifiedAt(lastModifiedAt);    	   
+		   entityManager.persist(episode);
+       }
+       public void persisSeries(Series series){
+    	   Date lastModifiedAt=new Date();
+    	   series.setLastModifiedAt(lastModifiedAt);
+    	   series.setCreatedAt(lastModifiedAt);
+		   entityManager.persist(series);
+       }
+       public void mergeSeries(Series series){
+    	   Date lastModifiedAt=new Date();
+    	   series.setLastModifiedAt(lastModifiedAt);    	   
+		   entityManager.persist(series);
+       }
+       public void persisMediaTag(MediaTag mediaTag){
+    	   Date lastModifiedAt=new Date();
+    	   mediaTag.setCreatedAt(lastModifiedAt);    	   
+		   entityManager.persist(mediaTag);
+       }
+       
+       public void update(Series series){
+		   mergeSeries(series);		   
+	   }
+       
 	   public void createEvent(ScheduleEvent newEvent){		    		   
 		    Programme programme=createProgrammeFromScheduleEvent(newEvent);
 		    if(programme!=null){
 		    	List<Programme> matchedProgrammes=findProgrammeByTitle(programme.getTitle());
-		    	if(matchedProgrammes.size()==0){		    		
-		    		entityManager.persist(programme);
+		    	if(matchedProgrammes.size()==0){
+		    		persisProgramme(programme);		    		
 		    		newEvent.setProgramme(programme);
 		    	}
 		    	else{
@@ -46,14 +96,15 @@ public class BoxMedataRepository {
 					    
 			if(GenericUtilities.isNotAValidId(newEvent.getScheduleEventID())){
 				newEvent.setEpisode(saveEpisode(newEvent.getEpisode()));
-				entityManager.persist(newEvent);
+				persisEvent(newEvent);				
 			}
 			else{
 				logger.info("querying the sechedule event:");
 				List<ScheduleEvent> existingEvents=findScheduleEventByScheduleEventId(newEvent.getScheduleEventID());
 				if(existingEvents.size()==0){
 					newEvent.setEpisode(saveEpisode(newEvent.getEpisode()));
-					entityManager.persist(newEvent);
+					persisEvent(newEvent);
+					
 				}
 				else{
 					if(existingEvents.size()>1){
@@ -62,7 +113,7 @@ public class BoxMedataRepository {
 					ScheduleEvent existingEvent=existingEvents.get(0);
 					existingEvent.setEpisode(saveEpisode(newEvent.getEpisode()));
 					existingEvent.merge(newEvent);
-					entityManager.merge(existingEvent);					
+					mergeEvent(existingEvent);
 				}
 				
 			}
@@ -96,9 +147,8 @@ public class BoxMedataRepository {
 	   }
 	   
 	   private Episode createNewEpisode(Episode episode){
-		   episode.setSeries(saveSeries(episode.getSeries()));
-		   logger.info("creating new episode");		   		   
-		   	entityManager.persist(episode);
+		    episode.setSeries(saveSeries(episode.getSeries()));		    
+		    persisEpisode(episode);		    
 		   	saveTags(episode.getTags());
 		   	return episode;
 	   }
@@ -159,8 +209,8 @@ public class BoxMedataRepository {
 	   
 	   private Series returnExistingSeriesOrPersist(Series series,List<Series> matchedSeries,String messageOnDuplication){
 		   if(matchedSeries.size()==0){
-			   entityManager.persist(series);
-			   logger.info("creating new series");
+			   persisSeries(series);			   
+			   
 			   return series;
 		   }
 		   else{
@@ -169,9 +219,7 @@ public class BoxMedataRepository {
 			   }
 			   Series existingSeries=matchedSeries.get(0);
 			   existingSeries.merge(series);
-			   logger.info("merging existing series");
-			   entityManager.merge(existingSeries);
-			   
+			   mergeSeries(existingSeries);
 			   return existingSeries;
 		   }
 	   }
@@ -182,7 +230,8 @@ public class BoxMedataRepository {
 		   if(GenericUtilities.isNotAValidId(series.getPrimaryId())){
 				   if(GenericUtilities.isNotAValidId(series.getContractNumber())){
 					   if(GenericUtilities.isNotValidTitle(series.getName())){
-						   entityManager.persist(series);
+						   persisSeries(series);
+						   
 						   return series;
 					   }
 					   else{
@@ -217,9 +266,7 @@ public class BoxMedataRepository {
 		   return query.setParameter("scheduleEventID",scheduleEventID).getResultList();
 	   }
 	   
-	   public void update(Series series){
-		   entityManager.merge(series);
-	   }
+	   
 	   public Series findSeriesById(Long id){
 		   return entityManager.find(Series.class, id);		   
 	   }
@@ -249,7 +296,7 @@ public class BoxMedataRepository {
 	   }
 	   
 	   public void update(Episode episode){
-		   entityManager.merge(episode);
+		   mergeEpisode(episode);		   
 		   saveTags(episode.getTags());
 	   }
 	  
@@ -310,7 +357,7 @@ public class BoxMedataRepository {
 		   if(tags.size()==0){
 			   MediaTag mediaTag=new MediaTag();
 			   mediaTag.setName(tag);
-			   entityManager.persist(mediaTag);
+			   persisMediaTag(mediaTag);			   
 		   }
 	   }
 	   public String[] getAllTags(){

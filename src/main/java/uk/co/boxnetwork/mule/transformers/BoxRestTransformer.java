@@ -5,41 +5,72 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
 
 public class BoxRestTransformer  extends AbstractMessageTransformer{
 	static final protected Logger logger=LoggerFactory.getLogger(BoxRestTransformer.class);
 	
+	protected String convertObjectToJson(Object obj) throws JsonProcessingException{
+		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();		
+		objectMapper.setSerializationInclusion(Include.NON_NULL);					
+		return objectMapper.writeValueAsString(obj);			
+	}
+	public String returnError(String message){
+		
+		return "{error:\""+message+"\"}";
+		
+	}
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
+	try{	
+				MuleRestUtil.addCORS(message, outputEncoding);
+				String inboudMethod=message.getInboundProperty("http.method");
+				Object returnObject=null;		
+				if(inboudMethod.equals("GET")){
+					returnObject=processGET(message, outputEncoding);
+				}
+				else if(inboudMethod.equals("PUT")){			
+					returnObject=processPUT(message, outputEncoding);			
+				}
+				else if(inboudMethod.equals("POST")){
+					returnObject=processPOST(message, outputEncoding);
+				}
 		
-		MuleRestUtil.addCORS(message, outputEncoding);
-		String inboudMethod=message.getInboundProperty("http.method");
-		if(inboudMethod.equals("GET")){
-			return processGET(message, outputEncoding);
-		}
-		else if(inboudMethod.equals("PUT")){
-			try {
-				return processPUT(message, outputEncoding);
-			} catch (Exception e) {
-				logger.error(e+"while processing PUT",e);
-				return new ErrorMessage(e+ "while processing PUT");	
-			}
-		}
-		else if(inboudMethod.equals("POST")){
-			return processPOST(message, outputEncoding);
-		}
-
-		else if(inboudMethod.equals("DELETE")){
-			return processDELETE(message, outputEncoding);
-		}
-		else if(inboudMethod.equals("OPTIONS")){
-			return processOPTIONS(message, outputEncoding);
-		}
-		else 
-			return processDefault(message,outputEncoding,inboudMethod);							
+				else if(inboudMethod.equals("DELETE")){
+					returnObject=processDELETE(message, outputEncoding);
+				}
+				else if(inboudMethod.equals("OPTIONS")){
+					returnObject=processOPTIONS(message, outputEncoding);
+				}
+				else 
+					returnObject=processDefault(message,outputEncoding,inboudMethod);	
+				if(returnObject ==null){
+					return null;
+				}
+				if(returnObject instanceof String){
+					return returnObject;
+				}
+				else {
+					try {
+						return convertObjectToJson(returnObject);
+					} catch (JsonProcessingException e) {
+						logger.error("Unbale to convert the object to json: returnObject=p["+returnObject+"] class="+returnObject.getClass().getName() );
+						return returnError("Unable to convert to json");
+					}
+				}
+	     }
+		catch(Exception e) {
+						logger.error(e+" in transformer",e);						
+						return returnError(e.toString());
+		 }
+		
+		
 	}
 	
 	 protected Object processGET(MuleMessage message, String outputEncoding){

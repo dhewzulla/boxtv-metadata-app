@@ -13,25 +13,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
         
         <transformer ref="importScheduleService" doc:name="ImportScheduleService"/>
          
-        <choice doc:name="Choice">
-           <when expression="#[payload == null]">
-             <processor-chain doc:name="Processor Chain">
-                    
-                        
-                          <set-payload value='{"code":404, "error":"Import Schedule failed"}' doc:name="Import Schedule failed"/>
-            			<set-property propertyName="http.status" value="404" doc:name="Property"/>
-                                         
-             </processor-chain>
-          </when>
-            <otherwise>
-                <processor-chain doc:name="Processor Chain">                    
-        				<json:object-to-json-transformer doc:name="Object to JSON"/>           
-                         
-                   
-                </processor-chain>
-            </otherwise>
          
-        </choice>      
 
     </flow>
     

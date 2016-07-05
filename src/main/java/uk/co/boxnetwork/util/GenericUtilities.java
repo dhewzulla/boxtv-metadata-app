@@ -5,9 +5,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.co.boxnetwork.mule.components.LoadResourceAsInputStream;
 
 public class GenericUtilities {
+	private static final Logger logger=LoggerFactory.getLogger(GenericUtilities.class);
   public static boolean equalString(String v1, String v2){
 	  if(v1==null){
 		   return v2==null;		   
@@ -77,5 +81,31 @@ public class GenericUtilities {
 	  return readStream(in);
 	  
   }
-  
+  public static boolean isEmpty(String v){
+	  if(v==null){
+		  return true;
+	  }
+	  v=v.trim();
+	  return v.length()==0;
+  }
+  public static Integer bcInteger(String v){
+	  if(isEmpty(v)){
+		  return null;
+	  }
+	  try{
+		  return Integer.valueOf(v);
+	  }
+	  catch(Exception e){
+		  logger.error(e+ " converting to integer:"+v,e);
+		  return null;
+	  }
+	  
+  }
+  public static String bcString(String v){
+	  if(isEmpty(v)){
+		  return null;
+	  }
+	  return v;
+	  
+  }
 }

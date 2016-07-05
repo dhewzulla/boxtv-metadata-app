@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import uk.co.boxnetwork.data.FileItem;
 
@@ -71,11 +72,14 @@ public class S3ListObjectToJSon extends AbstractMessageTransformer{
                 
             	
             }
-            ObjectMapper mapper=new ObjectMapper();
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+    		
+    		
+    		objectMapper.setSerializationInclusion(Include.NON_NULL);
             try{
             	message.setOutboundProperty("Content-Type", "application/json");
             	
-            	return mapper.writeValueAsString(ret);
+            	return objectMapper.writeValueAsString(ret);
             }catch(Exception e){
             	return "{\"error\":\"error\"}";
             }

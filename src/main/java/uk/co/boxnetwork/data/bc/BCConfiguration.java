@@ -38,8 +38,44 @@ public class BCConfiguration {
 	public String requestAccessTokenURL(){
 		return oauthurl+"/access_token";		
 	}
-	public String videoURL(){
-		return cmsurl+"/accounts/"+accountId+"/videos";
+	public String videoURL(Integer limit, Integer offset, String sort,String q){
+		return queryURL(cmsurl+"/accounts/"+accountId+"/videos",limit,offset,sort,q);
+	}
+	public String queryURL(String baseURL, Integer limit, Integer offset, String sort,String q){
+		StringBuilder builder=new StringBuilder();
+		builder.append(baseURL);
+		if(q!=null||limit!=null||offset!=null||sort!=null){
+			builder.append("?");
+			boolean appended=false;
+			if(limit!=null){
+				builder.append("limit="+limit);	
+				appended=true;
+			}
+			if(offset!=null){
+				if(appended){
+					builder.append("&");
+				}
+				builder.append("offset="+offset);	
+				appended=true;
+			}
+			if(sort!=null){
+				if(appended){
+					builder.append("&");
+				}
+				builder.append("sort="+sort);	
+				appended=true;
+			}
+			if(q!=null){
+				if(appended){
+					builder.append("&");
+				}
+				builder.append("q="+q);	
+				appended=true;
+			}
+			
+		}
+				
+		return builder.toString();
 	}
 	public String videoURL(String videoid){
 		return cmsurl+"/accounts/"+accountId+"/videos/"+videoid;

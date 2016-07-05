@@ -69,6 +69,12 @@ public class Episode {
 	private List<ScheduleEvent> scheduleEvents=new ArrayList<ScheduleEvent>();
 	
 	
+	private Date lastModifiedAt;
+	
+	
+	
+	private Date createdAt;
+	
 
 	public Long getId() {
 		return id;
@@ -272,6 +278,8 @@ public Episode(){
 		this.brightcoveId=episode.getBrightcoveId();
 		this.series = new Series(episode.getSeries());
 		this.programme = new Programme(episode.getProgramme());
+		this.lastModifiedAt=episode.getLastModifiedAt();
+		this.createdAt=episode.getCreatedAt();
 		
 	}
 	public void update(uk.co.boxnetwork.model.Episode episode) {
@@ -321,6 +329,26 @@ public Episode(){
 
 	public void setTags(String[] tags) {
 		this.tags = tags;
+	}
+
+
+	public Date getLastModifiedAt() {
+		return lastModifiedAt;
+	}
+
+
+	public void setLastModifiedAt(Date lastModifiedAt) {
+		this.lastModifiedAt = lastModifiedAt;
+	}
+
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 	
 	

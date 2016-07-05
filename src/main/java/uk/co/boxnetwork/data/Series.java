@@ -1,7 +1,6 @@
 package uk.co.boxnetwork.data;
 
-
-
+import java.util.Date;
 
 public class Series {
     private Long id;
@@ -10,7 +9,8 @@ public class Series {
 	private String name;
 	private String contractNumber;		
 	private Programme programme;
-     
+	private Date lastModifiedAt;
+	private Date createdAt;
 	
 	public Series(uk.co.boxnetwork.model.Series series) {
 		super();
@@ -20,6 +20,8 @@ public class Series {
 		this.name = series.getName();
 		this.contractNumber = series.getContractNumber();
 		this.programme = new Programme(series.getProgramme());
+		this.lastModifiedAt=series.getLastModifiedAt();
+		this.createdAt=series.getCreatedAt();
 	}
 	public void update(uk.co.boxnetwork.model.Series series){		
 		series.setAssetId(this.assetId);
@@ -66,6 +68,18 @@ public class Series {
 	}
 	public void setProgramme(Programme programme) {
 		this.programme = programme;
+	}
+	public Date getLastModifiedAt() {
+		return lastModifiedAt;
+	}
+	public void setLastModifiedAt(Date lastModifiedAt) {
+		this.lastModifiedAt = lastModifiedAt;
+	}
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 	
   

@@ -29,7 +29,8 @@ public class VideoTransmer extends  BoxRestTransformer{
 			
 		String videoid=MuleRestUtil.getPathPath(message);
 		if(videoid==null || videoid.length()==0){
-			return videoService.listVideo();
+			ParameterMap queryparams=message.getInboundProperty("http.query.params");
+			return videoService.listVideo(queryparams.get("limit"),queryparams.get("offset"),queryparams.get("sort"),queryparams.get("q"));
 		}
 		else{
 			ParameterMap queryparams=message.getInboundProperty("http.query.params");

@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.model.Episode;
@@ -58,7 +60,10 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		   else{			   
 			   		String episodeInJson=(String)message.getPayloadAsString();		   
 				   logger.info("*****"+episodeInJson+"****");
-					ObjectMapper objectMapper=new ObjectMapper();
+				   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+					
+					
+					objectMapper.setSerializationInclusion(Include.NON_NULL);
 					episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
 		   }
 		   metadataService.update(id,episode);

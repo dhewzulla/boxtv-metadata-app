@@ -6,6 +6,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.Episode;
 
 
@@ -36,7 +37,7 @@ public class BCVideoData {
 		  private String schedule;
 		  private String sharing;
 		  
-		  private String state;
+		  private String state="INACTIVE";
 		  private String[] tags;
 		  private String[] text_tracks;
 		  private String updated_at;
@@ -56,8 +57,34 @@ public class BCVideoData {
 			 else {
 				 this.reference_id="box/media/episode/"+episode.getId();				 
 			 }
+			 this.description=episode.getSynopsis();
+			 
+			 StringBuilder builder=new StringBuilder();
+			 builder.append(episode.getTitle());
+			 if(episode.getNumber()!=null){
+				 builder.append("(");
+				 builder.append(episode.getNumber());
+				 builder.append(")");				 
+			 }
+			 if(episode.getSeries()!=null && episode.getSeries().getName()!=null){				 
+				 builder.append("-");
+				 builder.append(episode.getSeries().getName());
+			 }
+			 if(episode.getSynopsis()!=null){
+				 builder.append(". "+episode.getSynopsis());
+			 }
+			 this.long_description=builder.toString();
+			 
+			 if(episode.getAdsupport()==AdSuport.FREE){
+				 this.economics="Free";
+			 }
+			 else if(episode.getAdsupport()==AdSuport.AD_SUPPORTED){
+				 this.economics="AdSupported";				 
+			 }
+			 
 			 
 		 }
+		 
 		public String getId() {
 			return id;
 		}
@@ -231,6 +258,17 @@ public class BCVideoData {
 					+ ", published_at=" + published_at + ", reference_id=" + reference_id + ", schedule=" + schedule
 					+ ", sharing=" + sharing + ", state=" + state + ", tags=" + Arrays.toString(tags) + ", text_tracks="
 					+ Arrays.toString(text_tracks) + ", updated_at=" + updated_at + "]";
+		}
+		public void copyFrom(BCVideoData bcVideo){			  
+			  
+			  if(bcVideo.getCue_points()!=null){
+				  this.cue_points=bcVideo.getCue_points();
+			  }
+			  this.description=bcVideo.getDescription();
+			  this.economics=bcVideo.getEconomics();
+			  this.long_description=bcVideo.getLong_description();
+			  this.name=bcVideo.getName();
+			  this.tags=bcVideo.getTags();			  
 		}
 		
 		 

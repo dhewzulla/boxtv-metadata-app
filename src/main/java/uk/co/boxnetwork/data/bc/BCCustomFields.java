@@ -1,13 +1,19 @@
 package uk.co.boxnetwork.data.bc;
 
 public class BCCustomFields {
- private String name;
-
-public String getName() {
-	return name;
+  private String contenttype;
+  private String txchannel;
+  public String getContenttype() {
+	return contenttype;
 }
-
-public void setName(String name) {
-	this.name = name;
-} 
+public void setContenttype(String contenttype) {
+	this.contenttype = contenttype;
+}
+public String getTxchannel() {
+	return txchannel;
+}
+public void setTxchannel(String txchannel) {
+	this.txchannel = txchannel;
+}
+ 
 }

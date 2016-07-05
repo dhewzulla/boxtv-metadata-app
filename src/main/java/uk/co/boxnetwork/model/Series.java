@@ -1,5 +1,7 @@
 package uk.co.boxnetwork.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,6 +33,13 @@ public class Series {
 	@JoinColumn( name = "programme_id", nullable = true )
 	private Programme programme;
 	
+	
+	@Column(name="last_modified_at")
+	private Date lastModifiedAt;
+	
+	
+	@Column(name="created_at")
+	private Date createdAt;
 	
 	
 	public Long getId() {
@@ -79,6 +88,22 @@ public class Series {
 
 	public void setProgramme(Programme programme) {
 		this.programme = programme;
+	}
+
+	public Date getLastModifiedAt() {
+		return lastModifiedAt;
+	}
+
+	public void setLastModifiedAt(Date lastModifiedAt) {
+		this.lastModifiedAt = lastModifiedAt;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public void merge(Series series){

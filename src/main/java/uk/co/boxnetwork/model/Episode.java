@@ -76,6 +76,31 @@ public class Episode {
 	@Column(name="brightcove_id")
 	private String brightcoveId;
 	
+	
+	@Column(name="last_modified_at")
+	private Date lastModifiedAt;
+	
+	
+	@Column(name="created_at")
+	private Date createdAt;
+	
+	
+	public Date getLastModifiedAt() {
+		return lastModifiedAt;
+	}
+
+	public void setLastModifiedAt(Date lastModifiedAt) {
+		this.lastModifiedAt = lastModifiedAt;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -228,6 +253,7 @@ public class Episode {
 		this.brightcoveId = brightcoveId;
 	}
 
+	
 	public void merge(Episode episode){
 		if(GenericUtilities.isNotValidTitle(this.title)){
 			this.title=episode.getTitle();
