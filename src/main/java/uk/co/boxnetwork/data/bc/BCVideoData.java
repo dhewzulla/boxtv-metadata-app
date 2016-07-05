@@ -1,6 +1,8 @@
 package uk.co.boxnetwork.data.bc;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -8,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.ScheduleEvent;
 
 
 
@@ -34,7 +37,7 @@ public class BCVideoData {
 		  private String original_filename;
 		  private String published_at;
 		  private String reference_id;
-		  private String schedule;
+		  private BCSchedule schedule;
 		  private String sharing;
 		  
 		  private String state="INACTIVE";
@@ -45,35 +48,39 @@ public class BCVideoData {
 			 
 		 }
 		 
+		 private void buildRefereceId(Episode episode){
+			 if(episode.getMaterialId()!=null){
+				 String parts[]=episode.getMaterialId().split("/");
+				 StringBuilder builder=new StringBuilder();
+				 builder.append("v");				 
+				 int counter=0;
+				 for(String p:parts){
+					 builder.append("_");
+					 builder.append(p);
+					 counter++;					 
+				 }
+				 while(counter<4){
+					 builder.append("_001");
+					 builder.append("_");
+					 counter++;
+				 }
+				 this.reference_id=builder.toString();
+			 }
+			 else {
+				 this.reference_id="box/media/episode/"+episode.getId();				 
+			 }
+		 }
+		 
 		 public BCVideoData(Episode episode){			 	
 			 this.name=episode.getTitle();		
 			 if(episode.getTags()!=null){
 				 this.tags=episode.getTags().split(",");
 			 }
 			 
-			 if(episode.getMaterialId()!=null){
-				 this.reference_id=episode.getMaterialId();
-			 }
-			 else {
-				 this.reference_id="box/media/episode/"+episode.getId();				 
-			 }
+			 buildRefereceId(episode);
 			 this.description=episode.getSynopsis();
 			 
-			 StringBuilder builder=new StringBuilder();
-			 builder.append(episode.getTitle());
-			 if(episode.getNumber()!=null){
-				 builder.append("(");
-				 builder.append(episode.getNumber());
-				 builder.append(")");				 
-			 }
-			 if(episode.getSeries()!=null && episode.getSeries().getName()!=null){				 
-				 builder.append("-");
-				 builder.append(episode.getSeries().getName());
-			 }
-			 if(episode.getSynopsis()!=null){
-				 builder.append(". "+episode.getSynopsis());
-			 }
-			 this.long_description=builder.toString();
+			 
 			 
 			 if(episode.getAdsupport()==AdSuport.FREE){
 				 this.economics="Free";
@@ -81,9 +88,11 @@ public class BCVideoData {
 			 else if(episode.getAdsupport()==AdSuport.AD_SUPPORTED){
 				 this.economics="AdSupported";				 
 			 }
-			 
+			custom_fields=new BCCustomFields(episode);
 			 
 		 }
+		 
+		 
 		 
 		public String getId() {
 			return id;
@@ -190,12 +199,7 @@ public class BCVideoData {
 		public void setReference_id(String reference_id) {
 			this.reference_id = reference_id;
 		}
-		public String getSchedule() {
-			return schedule;
-		}
-		public void setSchedule(String schedule) {
-			this.schedule = schedule;
-		}
+		
 		public String getSharing() {
 			return sharing;
 		}
@@ -246,6 +250,15 @@ public class BCVideoData {
 		public void setDuration(Integer duration) {
 			this.duration = duration;
 		}
+		
+
+		public BCSchedule getSchedule() {
+			return schedule;
+		}
+
+		public void setSchedule(BCSchedule schedule) {
+			this.schedule = schedule;
+		}
 
 		@Override
 		public String toString() {
@@ -268,7 +281,30 @@ public class BCVideoData {
 			  this.economics=bcVideo.getEconomics();
 			  this.long_description=bcVideo.getLong_description();
 			  this.name=bcVideo.getName();
-			  this.tags=bcVideo.getTags();			  
+			  this.tags=bcVideo.getTags();
+			  this.schedule=bcVideo.getSchedule();
+			  this.custom_fields=bcVideo.getCustom_fields();
+			  
+		}
+		public void calculateSchedule(List<ScheduleEvent> schedules){
+			if(schedules==null||schedules.size()==0){
+				return;				
+			}
+			Date fromDate=schedules.get(0).getScheduleTimestamp();
+			Date toDate=fromDate;
+			
+			for(int i=1;i<schedules.size();i++){
+				Date d=schedules.get(i).getScheduleTimestamp();
+				if(d.before(fromDate)){
+					fromDate=d;
+				}
+				if(d.after(toDate)){
+					toDate=d;
+				}
+				
+			}
+			schedule =new BCSchedule(fromDate,toDate);
+			
 		}
 		
 		 

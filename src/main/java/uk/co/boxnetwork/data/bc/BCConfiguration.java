@@ -9,8 +9,9 @@ public class BCConfiguration {
 	private String accountId;
 	private String clientId;
 	private String clientSecret;
-	
-	
+	private String s3videoURL;
+	private String defaltIngestProfile;
+	private String ingestCallback;
 	public String getAccountId() {
 		return accountId;
 	}
@@ -77,6 +78,10 @@ public class BCConfiguration {
 				
 		return builder.toString();
 	}
+	
+	public String ingestUrl(String videoid){
+		return   ingesturl+"/accounts/"+ accountId+"/videos/"+videoid+"/ingest-requests";		
+	}
 	public String videoURL(String videoid){
 		return cmsurl+"/accounts/"+accountId+"/videos/"+videoid;
 	}
@@ -92,6 +97,25 @@ public class BCConfiguration {
 	}
 	public void setClientSecret(String clientSecret) {
 		this.clientSecret = clientSecret;
+	}
+	
+	public String getS3videoURL() {
+		return s3videoURL;
+	}
+	public void setS3videoURL(String s3videoURL) {
+		this.s3videoURL = s3videoURL;
+	}
+	public String getDefaltIngestProfile() {
+		return defaltIngestProfile;
+	}
+	public void setDefaltIngestProfile(String defaltIngestProfile) {
+		this.defaltIngestProfile = defaltIngestProfile;
+	}
+	public String getIngestCallback() {
+		return ingestCallback;
+	}
+	public void setIngestCallback(String ingestCallback) {
+		this.ingestCallback = ingestCallback;
 	}
 	public String basicAuthentication(){
 		String plainCreds = clientId+":"+clientSecret;

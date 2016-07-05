@@ -86,6 +86,9 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                             <spring:property name="accountId" value="${brightcove.account_id}"/>
                             <spring:property name="clientId" value="${brightcove.client_id}"/>
                             <spring:property name="clientSecret" value="${brightcove.client_secret}"/>
+                            <spring:property name="s3videoURL" value="${s3.ingest.url}"/>
+                             <spring:property name="defaltIngestProfile" value="${brightcove.ingest.profile}"/>
+                             <spring:property name="ingestCallback" value="${brightcove.ingest.callback}"/>
          </spring:bean>
          <spring:bean id="c4ScheduleConfiguration"  class="uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration">
                             <spring:property name="url" value="${c4.schedule.get.url}"/>
@@ -107,6 +110,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoPublisher" name="bcVideoPublisher" doc:name="BC Video Publisher"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCIngestTransformer" name="bcVideoIngestTransformer" doc:name="BC Video Ingest"/>
+   
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.c4.ImportC4ScheduleTransformer" name="importScheduleService" doc:name="Import Schedules"/>
    

@@ -20,10 +20,9 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 		objectMapper.setSerializationInclusion(Include.NON_NULL);					
 		return objectMapper.writeValueAsString(obj);			
 	}
-	public String returnError(String message){
-		
-		return "{error:\""+message+"\"}";
-		
+	public String returnError(String desc,MuleMessage message){
+		message.setOutboundProperty("http.status", 500);		
+		return "{error:\""+desc+"\"}";		
 	}
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding)
@@ -51,8 +50,9 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 				else 
 					returnObject=processDefault(message,outputEncoding,inboudMethod);	
 				if(returnObject ==null){
-					return null;
+					return "{\"message\":\"ok, empty response\"}";					
 				}
+				
 				if(returnObject instanceof String){
 					return returnObject;
 				}
@@ -61,13 +61,13 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 						return convertObjectToJson(returnObject);
 					} catch (JsonProcessingException e) {
 						logger.error("Unbale to convert the object to json: returnObject=p["+returnObject+"] class="+returnObject.getClass().getName() );
-						return returnError("Unable to convert to json");
+						return returnError("Unable to convert to json",message);
 					}
 				}
 	     }
 		catch(Exception e) {
 						logger.error(e+" in transformer",e);						
-						return returnError(e.toString());
+						return returnError(e.toString(),message);
 		 }
 		
 		

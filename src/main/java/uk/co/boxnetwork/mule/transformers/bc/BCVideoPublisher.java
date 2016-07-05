@@ -33,6 +33,14 @@ public class BCVideoPublisher extends BoxRestTransformer{
 		  return bcVideoService.publishEpisodeToBrightcove(id);		  
 		  		  	    			 
 	}
-	  
+	protected Object processDELETE(MuleMessage message, String outputEncoding){	
+		String episodeid=MuleRestUtil.getPathPath(message);
+		if(episodeid==null||episodeid.length()==0){
+			   return new ErrorMessage("The episodeid is missing in DELETE");
+		  }
+		  Long id=Long.valueOf(episodeid);
+		  return bcVideoService.deleteEpisodeFromBrightcove(id);			 
+	}
+	 
    
 }

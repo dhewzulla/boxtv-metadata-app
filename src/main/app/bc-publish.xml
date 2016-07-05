@@ -9,9 +9,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
     <flow name="bc-publish">
-        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.bc.publish}/*" doc:name="HTTP"/>
-        
-        <transformer ref="bcVideoPublisher" doc:name="BC Video Publusher"/>
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.bc.publish}/*" doc:name="HTTP"/>        
+        <transformer ref="bcVideoPublisher" doc:name="BC Video Ingest"/>
 
     </flow>
     
