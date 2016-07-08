@@ -1,8 +1,12 @@
 package uk.co.boxnetwork.components;
 
 import java.io.BufferedInputStream;
+import java.io.CharArrayReader;
 import java.io.IOException;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +17,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration;
+import uk.co.boxnetwork.data.C4Metadata;
 import uk.co.boxnetwork.data.ImportScheduleRequest;
 import uk.co.boxnetwork.data.bc.BCAccessToken;
+import uk.co.boxnetwork.model.ComplianceInformation;
+import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.util.GenericUtilities;
 
 @Service
@@ -31,9 +39,16 @@ public class ImportC4ScheduleService {
  @Qualifier("c4CertificationConfiguration")
  private BasicAuthenticatedURLConfiguration c4CertificationConfiguration;
 
- @Autowired
- private C4ScheduleReceiver c4scheduleReceiver;
- 
+  @Autowired
+ private BoxMedataRepository boxMetadataRepository;
+	
+  @Autowired
+  C4ScheduleSoapParser c4SchedulerParser;
+  
+  @Autowired
+  C4CertificationSoapParser c4CertificationSoapParser;
+	
+  
  public String requestSchedulService(ImportScheduleRequest request){	
 		RestTemplate rest=new RestTemplate();
 		
@@ -63,12 +78,87 @@ public class ImportC4ScheduleService {
 	}
  
  
+ public String requestCertification(String assetId){	
+		RestTemplate rest=new RestTemplate();
+		
+		logger.info("Certification request assetId="+assetId);		
+		 String requestContent=GenericUtilities.readFileContent("data/certification/request.xml");
+		 requestContent=requestContent.replace("${assetId}",assetId);
+		 
+		 logger.info("***certification requestContent**************:"+requestContent);
+		 				
+		//rest.setErrorHandler(new RestResponseHandler());
+		HttpHeaders headers=new HttpHeaders();
+		headers.add("Content-Type", "text/xml;charset=UTF-8");	    
+		headers.add("Authorization", "Basic " + c4CertificationConfiguration.basicAuthentication());
+		
+		HttpEntity<String> requestEntity = new HttpEntity<String>(requestContent, headers);		
+	    ResponseEntity<String> responseEntity = rest.exchange(c4CertificationConfiguration.getUrl(), HttpMethod.POST, requestEntity, String.class);
+	    
+	    HttpStatus statusCode=responseEntity.getStatusCode();
+	    logger.info(":::::::::statuscode:"+statusCode);
+	    return responseEntity.getBody();	    	
+	}
+  
+  public void requestCertification(ScheduleEvent event) throws DocumentException{
+	 
+	 if(event.getEpisode()!=null){
+		 if(event.getEpisode().getAssetId()!=null && event.getEpisode().getAssetId().length()>0){
+			 String certificationResponse=requestCertification(event.getEpisode().getAssetId());
+			 ComplianceInformation complianceInformation=c4CertificationSoapParser.parse(certificationResponse);
+			 if(complianceInformation==null){
+				 logger.info("Complaince is null for:episode");
+			 }
+			 else{
+				 logger.info("episode compliance:"+complianceInformation);
+				 
+			 }
+			 event.getEpisode().setComplianceInformation(complianceInformation);
+			 
+		 }
+		 if(event.getEpisode().getSeries() !=null){
+			 if(event.getEpisode().getSeries().getAssetId()!=null && event.getEpisode().getSeries().getAssetId().length()>0){
+				 String certificationResponse=requestCertification(event.getEpisode().getSeries().getAssetId());
+				 ComplianceInformation complianceInformation=c4CertificationSoapParser.parse(certificationResponse);
+				 
+				 event.getEpisode().getSeries().setComplianceInformation(complianceInformation);
+				 
+				 
+				 if(complianceInformation==null){
+					 logger.info("Complaince is null for series");
+				 }
+				 else{
+					 logger.info("series compliance:"+complianceInformation);
+				 }
+				 
+			 }
+			 
+		 }
+	 }
+	 
+ }
+
  
+	public void parseAndImport(String scheduleDocument){		
+		try {			
+			C4Metadata c4metadata=c4SchedulerParser.parse(scheduleDocument);
+			for(ScheduleEvent event: c4metadata.getScheduleEvents()){
+				requestCertification(event);
+				boxMetadataRepository.createEvent(event);
+			}
+			
+		} catch (DocumentException e) {
+			logger.error("Error in Parsing schedule document",e);
+		   throw new RuntimeException(e+ "in parsig the schedule document",e);
+		}
+		
+	}
+
  
  public void importSchedule(ImportScheduleRequest request){	 	 
 	 String schedule=requestSchedulService(request);
 	 try{
-		 c4scheduleReceiver.process(schedule);
+		 parseAndImport(schedule);
 	 }
 	 catch(Exception ex){
 		 logger.error("error is parsing the schedule", ex);

@@ -12,9 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.co.boxnetwork.model.CertificationCategory;
+import uk.co.boxnetwork.model.CertificationTime;
+import uk.co.boxnetwork.model.CertificationType;
+import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.MediaTag;
 import uk.co.boxnetwork.model.Programme;
+import uk.co.boxnetwork.model.ProgrammeCertification;
 import uk.co.boxnetwork.model.ProgrammeContentType;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
@@ -72,13 +77,45 @@ public class BoxMedataRepository {
     	   mediaTag.setCreatedAt(lastModifiedAt);    	   
 		   entityManager.persist(mediaTag);
        }
+       public void persist(ComplianceInformation compliance){
+    	   entityManager.persist(compliance);
+       }
+       public void merge(ComplianceInformation compliance){
+    	   entityManager.persist(compliance);
+       }
+       public void persist(ProgrammeCertification programmeCertification){
+    	   entityManager.persist(programmeCertification);
+       }
+       public void merge(ProgrammeCertification programmeCertification){
+    	   entityManager.merge(programmeCertification);    	   
+       }
+       public void persis(CertificationType certificationType){
+    	   entityManager.persist(certificationType);
+       }
+       public void merge(CertificationType certificationType){
+    	   entityManager.merge(certificationType);
+       }
+       public void persist(CertificationCategory certificationcategory){
+    	   entityManager.persist(certificationcategory);    	   
+       }
+       public void merge(CertificationCategory certificationcategory){
+    	   entityManager.merge(certificationcategory);    	   
+       }
+       public void persist(CertificationTime certificationTime){
+    	   entityManager.persist(certificationTime);    	   
+       }
+       public void merge(CertificationTime certificationTime){
+    	   entityManager.merge(certificationTime);    	   
+       }
+       
        
        public void update(Series series){
 		   mergeSeries(series);		   
 	   }
-       
+       @Transactional
 	   public void createEvent(ScheduleEvent newEvent){		    		   
-		    Programme programme=createProgrammeFromScheduleEvent(newEvent);
+		    
+    	   Programme programme=createProgrammeFromScheduleEvent(newEvent);
 		    if(programme!=null){
 		    	List<Programme> matchedProgrammes=findProgrammeByTitle(programme.getTitle());
 		    	if(matchedProgrammes.size()==0){
@@ -92,7 +129,8 @@ public class BoxMedataRepository {
 		    		Programme existingProgramme=matchedProgrammes.get(0);		    		
 		    		newEvent.setProgramme(existingProgramme);		    		
 		    	}		    	
-		    }		   		   
+		    }
+		    
 					    
 			if(GenericUtilities.isNotAValidId(newEvent.getScheduleEventID())){
 				newEvent.setEpisode(saveEpisode(newEvent.getEpisode()));
@@ -169,11 +207,87 @@ public class BoxMedataRepository {
 			   return existingEpisode;
 		   }		   
 	   }
+	   public CertificationCategory saveCertificationCategory(CertificationCategory certificationCategory){
+		   if(certificationCategory==null){
+			   return null;			   
+		   }
+		   List<CertificationCategory> matched=findCertificationCategoryById(certificationCategory.getId());
+		   if(matched.size()==0){
+			   persist(certificationCategory);
+		   }
+		   else{
+			   matched.get(0).update(certificationCategory);			   
+			   merge(certificationCategory);
+		   }
+			return certificationCategory;			
+	   }
+	   public CertificationTime saveCertificationTime(CertificationTime certificationTime){
+		   if(certificationTime==null){
+			   return certificationTime;
+		   }
+		   List<CertificationTime> matched=findCertificationTimeById(certificationTime.getId());
+		   if(matched.size()==0){
+			   persist(certificationTime);
+		   }
+		   else{
+			   matched.get(0).update(certificationTime);			   
+			   merge(certificationTime);
+		   }
+		   return certificationTime;
+	   }
+	   public CertificationType saveCertificationType(CertificationType certificationType){
+		   if(certificationType==null){
+			   return null;
+		   }
+		   certificationType.setCertificationCategory(saveCertificationCategory(certificationType.getCertificationCategory()));
+		   certificationType.setCertificationTime(saveCertificationTime(certificationType.getCertificationTime()));
+		   List<CertificationType> matched=findCertificationTypeById(certificationType.getId());
+		   if(matched.size()==0){
+			   persis(certificationType);
+		   }
+		   else{
+			   matched.get(0).update(certificationType);			   
+			   merge(certificationType);
+		   }
+		   return certificationType;
+	   }
+	   public ProgrammeCertification saveProgrammeCertification(ProgrammeCertification programmeCertification){
+		   if(programmeCertification == null){
+			   return null;
+		   }
+		   programmeCertification.setCertificationType(saveCertificationType(programmeCertification.getCertificationType()));
+		   List<ProgrammeCertification> matchedProgramemeCertification=findProgrammeCertificationById(programmeCertification.getId());
+		   if(matchedProgramemeCertification.size()==0){
+			   persist(programmeCertification);
+		   }
+		   else{
+			   matchedProgramemeCertification.get(0).update(programmeCertification);			   
+			   merge( matchedProgramemeCertification.get(0));
+		   }
+		   
+		   return programmeCertification;
+	   }
+	   public ComplianceInformation saveComplianceInformation(ComplianceInformation complianceInformation){		   
+		   if(complianceInformation==null){
+			   return null;
+		   }
+		   complianceInformation.setProgrammeCertification(saveProgrammeCertification(complianceInformation.getProgrammeCertification()));
+		   List<ComplianceInformation> matchedCompliances=findComplianceInformationById(complianceInformation.getId());
+		   if(matchedCompliances.size()==0){
+			   persist(complianceInformation);			   
+		   }
+		   else{
+			   matchedCompliances.get(0).update(complianceInformation);
+			   merge(matchedCompliances.get(0));
+		   }
+		   return complianceInformation;
+	   }
 	   public Episode saveEpisode(Episode episode){
 		   if(episode==null){
 			   return null;			   
 		   }
 		   else{
+			   episode.setComplianceInformation(saveComplianceInformation(episode.getComplianceInformation()));			      
 			   if(GenericUtilities.isNotAValidId(episode.getPrimaryId())){
 				   if(GenericUtilities.isNotValidCrid(episode.getCtrPrg())){
 					   if(GenericUtilities.isNotValidTitle(episode.getTitle())){
@@ -324,6 +438,26 @@ public class BoxMedataRepository {
 	   public List<Series> findSeriesByName(String name){
 		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s where s.name=:name", Series.class);
 		   return query.setParameter("name",name).getResultList();
+	   }
+	   public List<ComplianceInformation> findComplianceInformationById(String id){
+		   TypedQuery<ComplianceInformation> query=entityManager.createQuery("SELECT c FROM compliance_information c where c.id=:id", ComplianceInformation.class);
+		   return query.setParameter("id",id).getResultList();
+	   }
+	   public List<ProgrammeCertification> findProgrammeCertificationById(String id){
+		   TypedQuery<ProgrammeCertification> query=entityManager.createQuery("SELECT p FROM programme_certification p where p.id=:id", ProgrammeCertification.class);
+		   return query.setParameter("id",id).getResultList();
+	   }
+	   public List<CertificationType> findCertificationTypeById(String id){
+		   TypedQuery<CertificationType> query=entityManager.createQuery("SELECT c FROM certification_type c where c.id=:id", CertificationType.class);
+		   return query.setParameter("id",id).getResultList();
+	   }
+	   public List<CertificationCategory> findCertificationCategoryById(String id){
+		   TypedQuery<CertificationCategory> query=entityManager.createQuery("SELECT c FROM certification_category c where c.id=:id", CertificationCategory.class);
+		   return query.setParameter("id",id).getResultList();
+	   }
+	   public List<CertificationTime> findCertificationTimeById(String id){
+		   TypedQuery<CertificationTime> query=entityManager.createQuery("SELECT c FROM certification_time c where c.id=:id", CertificationTime.class);
+		   return query.setParameter("id",id).getResultList();
 	   }
 	   public void saveTags(String tagCommaSeparated){
 		   

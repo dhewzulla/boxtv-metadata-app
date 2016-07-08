@@ -97,8 +97,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          </spring:bean>
          <spring:bean id="c4CertificationConfiguration"  class="uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration">
                             <spring:property name="url" value="${c4.certification.get.url}"/>
-                            <spring:property name="user" value="${c4.schedule.get.user}"/>
-                            <spring:property name="password" value="${c4.schedule.get.password}"/>                            
+                            <spring:property name="user" value="${c4.certification.get.user}"/>
+                            <spring:property name="password" value="${c4.certification.get.password}"/>                            
          </spring:bean>
 		           
  </spring:beans>
@@ -116,6 +116,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.c4.ImportC4ScheduleTransformer" name="importScheduleService" doc:name="Import Schedules"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.c4.C4ScheduleTransformer" name="c4Schedule" doc:name="C4 Schedules"/>
+   
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.s3.S3NotificationTransformer" name="s3NotificationTransformer" doc:name="S3 Notification"/>
    
 
    

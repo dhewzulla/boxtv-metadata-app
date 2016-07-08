@@ -1,6 +1,8 @@
 package uk.co.boxnetwork.model;
 
 import java.util.Date;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -83,6 +85,10 @@ public class Episode {
 	
 	@Column(name="created_at")
 	private Date createdAt;
+	
+	@ManyToOne(optional=true, fetch=FetchType.EAGER)
+	@JoinColumn( name = "compliance_information_id", nullable = true )
+	private ComplianceInformation ComplianceInformation;
 	
 	
 	public Date getLastModifiedAt() {
@@ -273,6 +279,14 @@ public class Episode {
 		if(this.programme==null){
 			this.programme=episode.getProgramme();
 		}
+	}
+
+	public ComplianceInformation getComplianceInformation() {
+		return ComplianceInformation;
+	}
+
+	public void setComplianceInformation(ComplianceInformation complianceInformation) {
+		ComplianceInformation = complianceInformation;
 	}
 	
 		

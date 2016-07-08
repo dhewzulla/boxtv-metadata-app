@@ -26,7 +26,10 @@ public class XMLDocumentParser {
 		  else
 			   return null;
 	}
-	
+	public Element getElementByPaths(Element element, String paths){
+		return getElementByPaths(element,paths.split("/"),0);
+		
+	}
 	public Element getElementByPaths(Element element, String paths[], int depths){
 		for ( Iterator<Element> i = element.elementIterator(); i.hasNext(); ) {
 	          Element elem = (Element) i.next();
@@ -42,8 +45,9 @@ public class XMLDocumentParser {
 		return null;		
 	}
 	
+	
 	public String getElementContentByPaths(Element element, String path){
-		Element foundElement=getElementByPaths(element,path.split("/"),0);
+		Element foundElement=getElementByPaths(element,path);
 		if(foundElement!=null){
 			return foundElement.getTextTrim();			
 		}

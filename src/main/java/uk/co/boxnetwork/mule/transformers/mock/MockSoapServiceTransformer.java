@@ -18,7 +18,9 @@ public class MockSoapServiceTransformer  extends BoxRestTransformer{
 		this.file = file;
 	}
 	
-
+	protected Object processGET(MuleMessage message, String outputEncoding){		
+		return processPOST(message,outputEncoding);
+	}
 	@Override
 	protected Object processPOST(MuleMessage message, String outputEncoding){		
 		  try{

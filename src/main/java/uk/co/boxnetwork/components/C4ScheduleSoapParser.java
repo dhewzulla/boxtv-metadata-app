@@ -1,11 +1,14 @@
 package uk.co.boxnetwork.components;
+import java.io.CharArrayReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,11 @@ public class C4ScheduleSoapParser {
 	@Autowired
 	private XMLDocumentParser xmlparser;
 		
+	public C4Metadata parse(String scheduleDocument) throws DocumentException{
+		SAXReader reader = new SAXReader();		
+			Document document=reader.read(new CharArrayReader((scheduleDocument.toCharArray())));
+			return parse(document);
+	}
 	public C4Metadata parse(Document document){
 		C4Metadata c4Medata=new C4Metadata();
 		

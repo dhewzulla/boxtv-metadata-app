@@ -41,6 +41,10 @@ public class Series {
 	@Column(name="created_at")
 	private Date createdAt;
 	
+	@ManyToOne(optional=true, fetch=FetchType.EAGER)
+	@JoinColumn( name = "compliance_information_id", nullable = true )
+	private ComplianceInformation ComplianceInformation;
+	
 	
 	public Long getId() {
 		return id;
@@ -104,6 +108,15 @@ public class Series {
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
+	}
+	
+
+	public ComplianceInformation getComplianceInformation() {
+		return ComplianceInformation;
+	}
+
+	public void setComplianceInformation(ComplianceInformation complianceInformation) {
+		ComplianceInformation = complianceInformation;
 	}
 
 	public void merge(Series series){

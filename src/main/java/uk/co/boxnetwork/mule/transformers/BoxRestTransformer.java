@@ -1,5 +1,7 @@
 package uk.co.boxnetwork.mule.transformers;
 
+import java.io.InputStream;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -52,8 +54,11 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 				if(returnObject ==null){
 					return "{\"message\":\"ok, empty response\"}";					
 				}
-				
-				if(returnObject instanceof String){
+				else if(returnObject instanceof org.mule.transport.NullPayload){
+					logger.info("Service returned NullPauyload");
+					return returnObject;
+				}
+				else if(returnObject instanceof String || returnObject instanceof InputStream){
 					return returnObject;
 				}
 				else {
