@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
 import org.mule.module.http.internal.ParameterMap;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +21,16 @@ import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
 
-public class ImportC4ScheduleTransformer extends BoxRestTransformer{
+public class ImportC4ScheduleTransformer extends AbstractMessageTransformer{
 	
 	
 	@Autowired
 	ImportC4ScheduleService importC4ScheduleService;
 	
+	
+
 	@Override
-	protected Object processPOST(MuleMessage message, String outputEncoding){		
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		String payload=null;
 		try {
 			payload = message.getPayloadAsString();
@@ -42,11 +46,10 @@ public class ImportC4ScheduleTransformer extends BoxRestTransformer{
 			importC4ScheduleService.importSchedule(request);
 			return request;			
 		} catch (Exception e) {
-			logger.error("error while parsing the import schedule request:"+payload,e);
-			
-			return null;
+			logger.error("error while parsing the import schedule request:"+payload,e);			
+			 message.setOutboundProperty("http.status", 500);
+			 return "{\"message\":\"Error:"+e+"\"}";
 		}
-		  		  	    			 
 	}
 	  
    

@@ -101,5 +101,16 @@ public class CertificationType {
 				+ certificationTime + ", cliKey=" + cliKey + ", code=" + code + ", description=" + description
 				+ ", id=" + id + "]";
 	}   
-    
+	public void adjustBeforeSave(Episode episode){
+		if(code!=null && code.equals("FA")){
+			episode.setCertType(CertType.ALL_TIMES);
+		}
+		if(certificationCategory!=null){
+			certificationCategory.adjustBeforeSave(episode);
+		}
+		if(certificationTime!=null){
+			certificationTime.adjustBeforeSave(episode);			
+		}
+			
+	}
 }

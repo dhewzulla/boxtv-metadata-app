@@ -135,5 +135,14 @@ public class ComplianceInformation {
         this.certificationFinished=obj.getCertificationFinished();
         this.editedOn=obj.getEditedOn();
     }
+    public void adjustBeforeSave(Episode episode){
+    	if(episode.getMaterialId()== null){
+    		episode.setMaterialId(materialId);
+    	}
+    	if(programmeCertification!=null){
+    		programmeCertification.adjustBeforeSave(episode);    		
+    	}
+    	
+    }
     
 }

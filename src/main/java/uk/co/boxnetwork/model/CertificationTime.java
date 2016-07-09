@@ -101,5 +101,8 @@ public class CertificationTime {
 				+ ", scheduleWarningFlag=" + scheduleWarningFlag + ", startTime=" + startTime + ", warning=" + warning
 				+ "]";
 	}	
-	
+	public void adjustBeforeSave(Episode episode){
+		episode.setCertType(CertType.POST_WATERSHED);
+		episode.setWarningText(warning);
+	}	
 }

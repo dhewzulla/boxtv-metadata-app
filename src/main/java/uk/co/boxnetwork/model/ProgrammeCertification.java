@@ -117,6 +117,10 @@ public class ProgrammeCertification {
 				+ complianceObservationId + ", createdBy=" + createdBy + ", createdOn=" + createdOn + ", id=" + id
 				+ ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + "]";
 	}
-	 
+	public void adjustBeforeSave(Episode episode){
+		if(certificationType!=null){
+			certificationType.adjustBeforeSave(episode);	
+		}
+	}
      
 }

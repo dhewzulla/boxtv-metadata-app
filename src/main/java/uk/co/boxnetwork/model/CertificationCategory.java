@@ -35,5 +35,7 @@ public class CertificationCategory {
 	public String toString() {
 		return "CertificationCategory [description=" + description + ", id=" + id + ", name=" + name + "]";
 	}	
-	
+	public void adjustBeforeSave(Episode episode){
+		
+	}
 }

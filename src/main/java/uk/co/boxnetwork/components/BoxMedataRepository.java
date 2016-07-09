@@ -62,10 +62,11 @@ public class BoxMedataRepository {
 		   entityManager.persist(episode);
        }
        public void persisSeries(Series series){
-    	   Date lastModifiedAt=new Date();
-    	   series.setLastModifiedAt(lastModifiedAt);
-    	   series.setCreatedAt(lastModifiedAt);
-		   entityManager.persist(series);
+		    	   Date lastModifiedAt=new Date();
+		    	   series.setLastModifiedAt(lastModifiedAt);
+		    	   series.setCreatedAt(lastModifiedAt);
+				   entityManager.persist(series);
+
        }
        public void mergeSeries(Series series){
     	   Date lastModifiedAt=new Date();
@@ -282,12 +283,15 @@ public class BoxMedataRepository {
 		   }
 		   return complianceInformation;
 	   }
+	   
+	 
 	   public Episode saveEpisode(Episode episode){
 		   if(episode==null){
 			   return null;			   
 		   }
 		   else{
-			   episode.setComplianceInformation(saveComplianceInformation(episode.getComplianceInformation()));			      
+			   episode.setComplianceInformation(saveComplianceInformation(episode.getComplianceInformation()));
+			   episode.adjustBeforeSave();
 			   if(GenericUtilities.isNotAValidId(episode.getPrimaryId())){
 				   if(GenericUtilities.isNotValidCrid(episode.getCtrPrg())){
 					   if(GenericUtilities.isNotValidTitle(episode.getTitle())){
@@ -322,9 +326,8 @@ public class BoxMedataRepository {
 	   
 	   
 	   private Series returnExistingSeriesOrPersist(Series series,List<Series> matchedSeries,String messageOnDuplication){
-		   if(matchedSeries.size()==0){
-			   persisSeries(series);			   
-			   
+		   if(matchedSeries.size()==0){			  
+				   persisSeries(series);
 			   return series;
 		   }
 		   else{
@@ -341,26 +344,32 @@ public class BoxMedataRepository {
 		   if(series==null){
 			   		return null;
 		   }
-		   if(GenericUtilities.isNotAValidId(series.getPrimaryId())){
-				   if(GenericUtilities.isNotAValidId(series.getContractNumber())){
-					   if(GenericUtilities.isNotValidTitle(series.getName())){
-						   persisSeries(series);
-						   
-						   return series;
-					   }
-					   else{
-						   List<Series> matchedSeries=findSeriesByName(series.getName());
-						   return returnExistingSeriesOrPersist(series,matchedSeries,"name="+series.getName());
-					   }
-				   }  
-				   else{
-						   List<Series> matchedSeries=findSeriesByContractNumber(series.getContractNumber());
-						   return returnExistingSeriesOrPersist(series,matchedSeries,"contractnumber="+series.getContractNumber());
-				   }
+		   else if(series.getId()!=null){
+			   persisSeries(series);
+			   return series;
 		   }
-		   else{			   
-			   			List<Series> matchedSeries=findSeriesByPrimaryId(series.getPrimaryId());
-			   			return returnExistingSeriesOrPersist(series,matchedSeries,"primaryId="+series.getPrimaryId());			   						   
+		   else{
+				   if(GenericUtilities.isNotAValidId(series.getPrimaryId())){
+						   if(GenericUtilities.isNotAValidId(series.getContractNumber())){
+							   if(GenericUtilities.isNotValidTitle(series.getName())){
+								   persisSeries(series);
+								   
+								   return series;
+							   }
+							   else{
+								   List<Series> matchedSeries=findSeriesByName(series.getName());
+								   return returnExistingSeriesOrPersist(series,matchedSeries,"name="+series.getName());
+							   }
+						   }  
+						   else{
+								   List<Series> matchedSeries=findSeriesByContractNumber(series.getContractNumber());
+								   return returnExistingSeriesOrPersist(series,matchedSeries,"contractnumber="+series.getContractNumber());
+						   }
+				   }
+				   else{			   
+					   			List<Series> matchedSeries=findSeriesByPrimaryId(series.getPrimaryId());
+					   			return returnExistingSeriesOrPersist(series,matchedSeries,"primaryId="+series.getPrimaryId());			   						   
+				   }
 		   }
 	   }
 	   public ScheduleEvent findScheduleEventById(Long id){

@@ -135,7 +135,6 @@ public class C4ScheduleSoapParser {
 		
 		String ctrPrg=xmlparser.getElementContentByPaths(episodeElement, "CtrPrg");
 		episode.setCtrPrg(ctrPrg);
-		episode.setMaterialId(ctrPrg);
 		
 		String numberString=xmlparser.getElementContentByPaths(episodeElement, "Number");
 		if(numberString!=null && numberString.trim().length()>0){

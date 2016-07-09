@@ -120,7 +120,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.s3.S3NotificationTransformer" name="s3NotificationTransformer" doc:name="S3 Notification"/>
    
 
-   
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.CheckTimedTaskTransformer" name="checkTimedTask" doc:name="Check Timed Tasks"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.TimedTaskServiceTransformer" name="timedTaskServiceTransformer" doc:name="Timed Task Rest Service"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="mockC4Schedule" doc:name="c4Schedule">
    		<spring:property name="file" value="data/schedule/s2/response.xml"/>

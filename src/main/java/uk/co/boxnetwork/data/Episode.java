@@ -8,6 +8,7 @@ import javax.persistence.Column;
 
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.CertType;
+import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.ScheduleEvent;
 
 
@@ -75,6 +76,7 @@ public class Episode {
 	
 	private Date createdAt;
 	
+	private ComplianceInformation ComplianceInformation;
 
 	public Long getId() {
 		return id;
@@ -234,6 +236,10 @@ public class Episode {
 
 
 	public void setScheduleEvents(List<ScheduleEvent> scheduleEvents) {
+		for(ScheduleEvent evt:scheduleEvents){
+			evt.setEpisode(null);
+			evt.setProgramme(null);
+		}
 		this.scheduleEvents = scheduleEvents;
 	}
 
@@ -349,6 +355,16 @@ public Episode(){
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
+	}
+
+
+	public ComplianceInformation getComplianceInformation() {
+		return ComplianceInformation;
+	}
+
+
+	public void setComplianceInformation(ComplianceInformation complianceInformation) {
+		ComplianceInformation = complianceInformation;
 	}
 	
 	

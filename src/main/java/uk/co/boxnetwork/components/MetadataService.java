@@ -47,7 +47,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	public uk.co.boxnetwork.data.Episode getEpisodeById(Long id){
 		Episode episode=boxMetadataRepository.findEpisodeById(id);
 		List<ScheduleEvent> scheduleEvents=boxMetadataRepository.findScheduleEventByEpisode(episode);
+		
 		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episode);
+		ret.setComplianceInformation(episode.getComplianceInformation());
+		
 		ret.setScheduleEvents(scheduleEvents);
 		return ret;		
 	}
