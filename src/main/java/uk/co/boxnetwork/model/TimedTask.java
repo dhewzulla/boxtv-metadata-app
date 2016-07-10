@@ -107,7 +107,8 @@ public class TimedTask {
 		Date now=new Date();
 		logger.info("before:"+now.before(expectedTime)+":now:"+now+":expected:"+expectedTime);
 		logger.info("after:"+expectedTime.after(getLastTimeRun())+":expected:"+expectedTime+":"+getLastTimeRun());
-		if((!now.before(expectedTime)) && expectedTime.after(getLastTimeRun())){		
+		
+		if(now.getTime()>expectedTime.getTime() &&  expectedTime.getTime() > (getLastTimeRun().getTime()+2000)){				
 			setLastTimeRun(new Date());
 			return true;
 		}
