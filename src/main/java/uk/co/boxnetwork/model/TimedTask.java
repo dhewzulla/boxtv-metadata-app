@@ -1,7 +1,11 @@
 package uk.co.boxnetwork.model;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -73,23 +77,21 @@ public class TimedTask {
 	}
     public Date calculateExpectedTime(){    	
     	Calendar calendar=Calendar.getInstance();
+    	Date expectedTime=calendar.getTime();
     	if(getRunOnTime()!=null){
-		    	String timeparts[]=getRunOnTime().split(":");
-		    	
-		    	for(int i=0;i<timeparts.length;i++){
-		    		Integer t=Integer.parseInt(timeparts[i]);
-		    		if(i==0){
-		    			calendar.set(Calendar.HOUR_OF_DAY,t);    			
-		    		}
-		    		else if(i==1){
-		    			calendar.set(Calendar.MINUTE,t);
-		    		}
-		    		else if(i==2){
-		    			calendar.set(Calendar.SECOND,t);
-		    		}    			
-		    	}
+    		DateFormat localFormatDate = new SimpleDateFormat("yyyy-MM-dd");
+    		DateFormat localFormatFull = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    		String datepart=localFormatDate.format(expectedTime);
+    		try {
+    			localFormatFull.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
+				expectedTime=localFormatFull.parse(datepart+" "+getRunOnTime());
+			} catch (ParseException e) {
+				throw new RuntimeException("The Runtime format is wrong:"+getRunOnTime(),e);
+			}   
+    		
     	}
-    	return calendar.getTime();    	
+    	return expectedTime;
+    	    	
     }
 	
 	public ImportScheduleTask getImportScheduleTask() {
@@ -103,6 +105,8 @@ public class TimedTask {
 	public boolean shouldRun(){
 		Date expectedTime=calculateExpectedTime();
 		Date now=new Date();
+		logger.info("before:"+now.before(expectedTime)+":now:"+now+":expected:"+expectedTime);
+		logger.info("after:"+expectedTime.after(getLastTimeRun())+":expected:"+expectedTime+":"+getLastTimeRun());
 		if((!now.before(expectedTime)) && expectedTime.after(getLastTimeRun())){		
 			setLastTimeRun(new Date());
 			return true;

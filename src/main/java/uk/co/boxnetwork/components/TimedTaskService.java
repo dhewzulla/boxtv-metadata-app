@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.co.boxnetwork.data.ImportScheduleRequest;
 
 import uk.co.boxnetwork.model.ImportScheduleTask;
+import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.TaskType;
 import uk.co.boxnetwork.model.TimedTask;
 
@@ -31,7 +32,7 @@ public class TimedTaskService {
 	@Autowired	
 	private EntityManager entityManager;
 
-	public List<TimedTask> findAllEpisodes(){
+	public List<TimedTask> findAllTimedTasks(){
 		   TypedQuery<TimedTask> query=entityManager.createQuery("SELECT e FROM timed_task e", TimedTask.class);
 		   return query.getResultList();
 	   }
@@ -45,15 +46,24 @@ public class TimedTaskService {
 		entityManager.remove(task);
 	}
 	@Transactional
+	public void removeTaskById(long id){
+		TimedTask task=entityManager.find(TimedTask.class, id);
+		entityManager.remove(task);
+	}
+	@Transactional
 	public void persist(TimedTask task){
 		Calendar now=Calendar.getInstance();
+		logger.info(":::::created:"+now.getTime());
 		task.setLastTimeRun(now.getTime());
 		entityManager.persist(task);
 	}
+	public TimedTask findTimedTaskById(Long id){
+		   return entityManager.find(TimedTask.class, id);		   
+    }
 	
 	@Transactional
 	public void checkAndRunTasks(){
-		List<TimedTask> tasks=findAllEpisodes();
+		List<TimedTask> tasks=findAllTimedTasks();
 		for(TimedTask task:tasks){
 			if(task.shouldRun()){
 				if(task.getTaskType()==TaskType.ONETIME){
