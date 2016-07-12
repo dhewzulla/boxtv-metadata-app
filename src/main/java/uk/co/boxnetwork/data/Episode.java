@@ -76,7 +76,7 @@ public class Episode {
 	
 	private Date createdAt;
 	
-	private ComplianceInformation ComplianceInformation;
+	private List<ComplianceInformation> ComplianceInformations;
 
 	public Long getId() {
 		return id;
@@ -358,14 +358,16 @@ public Episode(){
 	}
 
 
-	public ComplianceInformation getComplianceInformation() {
-		return ComplianceInformation;
+	public List<ComplianceInformation> getComplianceInformations() {
+		return ComplianceInformations;
 	}
 
 
-	public void setComplianceInformation(ComplianceInformation complianceInformation) {
-		ComplianceInformation = complianceInformation;
+	public void setComplianceInformations(List<ComplianceInformation> complianceInformations) {
+		ComplianceInformations = complianceInformations;
 	}
+
+
 	
 	
 }

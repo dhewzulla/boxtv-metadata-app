@@ -1,9 +1,15 @@
 package uk.co.boxnetwork.mule.transformers.s3;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.mule.api.MuleMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.amazonaws.services.sqs.model.Message;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.co.boxnetwork.components.ImportC4ScheduleService;
 import uk.co.boxnetwork.data.ErrorMessage;
@@ -20,17 +26,24 @@ public class S3NotificationTransformer extends BoxRestTransformer{
 	@Override
 	protected Object processPOST(MuleMessage message, String outputEncoding){		
 		try{
+			
 			com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
 			objectMapper.setSerializationInclusion(Include.NON_NULL);
+			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			
 			String requestInJson = (String)message.getPayloadAsString();							
-			logger.info("S3 Notification is received"+requestInJson);
-			S3Notifivcation s3Notification = objectMapper.readValue(requestInJson, S3Notifivcation.class);		
-			return s3Notification;			
+			logger.info("SNSSubscriptionMessage is received:"+requestInJson);
+			Map<String, Object> msg = (Map<String, Object>)objectMapper.readValue(requestInJson, Map.class);
+		    logger.info("Ha ha....."+msg);
+			
+			//S3Notifivcation s3Notification = objectMapper.readValue(requestInJson, S3Notifivcation.class);
+			//SNSSubscriptionMessage snsM3ssage=objectMapper.readValue(requestInJson, SNSSubscriptionMessage.class);
+			return requestInJson;
+			//return snsM3ssage;			
 		}
 		catch(Exception e){
 			throw new RuntimeException("failed on processing S3VideoConcatTransformer request",e);
 		}
 		  		  	    			 
 	}
-	
 }

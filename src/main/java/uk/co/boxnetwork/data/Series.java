@@ -1,6 +1,7 @@
 package uk.co.boxnetwork.data;
 
 import java.util.Date;
+import java.util.List;
 
 public class Series {
     private Long id;
@@ -11,6 +12,8 @@ public class Series {
 	private Programme programme;
 	private Date lastModifiedAt;
 	private Date createdAt;
+	private List<uk.co.boxnetwork.model.Episode> episodes;
+	
 	
 	public Series(uk.co.boxnetwork.model.Series series) {
 		super();
@@ -81,6 +84,13 @@ public class Series {
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
+	public List<uk.co.boxnetwork.model.Episode> getEpisodes() {
+		return episodes;
+	}
+	public void setEpisodes(List<uk.co.boxnetwork.model.Episode> episodes) {
+		this.episodes = episodes;
+	}
+	
 	
   
 }

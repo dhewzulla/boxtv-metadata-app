@@ -3,6 +3,7 @@ package uk.co.boxnetwork.components;
 import java.io.CharArrayReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -30,19 +31,31 @@ import uk.co.boxnetwork.util.GenericUtilities;
 @Component
 public class C4CertificationSoapParser {
 	private static final Logger logger=LoggerFactory.getLogger(C4CertificationSoapParser.class);
-	private String compliancepath[]={"GetComplianceInformationForAssetResponse","GetComplianceInformationForAssetResult","ComplianceInformation"};
+	private String compliancepath[]={"GetComplianceInformationForAssetResponse","GetComplianceInformationForAssetResult"};
 	
 	@Autowired
 	private XMLDocumentParser xmlparser;
 		
-	public ComplianceInformation parse(String complianceDocument) throws DocumentException{
+	public List<ComplianceInformation> parse(String complianceDocument) throws DocumentException{
 		SAXReader reader = new SAXReader();		
 			Document document=reader.read(new CharArrayReader((complianceDocument.toCharArray())));
 			return parse(document);
 	}
 	
-	public ComplianceInformation parse(Document document){						
-		return processComplianceInformation(xmlparser.getElementByPaths(document,compliancepath));				    
+	public List<ComplianceInformation> parse(Document document){
+		Element comtainerElement=xmlparser.getElementByPaths(document,compliancepath);
+		
+		List<ComplianceInformation> compliances=new ArrayList<ComplianceInformation>();
+		
+		
+		for ( Iterator<Element> i = comtainerElement.elementIterator(); i.hasNext(); ) {
+			Element elem = (Element) i.next();
+			if(elem.getName().equals("ComplianceInformation")){
+				ComplianceInformation compliance=processComplianceInformation(elem);
+				compliances.add(compliance);
+		    }
+	     }
+		return compliances;
 	}	
 	public ComplianceInformation processComplianceInformation(Element complianceElement){
 		if(complianceElement==null){

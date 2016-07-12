@@ -1,7 +1,7 @@
 package uk.co.boxnetwork.model;
 
 import java.util.Date;
-
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,9 +9,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
-import uk.co.boxnetwork.util.GenericUtilities;
+
 
 @Entity(name="episode")
 public class Episode {
@@ -86,9 +88,15 @@ public class Episode {
 	@Column(name="created_at")
 	private Date createdAt;
 	
-	@ManyToOne(optional=true, fetch=FetchType.EAGER)
+	@OneToMany(fetch=FetchType.EAGER)
+	@JoinTable
+	(
+			name="episode_complaince",
+			joinColumns={ @JoinColumn(name="episode_id", referencedColumnName="id") },
+		    inverseJoinColumns={ @JoinColumn(name="compliance_information_id", referencedColumnName="id") }
+	)
 	@JoinColumn( name = "compliance_information_id", nullable = true )
-	private ComplianceInformation complianceInformation;
+	private List<ComplianceInformation> complianceInformations;
 	
 	
 	public Date getLastModifiedAt() {
@@ -259,39 +267,20 @@ public class Episode {
 		this.brightcoveId = brightcoveId;
 	}
 
-	
-	public void merge(Episode episode){
-		if(GenericUtilities.isNotValidTitle(this.title)){
-			this.title=episode.getTitle();
-		}
-		if(GenericUtilities.isNotValidTitle(this.name)){
-			this.name=episode.getName();
-		}
-		if(GenericUtilities.isNotAValidId(this.assetId)){
-			this.assetId=episode.getAssetId();
-		}
-		if(GenericUtilities.isNotValidCrid(this.ctrPrg)){
-			this.ctrPrg=episode.getCtrPrg();
-		}
-		if(GenericUtilities.isNotValidCrid(this.primaryId)){
-			this.primaryId=episode.getPrimaryId();
-		}
-		if(this.programme==null){
-			this.programme=episode.getProgramme();
-		}
+	     
+    public List<ComplianceInformation> getComplianceInformations() {
+		return complianceInformations;
 	}
 
-	public ComplianceInformation getComplianceInformation() {
-		return complianceInformation;
+	public void setComplianceInformations(List<ComplianceInformation> complianceInformations) {
+		this.complianceInformations = complianceInformations;
 	}
 
-	public void setComplianceInformation(ComplianceInformation complianceInformation) {
-		this.complianceInformation = complianceInformation;
-	}
-     
-    public void adjustBeforeSave(){
-    	if(complianceInformation!=null){
-    		complianceInformation.adjustBeforeSave(this);
+	public void adjustBeforeSave(){
+    	if(complianceInformations!=null){
+    		for(ComplianceInformation complianceInformation:complianceInformations){
+    			complianceInformation.adjustBeforeSave(this);
+    		}    		
     	}
     }
 }

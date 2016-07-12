@@ -32,6 +32,8 @@ import uk.co.boxnetwork.data.bc.BCAccessToken;
 import uk.co.boxnetwork.data.bc.BCConfiguration;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.bc.BCVideoIngestRequest;
+import uk.co.boxnetwork.data.bc.BcIngestResponse;
+import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.util.GenericUtilities;
@@ -209,7 +211,7 @@ public class BCVideoService {
 			}
 	}
 	
-	public String ingestVideo(BCVideoIngestRequest ingestRequest, String videoid){
+	public BcIngestResponse ingestVideo(BCVideoIngestRequest ingestRequest, String videoid){
 		BCAccessToken accessToken=bcAccessToenService.getAccessToken();
 		RestTemplate rest=new RestTemplate();
 		
@@ -240,7 +242,11 @@ public class BCVideoService {
 		    responseEntity.getStatusCode();	    
 		    HttpStatus statusCode=responseEntity.getStatusCode();
 		    logger.info(":::::::::statuscode:"+statusCode);
-		    return responseEntity.getBody();
+		    String responseBody= responseEntity.getBody();
+		    logger.info("The Ingest response:"+responseBody);
+		    BcIngestResponse response= jsonToBcIngestResponse(responseBody);
+		    response.setCallback(configuration.getIngestCallback()+"/"+response.getId());
+		    return response;
 		
 		} catch (Exception e) {
 			logger.error("error while parsing the brightcove video data",e);
@@ -268,6 +274,20 @@ public class BCVideoService {
 			logger.error("error while parsing the brightcove video data",e);
 			logger.error(videoInJson);
 			return null;
+		}
+	}
+	private BcIngestResponse jsonToBcIngestResponse(String responseInJson){
+		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+		objectMapper.setSerializationInclusion(Include.NON_NULL);	
+		
+		BcIngestResponse response;
+		try {
+			response = objectMapper.readValue(responseInJson, BcIngestResponse.class);
+			return response;			
+		} catch (IOException e) {
+			logger.error("error while parsing the brightcove video data",e);
+			logger.error(responseInJson);
+			throw new RuntimeException("Error parsing the ingest response"+e,e);
 		}
 	}
 	public BCVideoData  getVideo(String videoid){			
@@ -376,7 +396,7 @@ public class BCVideoService {
 	
 	
 	@Transactional
-	public String ingestVideoToBrightCove(FileIngestRequest ingestRequest){
+	public BcIngestResponse ingestVideoToBrightCove(FileIngestRequest ingestRequest){
 		  Episode  episode=metadataRepository.findEpisodeById(ingestRequest.getEpisodeid());		  
 		  if(episode==null){
 			  throw new RuntimeException("The episodeid is not found in the database"); 
@@ -386,12 +406,22 @@ public class BCVideoService {
 		  }
 		  else{
 			  	  BCVideoIngestRequest bcVideoIngestRequest=new BCVideoIngestRequest(ingestRequest,configuration);
-				  String reponse=ingestVideo(bcVideoIngestRequest,episode.getBrightcoveId());
-				  logger.info("ingest repose:"+reponse);
-				  return reponse;
+				  return ingestVideo(bcVideoIngestRequest,episode.getBrightcoveId());
 			  }
 			  
 		  
+	}
+	@Transactional
+	public void persist(BCNotification bcNotification){
+		metadataRepository.persist(bcNotification);		
+	}
+	
+	
+	public List<BCNotification> findAllBCNotification(){
+		return metadataRepository.findAllBCNotification();		
+	}
+	public List<BCNotification> findBCNotificationByJobId(String jobid){
+		return metadataRepository.findBCNotificationByJobId(jobid);		
 	}
 	
 }

@@ -33,13 +33,25 @@ public class MetadataService {
 		
 		return boxMetadataRepository.findAllEpisodes();
 	}
+	public List<Episode> findEpisodes(String search){
+		return boxMetadataRepository.findEpisodes(search);
+	}
 	
 public List<Series> getAllSeries(){		
 		 return boxMetadataRepository.findAllSeries();
 	}
 public uk.co.boxnetwork.data.Series getSeriesById(Long id){
-	Series series=boxMetadataRepository.findSeriesById(id);	
-	uk.co.boxnetwork.data.Series ret=new uk.co.boxnetwork.data.Series(series);	
+	Series series=boxMetadataRepository.findSeriesById(id);
+	if(series==null){
+		return null;
+	}
+	List<Episode> episodes=boxMetadataRepository.findEpisodesBySeries(series);
+	uk.co.boxnetwork.data.Series ret=new uk.co.boxnetwork.data.Series(series);
+	for(Episode episode:episodes){
+		episode.setSeries(null);
+		episode.setProgramme(null);
+	}
+	ret.setEpisodes(episodes);		
 	return ret;		
 }
 
@@ -49,8 +61,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		List<ScheduleEvent> scheduleEvents=boxMetadataRepository.findScheduleEventByEpisode(episode);
 		
 		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episode);
-		ret.setComplianceInformation(episode.getComplianceInformation());
-		
+		ret.setComplianceInformations(episode.getComplianceInformations());		
 		ret.setScheduleEvents(scheduleEvents);
 		return ret;		
 	}

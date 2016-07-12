@@ -3,6 +3,7 @@ package uk.co.boxnetwork.components;
 import java.io.BufferedInputStream;
 import java.io.CharArrayReader;
 import java.io.IOException;
+import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -105,35 +106,10 @@ public class ImportC4ScheduleService {
 	 if(event.getEpisode()!=null){
 		 if(event.getEpisode().getAssetId()!=null && event.getEpisode().getAssetId().length()>0){
 			 String certificationResponse=requestCertification(event.getEpisode().getAssetId());
-			 ComplianceInformation complianceInformation=c4CertificationSoapParser.parse(certificationResponse);
-			 if(complianceInformation==null){
-				 logger.info("Complaince is null for:episode");
-			 }
-			 else{
-				 logger.info("episode compliance:"+complianceInformation);
-				 
-			 }
-			 event.getEpisode().setComplianceInformation(complianceInformation);
-			 
+			 List<ComplianceInformation> complianceInformations=c4CertificationSoapParser.parse(certificationResponse);			 
+			 event.getEpisode().setComplianceInformations(complianceInformations);			 
 		 }
-		 if(event.getEpisode().getSeries() !=null){
-			 if(event.getEpisode().getSeries().getAssetId()!=null && event.getEpisode().getSeries().getAssetId().length()>0){
-				 String certificationResponse=requestCertification(event.getEpisode().getSeries().getAssetId());
-				 ComplianceInformation complianceInformation=c4CertificationSoapParser.parse(certificationResponse);
-				 
-				 event.getEpisode().getSeries().setComplianceInformation(complianceInformation);
-				 
-				 
-				 if(complianceInformation==null){
-					 logger.info("Complaince is null for series");
-				 }
-				 else{
-					 logger.info("series compliance:"+complianceInformation);
-				 }
-				 
-			 }
-			 
-		 }
+		
 	 }
 	 
  }

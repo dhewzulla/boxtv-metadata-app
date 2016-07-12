@@ -1,5 +1,6 @@
 package uk.co.boxnetwork.components;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.CertificationCategory;
 import uk.co.boxnetwork.model.CertificationTime;
 import uk.co.boxnetwork.model.CertificationType;
@@ -109,6 +111,9 @@ public class BoxMedataRepository {
     	   entityManager.merge(certificationTime);    	   
        }
        
+       public void persist(BCNotification bcNotification){
+    	   entityManager.persist(bcNotification);
+       }
        
        public void update(Series series){
 		   mergeSeries(series);		   
@@ -268,10 +273,17 @@ public class BoxMedataRepository {
 		   
 		   return programmeCertification;
 	   }
-	   public ComplianceInformation saveComplianceInformation(ComplianceInformation complianceInformation){		   
-		   if(complianceInformation==null){
-			   return null;
+	   public List<ComplianceInformation> saveComplianceInformations(List<ComplianceInformation> complianceInformations){		   
+		   if(complianceInformations.size()==0){
+			   return complianceInformations;
 		   }
+		   List<ComplianceInformation> ret=new ArrayList<ComplianceInformation>();
+		   for(ComplianceInformation complianceInformation:complianceInformations){
+			   ret.add(saveComplianceInfo(complianceInformation));			   
+		   }
+		   return ret;
+	   }
+	   public ComplianceInformation saveComplianceInfo(ComplianceInformation complianceInformation){
 		   complianceInformation.setProgrammeCertification(saveProgrammeCertification(complianceInformation.getProgrammeCertification()));
 		   List<ComplianceInformation> matchedCompliances=findComplianceInformationById(complianceInformation.getId());
 		   if(matchedCompliances.size()==0){
@@ -290,7 +302,7 @@ public class BoxMedataRepository {
 			   return null;			   
 		   }
 		   else{
-			   episode.setComplianceInformation(saveComplianceInformation(episode.getComplianceInformation()));
+			   episode.setComplianceInformations(saveComplianceInformations(episode.getComplianceInformations()));
 			   episode.adjustBeforeSave();
 			   if(GenericUtilities.isNotAValidId(episode.getPrimaryId())){
 				   if(GenericUtilities.isNotValidCrid(episode.getCtrPrg())){
@@ -414,6 +426,11 @@ public class BoxMedataRepository {
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title=:title", Episode.class);
 		   return query.setParameter("title",title).getResultList();
 	   }
+	   public List<Episode> findEpisodesBySeries(Series series){
+		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.series=:series", Episode.class);
+		   return query.setParameter("series",series).getResultList();
+	   }
+
 	   public Episode findEpisodeById(Long id){
 		   return entityManager.find(Episode.class, id);		   
 	   }
@@ -426,6 +443,10 @@ public class BoxMedataRepository {
 	   public List<Episode> findAllEpisodes(){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);
 		   return query.getResultList();
+	   }
+	   public List<Episode> findEpisodes(String search){
+		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title LIKE :search OR e.materialId LIKE :search OR e.series.name LIKE :search", Episode.class);
+		   return query.setParameter("search",search).getResultList();
 	   }
 	   
 	   public List<Episode> findEpisodesByCtrPrg(String ctrPrg){
@@ -467,6 +488,14 @@ public class BoxMedataRepository {
 	   public List<CertificationTime> findCertificationTimeById(String id){
 		   TypedQuery<CertificationTime> query=entityManager.createQuery("SELECT c FROM certification_time c where c.id=:id", CertificationTime.class);
 		   return query.setParameter("id",id).getResultList();
+	   }
+	   public List<BCNotification> findAllBCNotification(){
+		   TypedQuery<BCNotification> query=entityManager.createQuery("SELECT b FROM bc_notification b", BCNotification.class);
+		   return query.getResultList();
+	   }
+	   public List<BCNotification> findBCNotificationByJobId(String jobid){
+		   TypedQuery<BCNotification> query=entityManager.createQuery("SELECT b FROM bc_notification b where b.jobId=:jobId", BCNotification.class);
+		   return query.setParameter("jobId",jobid).getResultList();
 	   }
 	   public void saveTags(String tagCommaSeparated){
 		   

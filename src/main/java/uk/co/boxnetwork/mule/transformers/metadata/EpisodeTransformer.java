@@ -5,6 +5,7 @@ import java.util.List;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.http.internal.ParameterMap;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,17 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		}
 		
 		private  Object getAllEpisodes(MuleMessage message, String outputEncoding){
-				List<Episode> episodes=metadataService.getAllEpisodes();
+			
+			ParameterMap queryparams=message.getInboundProperty("http.query.params");
+			if(queryparams==null || queryparams.get("search") ==null || queryparams.get("search").length()==0){				
+					List<Episode> episodes=metadataService.getAllEpisodes();
 					return episodes;
+			}
+			String search=queryparams.get("search");
+			if(search.indexOf("%")==-1){
+				search="%"+search+"%";				
+			}
+			return metadataService.findEpisodes(search);		    
 		}
 		
          private Object getAnEpisode(String episodeid, MuleMessage message, String outputEncoding){

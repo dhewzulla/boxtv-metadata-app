@@ -115,14 +115,7 @@ public class ComplianceInformation {
 		}
 		this.programmeCertification=certification;
 	}
-	@Override
-	public String toString() {
-		return "ComplianceInformation [issueNumber=" + issueNumber + ", materialId=" + materialId
-				+ ", programmeCertification=" + programmeCertification + ", programmeVersionCertification="
-				+ programmeVersionCertification + ", transmissionDate=" + transmissionDate + ", id=" + id + ", assetId="
-				+ assetId + ", viewerUserKey=" + viewerUserKey + ", certificationFinished=" + certificationFinished
-				+ ", editedOn=" + editedOn + "]";
-	}
+	
     public void update(ComplianceInformation obj){    	
     	this.issueNumber=obj.getIssueNumber();
     	this.materialId=obj.getMaterialId();
@@ -135,10 +128,7 @@ public class ComplianceInformation {
         this.certificationFinished=obj.getCertificationFinished();
         this.editedOn=obj.getEditedOn();
     }
-    public void adjustBeforeSave(Episode episode){
-    	if(episode.getMaterialId()== null){
-    		episode.setMaterialId(materialId);
-    	}
+    public void adjustBeforeSave(Episode episode){    	
     	if(programmeCertification!=null){
     		programmeCertification.adjustBeforeSave(episode);    		
     	}
