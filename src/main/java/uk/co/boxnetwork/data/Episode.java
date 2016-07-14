@@ -67,6 +67,17 @@ public class Episode {
 	
 	private String brightcoveId;
 	
+	
+	private String ingestProfile;
+	
+	
+	private String ingestSource;
+	
+	
+	private String txChannel;
+	
+	
+	
 	private List<ScheduleEvent> scheduleEvents=new ArrayList<ScheduleEvent>();
 	
 	
@@ -287,6 +298,9 @@ public Episode(){
 		this.lastModifiedAt=episode.getLastModifiedAt();
 		this.createdAt=episode.getCreatedAt();
 		
+		this.ingestProfile=episode.getIngestProfile();
+		this.ingestSource=episode.getIngestSource();
+		this.txChannel=episode.getTxChannel();
 	}
 	public void update(uk.co.boxnetwork.model.Episode episode) {
 		
@@ -325,6 +339,11 @@ public Episode(){
 		}
 		episode.setAdsupport(this.adsupport);	
 		episode.setBrightcoveId(this.brightcoveId);
+		
+		episode.setIngestProfile(this.ingestProfile);
+		episode.setIngestSource(this.ingestSource);	
+		episode.setTxChannel(this.txChannel);
+		
 	}
 
 
@@ -365,6 +384,36 @@ public Episode(){
 
 	public void setComplianceInformations(List<ComplianceInformation> complianceInformations) {
 		ComplianceInformations = complianceInformations;
+	}
+
+
+	public String getIngestProfile() {
+		return ingestProfile;
+	}
+
+
+	public void setIngestProfile(String ingestProfile) {
+		this.ingestProfile = ingestProfile;
+	}
+
+
+	public String getIngestSource() {
+		return ingestSource;
+	}
+
+
+	public void setIngestSource(String ingestSource) {
+		this.ingestSource = ingestSource;
+	}
+
+
+	public String getTxChannel() {
+		return txChannel;
+	}
+
+
+	public void setTxChannel(String txChannel) {
+		this.txChannel = txChannel;
 	}
 
 

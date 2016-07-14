@@ -13,6 +13,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import uk.co.boxnetwork.data.s3.FileItem;
+
 
 
 @Entity(name="episode")
@@ -80,6 +82,18 @@ public class Episode {
 	@Column(name="brightcove_id")
 	private String brightcoveId;
 	
+	@Column(name="ingest_profile")
+	private String ingestProfile;
+	
+	@Column(name="ingest_source")
+	private String ingestSource;
+	
+	@Column(name="tx_channel")
+	private String txChannel;
+	
+	
+	
+	
 	
 	@Column(name="last_modified_at")
 	private Date lastModifiedAt;
@@ -87,6 +101,8 @@ public class Episode {
 	
 	@Column(name="created_at")
 	private Date createdAt;
+	
+	
 	
 	@OneToMany(fetch=FetchType.EAGER)
 	@JoinTable
@@ -276,11 +292,74 @@ public class Episode {
 		this.complianceInformations = complianceInformations;
 	}
 
+	public String getIngestProfile() {
+		return ingestProfile;
+	}
+
+	public void setIngestProfile(String ingestProfile) {
+		this.ingestProfile = ingestProfile;
+	}
+
+	public String getIngestSource() {
+		return ingestSource;
+	}
+
+	public void setIngestSource(String ingestSource) {
+		this.ingestSource = ingestSource;
+	}
+
+	public String getTxChannel() {
+		return txChannel;
+	}
+
+	public void setTxChannel(String txChannel) {
+		this.txChannel = txChannel;
+	}
+
 	public void adjustBeforeSave(){
+		if(getMaterialId()==null){
+			setMaterialId(getCtrPrg());
+		}
     	if(complianceInformations!=null){
     		for(ComplianceInformation complianceInformation:complianceInformations){
     			complianceInformation.adjustBeforeSave(this);
     		}    		
     	}
+    	if(series!=null){
+    		series.adjustBeforeSave(this);
+    	}
+    	if(ingestProfile==null){
+    		ingestProfile="high-resolution";
+    	}
     }
+	public String calculateSourceVideoFilePrefix(){		
+			 String materialID=null;
+			 if(getMaterialId()!=null && getMaterialId().trim().length()>0){
+				 materialID=getMaterialId();
+			 }
+			 if(materialID==null){
+				 materialID=getCtrPrg();		 
+			 }
+			 if(materialID==null){
+				 return null;
+			 }
+			 materialID=materialID.trim();
+			 if(materialID.length()==0){
+				 return null;
+			 }
+			 String matParts[]=materialID.split("/");
+			 StringBuilder filenameBuilder=new StringBuilder();
+			 filenameBuilder.append("V");
+			 int counter=0;
+			 for(String mpart:matParts){
+				 filenameBuilder.append("_");
+				 filenameBuilder.append(mpart);
+				 counter++;
+				 if(counter>2){
+					 break;
+				 }
+		     }
+			 return filenameBuilder.toString();
+	}
+	
 }

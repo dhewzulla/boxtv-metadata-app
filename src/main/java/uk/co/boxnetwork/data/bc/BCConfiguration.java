@@ -6,6 +6,7 @@ public class BCConfiguration {
 	private String oauthurl;
 	private String cmsurl;
 	private String ingesturl;
+	private String videoBucket;
 	private String accountId;
 	private String clientId;
 	private String clientSecret;
@@ -117,6 +118,13 @@ public class BCConfiguration {
 	public void setIngestCallback(String ingestCallback) {
 		this.ingestCallback = ingestCallback;
 	}
+	
+	public String getVideoBucket() {
+		return videoBucket;
+	}
+	public void setVideoBucket(String videoBucket) {
+		this.videoBucket = videoBucket;
+	}
 	public String basicAuthentication(){
 		String plainCreds = clientId+":"+clientSecret;
 		byte[] plainCredsBytes = plainCreds.getBytes();
@@ -124,9 +132,6 @@ public class BCConfiguration {
 		String base64Creds = new String(base64CredsBytes);
 		return base64Creds;
 		
-	}
-	public String toString(){
-		return "oauthurl=["+oauthurl+"]cmsurl=["+cmsurl+"]ingesturl=["+ingesturl+"]accountId=["+accountId+"]";		
 	}
 	
   

@@ -25,7 +25,10 @@ import uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration;
 import uk.co.boxnetwork.data.C4Metadata;
 import uk.co.boxnetwork.data.ImportScheduleRequest;
 import uk.co.boxnetwork.data.bc.BCAccessToken;
+import uk.co.boxnetwork.data.s3.FileItem;
+import uk.co.boxnetwork.data.s3.VideoFilesLocation;
 import uk.co.boxnetwork.model.ComplianceInformation;
+import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -49,6 +52,8 @@ public class ImportC4ScheduleService {
   @Autowired
   C4CertificationSoapParser c4CertificationSoapParser;
 	
+  @Autowired
+  S3BucketService s3BucketService;
   
  public String requestSchedulService(ImportScheduleRequest request){	
 		RestTemplate rest=new RestTemplate();
@@ -101,6 +106,25 @@ public class ImportC4ScheduleService {
 	    return responseEntity.getBody();	    	
 	}
   
+ public void requestS3(ScheduleEvent event) throws DocumentException{
+	 if(event.getEpisode()!=null){
+		 requestS3(event.getEpisode()); 		 
+	 }	 
+ }
+ 
+ private void requestS3(Episode episode){
+	 String fileNameFilter=episode.calculateSourceVideoFilePrefix();
+	 if(fileNameFilter==null){
+		 return;
+	 }
+	 VideoFilesLocation matchedfiles=s3BucketService.listFilesInVideoBucket(fileNameFilter);
+	 String ingestFile=matchedfiles.highestVersion();
+	 if(ingestFile!=null){
+		 episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
+	 }	 
+	 	
+ }
+    
   public void requestCertification(ScheduleEvent event) throws DocumentException{
 	 
 	 if(event.getEpisode()!=null){
@@ -120,6 +144,7 @@ public class ImportC4ScheduleService {
 			C4Metadata c4metadata=c4SchedulerParser.parse(scheduleDocument);
 			for(ScheduleEvent event: c4metadata.getScheduleEvents()){
 				requestCertification(event);
+				requestS3(event);
 				boxMetadataRepository.createEvent(event);
 			}
 			

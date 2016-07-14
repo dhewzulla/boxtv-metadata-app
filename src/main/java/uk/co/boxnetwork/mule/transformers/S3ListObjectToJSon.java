@@ -21,7 +21,7 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import uk.co.boxnetwork.data.FileItem;
+import uk.co.boxnetwork.data.s3.FileItem;
 
 
 

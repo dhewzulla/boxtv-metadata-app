@@ -126,6 +126,10 @@ public class Series {
 			this.programme=series.getProgramme();
 		}
 	}
-	
+	public void adjustBeforeSave(Episode episode){
+		if(episode.getMaterialId()==null){
+			episode.setMaterialId(contractNumber);
+		}
+	}
 
 }

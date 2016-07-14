@@ -1,6 +1,7 @@
 package uk.co.boxnetwork.data.bc;
 
 import uk.co.boxnetwork.data.FileIngestRequest;
+import uk.co.boxnetwork.model.Episode;
 
 public class BCVideoIngestRequest {
 	
@@ -10,16 +11,13 @@ public class BCVideoIngestRequest {
 	public BCVideoIngestRequest(){
 		
 	}
-	public BCVideoIngestRequest(FileIngestRequest ingestRequest, BCConfiguration bcConfiguration){
+	public BCVideoIngestRequest(Episode episode,BCConfiguration configuration){
 		master=new BCMasterVideo();
-		master.setUrl(bcConfiguration.getS3videoURL()+"/"+ingestRequest.getFile());
-		if(ingestRequest.getProfile()!=null){
-			profile=ingestRequest.getProfile();			
-		}
-		else
-			profile=bcConfiguration.getDefaltIngestProfile();
+	
+		master.setUrl(episode.getIngestSource());
+	    profile=episode.getIngestProfile();
 		callbacks=new String[1];
-		callbacks[0]=bcConfiguration.getIngestCallback();
+		callbacks[0]=configuration.getIngestCallback();
 	}
 	public BCMasterVideo getMaster() {
 		return master;

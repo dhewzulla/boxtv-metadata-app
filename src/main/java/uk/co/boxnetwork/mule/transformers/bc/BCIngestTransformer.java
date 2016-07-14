@@ -26,7 +26,7 @@ public class BCIngestTransformer  extends BoxRestTransformer{
 		
 			try {
 					FileIngestRequest ingestrequest=null;
-				    if(message.getPayload() instanceof uk.co.boxnetwork.data.FileItem){
+				    if(message.getPayload() instanceof FileIngestRequest){
 					   ingestrequest=(FileIngestRequest)message.getPayload();			   
 					}
 					else{			   									

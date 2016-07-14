@@ -12,9 +12,18 @@ http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/cu
       
     <flow name="s3-service">
         <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.s3.path}" doc:name="HTTP"/>
-        <custom-transformer class="uk.co.boxnetwork.mule.transformers.S3ListObjectToJSon" doc:name="Custom"/>
-        <logger message="#[payload.class.toString()]" level="INFO" doc:name="Logger"/>        
-       
-         		
+         <transformer ref="s3VideoBucketTransformer" doc:name="Video Bucket"/>                  		
     </flow>
+    <flow name="box-video-service">
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.boxvideo.path}" doc:name="HTTP"/>
+         <transformer ref="boxVideoTransformer" doc:name="Video Bucket"/>                         		
+    </flow>
+    
+    <flow name="presigned">
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.presigned.path}" doc:name="HTTP"/>
+         <transformer ref="presignedURLTransformer" doc:name="Video Bucket"/>                         		
+    </flow>
+    
+    
+    
 </mule>

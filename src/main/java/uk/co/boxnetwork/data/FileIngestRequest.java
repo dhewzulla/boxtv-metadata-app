@@ -1,15 +1,8 @@
 package uk.co.boxnetwork.data;
 
 public class FileIngestRequest {
- private String file;
  private String profile;
  private long episodeid;
-public String getFile() {
-	return file;
-}
-public void setFile(String file) {
-	this.file = file;
-}
 public String getProfile() {
 	return profile;
 }

@@ -1,4 +1,4 @@
-package uk.co.boxnetwork.data;
+package uk.co.boxnetwork.data.s3;
 
 public class FileItem {
   private  String file;

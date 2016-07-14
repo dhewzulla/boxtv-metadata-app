@@ -87,6 +87,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                             <spring:property name="clientId" value="${brightcove.client_id}"/>
                             <spring:property name="clientSecret" value="${brightcove.client_secret}"/>
                             <spring:property name="s3videoURL" value="${s3.ingest.url}"/>
+                            <spring:property name="videoBucket" value="${s3.video.bucket}"/>
                              <spring:property name="defaltIngestProfile" value="${brightcove.ingest.profile}"/>
                              <spring:property name="ingestCallback" value="${brightcove.ingest.callback}"/>
          </spring:bean>
@@ -120,6 +121,10 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.c4.C4ScheduleTransformer" name="c4Schedule" doc:name="C4 Schedules"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.s3.S3NotificationTransformer" name="s3NotificationTransformer" doc:name="S3 Notification"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.s3.S3VideoBucketTransformer" name="s3VideoBucketTransformer" doc:name="S3 VideoBucket Transformer"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.s3.BoxVideoTransformer" name="boxVideoTransformer" doc:name="BoxVideoTransformer"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.s3.PresignedURLTransformer" name="presignedURLTransformer" doc:name="presignedURLTransformer"/>
+   
    
 
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.CheckTimedTaskTransformer" name="checkTimedTask" doc:name="Check Timed Tasks"/>

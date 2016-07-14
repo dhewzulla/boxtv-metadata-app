@@ -404,8 +404,14 @@ public class BCVideoService {
 		  if(episode.getBrightcoveId()==null){
 			  throw new RuntimeException("The episode is not published to brightcove:"+episode);			  
 		  }
+		  else if(episode.getIngestSource()==null){
+			  throw new RuntimeException("The ingestSource  is not set in episode: episode="+episode);			  
+		  }
+		  else if(episode.getIngestProfile()==null){
+			  throw new RuntimeException("The ingestSource  is not specified"+episode);			  
+		  }	
 		  else{
-			  	  BCVideoIngestRequest bcVideoIngestRequest=new BCVideoIngestRequest(ingestRequest,configuration);
+			  	  BCVideoIngestRequest bcVideoIngestRequest=new BCVideoIngestRequest(episode,configuration);			  	  
 				  return ingestVideo(bcVideoIngestRequest,episode.getBrightcoveId());
 			  }
 			  
