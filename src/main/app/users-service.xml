@@ -8,14 +8,14 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-    <flow name="episode-servicesFlow">
-        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.epsiodes}/*" doc:name="HTTP"/>
+    <flow name="user-service-flow">
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.users.path}/*" doc:name="HTTP"/>
         <http:basic-security-filter realm="mule-realm"/>
-        <transformer ref="episodeService" doc:name="Transformer Episode Service"/>
+        <transformer ref="boxUsersTransformer" doc:name="User Service Transformer"/>
          
              
 
     </flow>
     
-    
+
 </mule>

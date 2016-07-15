@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.model.BCNotification;
+import uk.co.boxnetwork.model.BoxUser;
 import uk.co.boxnetwork.model.CertificationCategory;
 import uk.co.boxnetwork.model.CertificationTime;
 import uk.co.boxnetwork.model.CertificationType;
@@ -83,6 +86,7 @@ public class BoxMedataRepository {
        public void persist(ComplianceInformation compliance){
     	   entityManager.persist(compliance);
        }
+       
        public void merge(ComplianceInformation compliance){
     	   entityManager.persist(compliance);
        }
@@ -497,6 +501,8 @@ public class BoxMedataRepository {
 		   TypedQuery<BCNotification> query=entityManager.createQuery("SELECT b FROM bc_notification b where b.jobId=:jobId", BCNotification.class);
 		   return query.setParameter("jobId",jobid).getResultList();
 	   }
+	   
+	   
 	   public void saveTags(String tagCommaSeparated){
 		   
 		   if(tagCommaSeparated==null){
@@ -545,6 +551,29 @@ public class BoxMedataRepository {
 		   return ret;		   
 	   }
 	   
-	   
-	   
+	        
+	   @Transactional
+       public void updateUser(BoxUser user){
+    	   entityManager.merge(user);
+       }
+	   @Transactional
+       public void createUser(BoxUser user){
+    	   entityManager.persist(user);
+       }
+	   @Transactional
+	   public void deleteByUsername(String username){
+		   BoxUser user= entityManager.find(BoxUser.class, username);
+		   if(user!=null){
+			   entityManager.remove(user);
+		   }
+	   }
+       public List<BoxUser> findUserByUsername(String username){
+    	   TypedQuery<BoxUser> query=entityManager.createQuery("SELECT u FROM user u where u.username=:username", BoxUser.class);    	   
+		   return query.setParameter("username",username).getResultList();		   
+	   }
+	   public List<BoxUser> findAllUsers(){		   
+    	   TypedQuery<BoxUser> query=entityManager.createQuery("SELECT u FROM user u", BoxUser.class);
+		   List<BoxUser> users=query.getResultList();
+		   return users;
+       }	   
 }

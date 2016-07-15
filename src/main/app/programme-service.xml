@@ -13,7 +13,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
     <flow name="programme-service">    
        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.programe}" doc:name="HTTP"/>
-        
+        <http:basic-security-filter realm="mule-realm"/>
          <component doc:name="Programme">
          	 <spring-object bean="programmeComponent"/>
         </component>

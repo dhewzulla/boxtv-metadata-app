@@ -21,6 +21,7 @@
 	   <spring.security.version>2.0.9.RELEASE</spring.security.version>
 	   <hibernate.version>4.0.1.Final</hibernate.version>
 	   <hibernate.validator.version>4.2.0.Final</hibernate.validator.version>
+	   
 	</properties>
 
 
@@ -362,6 +363,13 @@
     	
     	
 </dependency>
+ <dependency>
+      <groupId>org.jasypt</groupId>
+      <artifactId>jasypt</artifactId>
+      <version>1.9.2</version>
+      <scope>compile</scope>
+    </dependency>
+
 		
     </dependencies>
 

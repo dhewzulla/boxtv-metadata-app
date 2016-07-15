@@ -12,6 +12,7 @@ http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/cu
       
     <flow name="s3-service">
         <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.s3.path}" doc:name="HTTP"/>
+        
          <transformer ref="s3VideoBucketTransformer" doc:name="Video Bucket"/>                  		
     </flow>
     <flow name="box-video-service">
@@ -21,6 +22,7 @@ http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/cu
     
     <flow name="presigned">
         <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.presigned.path}" doc:name="HTTP"/>
+        <http:basic-security-filter realm="mule-realm"/>
          <transformer ref="presignedURLTransformer" doc:name="Video Bucket"/>                         		
     </flow>
     

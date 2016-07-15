@@ -5,25 +5,28 @@
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:management="http://www.mulesoft.org/schema/mule/management"
 	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:ss="http://www.springframework.org/schema/security"
+	xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
+		
 	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-	 xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd 
-http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd 
-http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd 
-http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd 
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd 
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
-http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/current/mule-ajax.xsd 
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
-http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd 
-http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
-http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
-http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
-http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-2.5.xsd
-http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+	 xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/current/mule-ajax.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.1/mule-spring-security.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
- 
-http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd ">
+http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
 <spring:beans> 
         <spring:bean id="property-placeholder2" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
@@ -101,8 +104,24 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                             <spring:property name="user" value="${c4.certification.get.user}"/>
                             <spring:property name="password" value="${c4.certification.get.password}"/>                            
          </spring:bean>
+         <spring:bean id="userService" class="uk.co.boxnetwork.security.BoxUserService">
+         	  <spring:property name="encryptionKey" value="${boxtv_metadata_app.security.encryption}"/>
+         </spring:bean>
+         
+         <spring:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+         
+         <ss:authentication-manager alias="authenticationManager">
+      			<ss:authentication-provider user-service-ref="userService">      			   
+      			   <ss:password-encoder ref="encoder" />
+      			</ss:authentication-provider>
+    	</ss:authentication-manager>
 		           
  </spring:beans>
+   
+  <mule-ss:security-manager doc:name="Spring Security Provider" name="Spring_Security_Provider">
+      <mule-ss:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager" />
+  </mule-ss:security-manager>
+   
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.EpisodeTransformer" name="episodeService" doc:name="EpisodeService"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.ScheduleTransformer" name="scheduleService" doc:name="ScheduleService"/>
@@ -130,6 +149,11 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.CheckTimedTaskTransformer" name="checkTimedTask" doc:name="Check Timed Tasks"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.TimedTaskServiceTransformer" name="timedTaskServiceTransformer" doc:name="Timed Task Rest Service"/>
    
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.security.BoxUsersTransformer" name="boxUsersTransformer" doc:name="BoxUsersTransformer"/>
+   
+     
+   
+   
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.mock.MockSoapServiceTransformer" name="mockC4Schedule" doc:name="c4Schedule">
    		<spring:property name="file" value="data/schedule/s2/response.xml"/>
@@ -144,12 +168,12 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
     
     
         
-<mulexml:jaxb-context name="jaxbContext" packageNames="uk.co.boxnetwork.data"/>
+<mulexml:jaxb-context name="jaxbContext" packageNames="uk.co.boxnetwork.data" doc:name="JAXB Context"/>
 
 <http:listener-config name="http_metadata_inbound_listener" host="${http.binding.host}" port="${http.binding.port}" basePath="${boxtv_metadata_app.http.path}" doc:name="HTTP Listener Configuration"/>
 
  
- <https:connector name="httpsConnector">
+ <https:connector name="httpsConnector" doc:name="HTTP-HTTPS">
      <https:tls-key-store path="${mule.home}/conf/keystore.jks" keyPassword="boxmedia39" storePassword="boxmedia39"/>
  </https:connector>
  

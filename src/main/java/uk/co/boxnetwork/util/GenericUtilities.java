@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Field;
 
+import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,32 @@ import uk.co.boxnetwork.mule.components.LoadResourceAsInputStream;
 
 public class GenericUtilities {
 	private static final Logger logger=LoggerFactory.getLogger(GenericUtilities.class);
+	
+	
+	static {
+	    try {
+	        Field field = Class.forName("javax.crypto.JceSecurity").getDeclaredField("isRestricted");
+	        field.setAccessible(true);
+	        field.set(null, java.lang.Boolean.FALSE);
+	    } catch (Exception ex) {
+	    }
+	} 
+	
+	public static StrongTextEncryptor getEncryptor(String encruptionKey){
+		StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
+ 	    textEncryptor.setPassword(encruptionKey);
+ 	    return textEncryptor;
+ 	   
+	}
+	public static String encrypt(String encruptionKey,String content){
+		StrongTextEncryptor textEncryptor =getEncryptor(encruptionKey); 
+		return textEncryptor.encrypt(content);		 	   
+	}
+	public static String decrypt(String encruptionKey,String content){
+		StrongTextEncryptor textEncryptor =getEncryptor(encruptionKey); 
+		return textEncryptor.decrypt(content);		 	   
+	}
+	
   public static boolean equalString(String v1, String v2){
 	  if(v1==null){
 		   return v2==null;		   
@@ -108,4 +136,5 @@ public class GenericUtilities {
 	  return v;
 	  
   }
+  
 }

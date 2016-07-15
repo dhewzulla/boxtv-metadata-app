@@ -11,6 +11,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
     <flow name="import-schedule-service">
         <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.import.schedule}/*" doc:name="HTTP"/>
+        <http:basic-security-filter realm="mule-realm"/>        
         <object-to-string-transformer doc:name="Object to String"/>
         <vm:outbound-endpoint exchange-pattern="one-way" path="importSchedule" doc:name="VM"/>
         <set-payload value="{&quot;message&quot;:&quot;Import Request is sent&quot;}" doc:name="Set Payload"/>

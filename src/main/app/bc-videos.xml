@@ -10,6 +10,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
     <flow name="bc-video">
         <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.bc.videos}/*" doc:name="HTTP"/>
+        <http:basic-security-filter realm="mule-realm"/>
         <transformer ref="bcVideoService" doc:name="BC Video Service"/>
     </flow>
     
