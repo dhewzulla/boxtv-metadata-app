@@ -82,15 +82,21 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          
          
          <spring:bean id="programmeComponent"  class="uk.co.boxnetwork.mule.components.metadata.ProgrammeComponent"/>
+         <spring:bean id="s3Configuration"  class="uk.co.boxnetwork.data.s3.S3Configuration">
+         	   <spring:property name="s3videoURL" value="${s3.ingest.url}"/>
+         	   <spring:property name="videoBucket" value="${s3.video.bucket}"/>
+         	   <spring:property name="imageBucket" value="${s3.images.bucket}"/>
+         	   <spring:property name="imageFolder" value="${s3.images.folder}"/>
+         	   
+         </spring:bean>
+         
          <spring:bean id="bcConfiguration"  class="uk.co.boxnetwork.data.bc.BCConfiguration">
                             <spring:property name="oauthurl" value="${brightcove.oauth.url}"/>
                             <spring:property name="cmsurl" value="${brightcove.cms.url}"/>
                             <spring:property name="ingesturl" value="${brightcove.ingest.url}"/>
                             <spring:property name="accountId" value="${brightcove.account_id}"/>
                             <spring:property name="clientId" value="${brightcove.client_id}"/>
-                            <spring:property name="clientSecret" value="${brightcove.client_secret}"/>
-                            <spring:property name="s3videoURL" value="${s3.ingest.url}"/>
-                            <spring:property name="videoBucket" value="${s3.video.bucket}"/>
+                            <spring:property name="clientSecret" value="${brightcove.client_secret}"/>                            
                              <spring:property name="defaltIngestProfile" value="${brightcove.ingest.profile}"/>
                              <spring:property name="ingestCallback" value="${brightcove.ingest.callback}"/>
          </spring:bean>
@@ -104,6 +110,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                             <spring:property name="user" value="${c4.certification.get.user}"/>
                             <spring:property name="password" value="${c4.certification.get.password}"/>                            
          </spring:bean>
+         
          <spring:bean id="userService" class="uk.co.boxnetwork.security.BoxUserService">
          	  <spring:property name="encryptionKey" value="${boxtv_metadata_app.security.encryption}"/>
          </spring:bean>
@@ -151,6 +158,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.security.BoxUsersTransformer" name="boxUsersTransformer" doc:name="BoxUsersTransformer"/>
    
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.DoNothingTransformer" name="doNothingTransformer" doc:name="DoNothingTransformer"/>
      
    
    

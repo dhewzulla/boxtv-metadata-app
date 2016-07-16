@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import uk.co.boxnetwork.data.s3.FileItem;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 
 
@@ -347,19 +348,7 @@ public class Episode {
 			 if(materialID.length()==0){
 				 return null;
 			 }
-			 String matParts[]=materialID.split("/");
-			 StringBuilder filenameBuilder=new StringBuilder();
-			 filenameBuilder.append("V");
-			 int counter=0;
-			 for(String mpart:matParts){
-				 filenameBuilder.append("_");
-				 filenameBuilder.append(mpart);
-				 counter++;
-				 if(counter>2){
-					 break;
-				 }
-		     }
-			 return filenameBuilder.toString();
+			 return GenericUtilities.materialIdToFileName(materialID);
 	}
 	
 }

@@ -19,6 +19,7 @@ public class BoxUsersTransformer extends BoxRestTransformer{
 	
 	@Override
 	protected Object processGET(MuleMessage message, String outputEncoding){
+		logger.info("list user request is received");
 		return boxUserService.listUsers();		
 	}
 	

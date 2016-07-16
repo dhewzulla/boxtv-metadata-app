@@ -6,11 +6,11 @@ public class BCConfiguration {
 	private String oauthurl;
 	private String cmsurl;
 	private String ingesturl;
-	private String videoBucket;
+	
 	private String accountId;
 	private String clientId;
 	private String clientSecret;
-	private String s3videoURL;
+	
 	private String defaltIngestProfile;
 	private String ingestCallback;
 	public String getAccountId() {
@@ -100,12 +100,7 @@ public class BCConfiguration {
 		this.clientSecret = clientSecret;
 	}
 	
-	public String getS3videoURL() {
-		return s3videoURL;
-	}
-	public void setS3videoURL(String s3videoURL) {
-		this.s3videoURL = s3videoURL;
-	}
+	
 	public String getDefaltIngestProfile() {
 		return defaltIngestProfile;
 	}
@@ -119,12 +114,7 @@ public class BCConfiguration {
 		this.ingestCallback = ingestCallback;
 	}
 	
-	public String getVideoBucket() {
-		return videoBucket;
-	}
-	public void setVideoBucket(String videoBucket) {
-		this.videoBucket = videoBucket;
-	}
+	
 	public String basicAuthentication(){
 		String plainCreds = clientId+":"+clientSecret;
 		byte[] plainCredsBytes = plainCreds.getBytes();

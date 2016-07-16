@@ -74,7 +74,7 @@ public class BoxUserService implements UserDetailsService{
 		else{			
 			password=boxuser.getPassword();			
 		}	
-		logger.info("root:******:::::::"+password);
+		
 		List<SimpleGrantedAuthority> authList = getAuthorities(boxuser);
 		String encodedPassword = passwordEncoder.encode(password);
 		User user=new User(username, encodedPassword, authList);

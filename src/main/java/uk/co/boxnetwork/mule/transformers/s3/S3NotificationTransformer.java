@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.co.boxnetwork.components.ImportC4ScheduleService;
+import uk.co.boxnetwork.components.NotificationReceiver;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.FileIngestRequest;
 import uk.co.boxnetwork.data.ImportScheduleRequest;
@@ -21,7 +22,8 @@ import uk.co.boxnetwork.mule.util.MuleRestUtil;
 
 public class S3NotificationTransformer extends BoxRestTransformer{
 
-	
+	@Autowired
+	private NotificationReceiver notificationReceiver; 
 	
 	@Override
 	protected Object processPOST(MuleMessage message, String outputEncoding){		
@@ -32,10 +34,9 @@ public class S3NotificationTransformer extends BoxRestTransformer{
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			
 			String requestInJson = (String)message.getPayloadAsString();							
-			logger.info("SNSSubscriptionMessage is received:"+requestInJson);
+			logger.info("S3NotificationTransformer: Notification Message is received:"+requestInJson);
 			Map<String, Object> msg = (Map<String, Object>)objectMapper.readValue(requestInJson, Map.class);
-		    logger.info("Ha ha....."+msg);
-			
+			notificationReceiver.notify(msg);			
 			//S3Notifivcation s3Notification = objectMapper.readValue(requestInJson, S3Notifivcation.class);
 			//SNSSubscriptionMessage snsM3ssage=objectMapper.readValue(requestInJson, SNSSubscriptionMessage.class);
 			return requestInJson;

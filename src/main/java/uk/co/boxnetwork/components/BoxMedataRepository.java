@@ -61,6 +61,7 @@ public class BoxMedataRepository {
     	   episode.setCreatedAt(lastModifiedAt);
 		   entityManager.persist(episode);
        }
+       
        public void mergeEpisode(Episode episode){
     	   Date lastModifiedAt=new Date();
     	   episode.setLastModifiedAt(lastModifiedAt);    	   
@@ -452,7 +453,10 @@ public class BoxMedataRepository {
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title LIKE :search OR e.materialId LIKE :search OR e.series.name LIKE :search", Episode.class);
 		   return query.setParameter("search",search).getResultList();
 	   }
-	   
+	   public List<Episode> findEpisodesByMatId(String matid){
+		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.materialId LIKE :matid", Episode.class);
+		   return query.setParameter("matid",matid).getResultList();
+	   }
 	   public List<Episode> findEpisodesByCtrPrg(String ctrPrg){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.ctrPrg=:ctrPrg", Episode.class);
 		   return query.setParameter("ctrPrg",ctrPrg).getResultList();

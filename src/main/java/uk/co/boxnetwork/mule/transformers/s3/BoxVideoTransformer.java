@@ -18,6 +18,7 @@ public class BoxVideoTransformer extends BoxRestTransformer{
 	
 	
 	protected Object processGET(MuleMessage message, String outputEncoding){
+		logger.info("boxvideo.get request is received");
 		Map<String, String> queryprarams=message.getInboundProperty("http.query.params");
 		String prefix=null;
 		if(queryprarams!=null && queryprarams.get("prefix")!=null){

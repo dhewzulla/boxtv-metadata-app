@@ -1,6 +1,7 @@
 package uk.co.boxnetwork.mule.transformers;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import uk.co.boxnetwork.data.ErrorMessage;
+
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
 
 public class BoxRestTransformer  extends AbstractMessageTransformer{
@@ -29,8 +31,9 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
+		    logger.info("***Rest request received on "+this.getClass().getName());
 	try{	
-				MuleRestUtil.addCORS(message, outputEncoding);
+				addCORS(message, outputEncoding);
 				String inboudMethod=message.getInboundProperty("http.method");
 				Object returnObject=null;		
 				if(inboudMethod.equals("GET")){
@@ -100,5 +103,18 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 		return new ErrorMessage("The Method "+method+" not supported");			 
 	}
    
-   
+   public void addCORS(MuleMessage message, String outputEncoding){
+		String origin=null;		 
+		Map<String,String> headers=message.getInboundProperty("http.headers");
+		if(headers!=null){
+			origin= headers.get("Origin");
+		}
+		else{
+			origin= "*";
+		}
+	    message.setOutboundProperty("Access-Control-Allow-Origin", origin);
+	    message.setOutboundProperty("Access-Control-Max-Age", "600");
+	    message.setOutboundProperty("Access-Control-Allow-Methods","GET,POST, PUT, PATCH, OPTIONS");
+	    message.setOutboundProperty("Access-Control-Allow-Headers","X-Requested-With, Content-Type, Accept,apikey,accept, authorization");
+   }
 }

@@ -40,7 +40,7 @@ public class S3VideoBucketTransformer extends BoxRestTransformer{
 		
 	}
 	protected Object processGET(MuleMessage message, String outputEncoding){
-		
+		logger.info("s3 list request is received");
 		VideoFilesLocation files=s3uckerService.listFilesInVideoBucket(null);
 		return 	filter(message, outputEncoding,files.getFiles());
 	

@@ -10,8 +10,19 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
     <flow name="schedule-servicesFlow">
         <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.schedules}/*" doc:name="HTTP"/>
-        <http:basic-security-filter realm="mule-realm"/>
-        <transformer ref="scheduleService" doc:name="Transformer Schedule Service"/>
+        
+        <choice doc:name="Choice">
+	         <when expression="#[message.inboundProperties['http.method'] == 'OPTIONS']">
+	         	<transformer ref="doNothingTransformer"/>         	
+	  		 </when>
+	    	<otherwise>
+	        	<http:basic-security-filter realm="mule-realm"/>
+	        	<transformer ref="scheduleService" doc:name="Transformer Schedule Service"/>    	
+	        </otherwise>
+	    </choice>
+        
+        
+        
          
        
         

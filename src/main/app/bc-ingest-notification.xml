@@ -9,7 +9,19 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
     <flow name="bc-ingest-notification">
 		<http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.bc.notification}/*" doc:name="HTTP"/>        
-        <transformer ref="bcNotification" doc:name="BC Video Ingest Notification"/>
+        
+        <choice doc:name="Choice">
+	         <when expression="#[message.inboundProperties['http.method'] == 'OPTIONS']">
+	         	<transformer ref="doNothingTransformer"/>         	
+	  		 </when>
+	    	<otherwise>
+	        	<http:basic-security-filter realm="mule-realm"/>
+	        	<transformer ref="bcNotification" doc:name="BC Video Ingest Notification"/>    	
+	        </otherwise>
+	    </choice>
+        
+        
+        
 </flow>
 
 </mule>

@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
@@ -135,6 +138,114 @@ public class GenericUtilities {
 	  }
 	  return v;
 	  
+  }
+  
+  public static String getValueInMap(Map<String, Object> messageMap, String paths){
+	  String[] path=paths.split("\\.");
+	  return getValueInMap(messageMap,path);
+	  
+  }
+  public static String getValueInMap(Map<String, Object> messageMap, String path[]){
+	  return getValueInMap(messageMap,path,0);
+  }
+  private static Object getValueInMapByVar(Map<String, Object> messageMap, String variableName){
+	  
+    int ib=variableName.indexOf("[");
+    int ie=variableName.indexOf("]");
+    if(ib!=-1 && ie>ib){
+    	String indexString=variableName.substring(ib+1,ie);
+    	String varName=variableName.substring(0,ib);
+    	int ind=Integer.valueOf(indexString);
+    	Object obj=messageMap.get(varName);
+    	if(obj instanceof ArrayList){
+    		List<Object> objarray=(List<Object>)obj;
+    		if(objarray.size()<=ind){
+    			logger.warn(" array index out of boundary in getValueInMapByVar() varName=["+varName+"]ind=["+ind+"]but array size is:"+objarray.size());
+    			return null;
+    		}
+    		else
+    			return objarray.get(ind);
+    	}
+    	return obj;
+    	
+    }
+    else{
+    	return messageMap.get(variableName);
+    }
+	  
+	  
+	  
+  }
+  private  static String getValueInMap(Map<String, Object> messageMap, String path[], int index){
+	  if(index>=path.length){
+		  return null;
+		  
+	  }
+	  
+	  Object obj=getValueInMapByVar(messageMap,path[index]);
+	  if(obj==null){
+		  return null;
+	  }
+	  if((index+1)>=path.length){
+		  if(obj instanceof String){			  
+			  return (String)obj;
+		  }
+		  else{
+			  logger.warn("Unpexected type on "+path+":"+index+":"+obj.getClass().getName());
+			  return null;			  
+		  }
+	  }
+	  else if(obj instanceof Map){
+		  Map<String, Object> objMap=(Map<String, Object>)obj;
+		  return getValueInMap(objMap, path,index+1);
+	  }
+	  else{
+		  logger.warn("Unpexected type on "+path+":"+index+":"+obj.getClass().getName());
+		  return null;
+		  
+	  }
+	  
+  }
+  
+  public static String materialIdToFileName(String materialID){
+	  String matParts[]=materialID.split("/");
+		 StringBuilder filenameBuilder=new StringBuilder();
+		 filenameBuilder.append("V");
+		 int counter=0;
+		 for(String mpart:matParts){
+			 filenameBuilder.append("_");
+			 filenameBuilder.append(mpart);
+			 counter++;
+			 if(counter>2){
+				 break;
+			 }
+	     }
+		 return filenameBuilder.toString();
+  }
+  public static String fileNameToMaterialID(String filename){
+	  if(filename.startsWith("V_") || filename.startsWith("v_")){
+		  String fpath=filename.substring(2);
+		  int ie=filename.indexOf(".");
+		  if(ie!=-1){
+			  fpath=fpath.substring(0,ie);
+		  }
+		  String matParts[]=fpath.split("_");
+		  StringBuilder matidBuilder=new StringBuilder();			 
+			 int counter=0;
+			 for(String mpart:matParts){
+				 if(counter>0){
+					 matidBuilder.append("/");
+				 }				 
+				 matidBuilder.append(mpart);
+				 counter++;
+				 if(counter>1){
+					 break;
+				 }
+		     }
+			 return matidBuilder.toString();
+	  }		
+	  else
+		  return null;
   }
   
 }

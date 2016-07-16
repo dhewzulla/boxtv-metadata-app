@@ -306,7 +306,7 @@ public class BCVideoService {
 		  BCVideoData newbcVideoData=new BCVideoData(episode);
 		  newbcVideoData.calculateSchedule(schedules);
 		  if(episode.getBrightcoveId()==null){			 
-			  newbcVideoData.setName("TEST_BOXMEDIA_"+newbcVideoData.getName());			  
+			  newbcVideoData.setName(newbcVideoData.getName());			  
 			  String reponse=createVideo(newbcVideoData);
 			  logger.info("create video respomse:"+reponse);
 			  BCVideoData createdVideo=jsonToBCVideoData(reponse);

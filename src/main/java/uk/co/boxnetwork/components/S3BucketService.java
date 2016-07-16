@@ -21,16 +21,18 @@ import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
-import uk.co.boxnetwork.data.bc.BCConfiguration;
+
 import uk.co.boxnetwork.data.s3.FileItem;
+import uk.co.boxnetwork.data.s3.S3Configuration;
 import uk.co.boxnetwork.data.s3.VideoFilesLocation;
 
 @Service
 public class S3BucketService {
 	static final protected Logger logger=LoggerFactory.getLogger(S3BucketService.class);
-	@Autowired
-    private BCConfiguration configuration;
 	
+	
+	@Autowired
+	private S3Configuration s3Configuration;	
 	
 	private  AWSCredentials getAWSCredentials(){			   
 	    return  new ProfileCredentialsProvider().getCredentials();
@@ -66,14 +68,15 @@ public class S3BucketService {
 	}
 	public VideoFilesLocation listFilesInVideoBucket(String prefix){
 		VideoFilesLocation videoFilesLocations=new VideoFilesLocation();
-		videoFilesLocations.setBaseUrl(configuration.getS3videoURL());
-		videoFilesLocations.setFiles(listFiles(configuration.getVideoBucket(),prefix));
+		videoFilesLocations.setBaseUrl(s3Configuration.getS3videoURL());
+		videoFilesLocations.setFiles(listFiles(s3Configuration.getVideoBucket(),prefix));
+		logger.info("******number of s3 file for prefix=["+prefix+"]:"+videoFilesLocations.getFiles().size());
 		return videoFilesLocations;
 	}
 	
 	
 	public String getFullVideoURL(String fileName){
-		return configuration.getS3videoURL()+"/"+fileName;
+		return s3Configuration.getS3videoURL()+"/"+fileName;
 	}
 	public String generatedPresignedURL(String url, int expiredInSeconds){
 		if(url==null){
@@ -83,7 +86,9 @@ public class S3BucketService {
 		if(url.length()==0){
 			return null;
 		}
-		String baseURL=configuration.getS3videoURL();
+		String baseURL=s3Configuration.getS3videoURL();
+		
+		
 		if(!url.startsWith(baseURL)){
 			throw new IllegalArgumentException("the url cannot be signed");
 		}
@@ -96,7 +101,7 @@ public class S3BucketService {
 		long milliSeconds = expiration.getTime();
 		milliSeconds += 1000 * expiredInSeconds; // Add 1 hour.
 		expiration.setTime(milliSeconds);
-		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(configuration.getVideoBucket(), filename);
+		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(s3Configuration.getVideoBucket(), filename);
 		generatePresignedUrlRequest.setMethod(HttpMethod.GET); 
 		generatePresignedUrlRequest.setExpiration(expiration);
 		AmazonS3 s3=getAmazonS3();
