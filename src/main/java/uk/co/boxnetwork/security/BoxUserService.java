@@ -32,8 +32,16 @@ public class BoxUserService implements UserDetailsService{
 
 	private String encryptionKey;
 	
+	private String defaultRootPassword;
+	
+	
 	public void setEncryptionKey(String encryptionKey) {
 		this.encryptionKey = encryptionKey;
+	}
+
+
+	public void setDefaultRootPassword(String defaultRootPassword) {
+		this.defaultRootPassword = defaultRootPassword;
 	}
 
 
@@ -59,7 +67,7 @@ public class BoxUserService implements UserDetailsService{
 		String password=null;
 		if(boxuser==null){
 			if("root".equals(username)){
-				password="bigdata&Boxmedia";
+				password=this.defaultRootPassword;
 				boxuser=new BoxUser();
 				boxuser.setUsername("root");
 				boxuser.setPassword(password);
