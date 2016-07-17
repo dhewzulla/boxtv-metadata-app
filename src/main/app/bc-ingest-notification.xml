@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	         	<transformer ref="doNothingTransformer"/>         	
 	  		 </when>
 	    	<otherwise>
-	        	<http:basic-security-filter realm="mule-realm"/>
+	        	
 	        	<transformer ref="bcNotification" doc:name="BC Video Ingest Notification"/>    	
 	        </otherwise>
 	    </choice>

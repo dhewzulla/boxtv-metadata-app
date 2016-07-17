@@ -4,9 +4,27 @@ public class S3Configuration {
 	private String s3videoURL;
 	private String videoBucket;
 	private String imageBucket;
-	private String imageFolder;
+    private String imageMasterFolder;
+    private String imagePublicFolder;
+    
 	
 	
+
+	public String getImagePublicFolder() {
+		return imagePublicFolder;
+	}
+
+	public void setImagePublicFolder(String imagePublicFolder) {
+		this.imagePublicFolder = imagePublicFolder;
+	}
+
+	public String getImageMasterFolder() {
+		return imageMasterFolder;
+	}
+
+	public void setImageMasterFolder(String imageMasterFolder) {
+		this.imageMasterFolder = imageMasterFolder;
+	}
 
 	public String getS3videoURL() {
 		return s3videoURL;
@@ -32,13 +50,6 @@ public class S3Configuration {
 		this.imageBucket = imageBucket;
 	}
 
-	public String getImageFolder() {
-		return imageFolder;
-	}
-
-	public void setImageFolder(String imageFolder) {
-		this.imageFolder = imageFolder;
-	}
-	
+		
 	
 }

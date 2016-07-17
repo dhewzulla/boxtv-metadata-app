@@ -86,7 +86,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          	   <spring:property name="s3videoURL" value="${s3.ingest.url}"/>
          	   <spring:property name="videoBucket" value="${s3.video.bucket}"/>
          	   <spring:property name="imageBucket" value="${s3.images.bucket}"/>
-         	   <spring:property name="imageFolder" value="${s3.images.folder}"/>
+         	   <spring:property name="imageMasterFolder" value="${s3.images.master.folder}"/>
+         	   <spring:property name="imagePublicFolder" value="${s3.images.public.folder}"/>
          	   
          </spring:bean>
          

@@ -236,8 +236,14 @@ public class BCVideoService {
 			
 			String ingestURL=configuration.ingestUrl(videoid);
 			
+//			if(true){
+//				BcIngestResponse response=new BcIngestResponse();
+//				response.setId("1111");
+//				return response;
+//			}
 			
-		    ResponseEntity<String> responseEntity = rest.exchange(ingestURL,HttpMethod.POST , requestEntity, String.class);
+		     ResponseEntity<String> responseEntity = rest.exchange(ingestURL,HttpMethod.POST , requestEntity, String.class);
+			 
 		    
 		    responseEntity.getStatusCode();	    
 		    HttpStatus statusCode=responseEntity.getStatusCode();
@@ -262,7 +268,8 @@ public class BCVideoService {
 		
 		
 	}
-	private BCVideoData jsonToBCVideoData(String videoInJson){
+	
+	public  BCVideoData jsonToBCVideoData(String videoInJson){
 		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);	
 		

@@ -24,6 +24,10 @@ public class NotificationReceiver {
 	@Autowired
 	private MetadataService metadataService; 
 	
+	@Autowired
+	private CommandServices commandService; 
+	
+	
 	private String getBucketName(Map<String, Object> messageMap){
 		return GenericUtilities.getValueInMap(messageMap,"Records[0].s3.bucket.name");
 	}
@@ -80,6 +84,14 @@ public class NotificationReceiver {
 		if(eventName.contains("ObjectCreated")){
 			onFileUpload(bucket, key);
 		}
+		else if(eventName.contains("ObjectRemoved")){
+			onFileDeleted(bucket, key);
+		}
+		else{
+			logger.info("Ignoring event:"+eventName);
+		}
+		
+		
 	}
 	private void onFileUpload(String bucketName, String file){
 		if(s3Configuration.getImageBucket().equals(bucketName)){
@@ -89,8 +101,22 @@ public class NotificationReceiver {
 			onVideoBucketUpload(file);
 		}
 	}
+	
+	private void onFileDeleted(String bucketName, String file){
+		if(s3Configuration.getImageBucket().equals(bucketName)){
+			onImageBucketFileDeleted(file);
+		}
+		else if(s3Configuration.getVideoBucket().equals(bucketName)){
+			onVideoBucketFileDeleted(file);
+		}
+	}
+	
+	
 	private void onImageBucketUpload(String file){
 		logger.info("Uploaded to the image bucket"+ file);
+		if(file.startsWith(s3Configuration.getImageMasterFolder())){
+			commandService.convertFromMasterImage(file);
+		}
 	}
    private void onVideoBucketUpload(String file){
 	   logger.info("Uploaded to the video bucket:"+file);
@@ -98,5 +124,12 @@ public class NotificationReceiver {
 	   
 	}
 	
-	
+	private void onImageBucketFileDeleted(String file){
+		logger.info("image file is deleted:"+file);
+		
+				
+	}
+	private void onVideoBucketFileDeleted(String file){
+		logger.info("video file is deleted:"+file);		
+	}
 }

@@ -1,5 +1,3 @@
 scriptbasedir=$(dirname "$0")
 source $scriptbasedir/../properties.sh
-
-
-curl -i $mulebaseurl/ingest/metadata
+curl -d "{episodeid:1}" -X POST $mulebaseurl/bc/ingest

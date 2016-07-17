@@ -13,6 +13,8 @@ public class BCCustomFields {
   private String programmesynopsis;
   private String warningtext;
   private String episodenumber;
+  private String drm;
+  
   
   
   
@@ -92,6 +94,12 @@ public String getEpisodenumber() {
 }
 public void setEpisodenumber(String episodenumber) {
 	this.episodenumber = episodenumber;
+}
+public String getDrm() {
+	return drm;
+}
+public void setDrm(String drm) {
+	this.drm = drm;
 }
 
  
