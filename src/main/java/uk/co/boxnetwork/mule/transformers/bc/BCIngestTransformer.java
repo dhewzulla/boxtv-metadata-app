@@ -23,8 +23,6 @@ public class BCIngestTransformer  extends BoxRestTransformer{
 	@Override
 	protected Object processPOST(MuleMessage message, String outputEncoding){
 			String requestInJson=null;
-			String listenerPath=message.getInboundProperty("http.listener.path");
-			logger.info("******:listener:path:"+listenerPath);
 			
 			try {
 					FileIngestRequest ingestrequest=null;

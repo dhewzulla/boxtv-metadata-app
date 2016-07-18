@@ -24,7 +24,7 @@ public class BoxVideoTransformer extends BoxRestTransformer{
 		if(queryprarams!=null && queryprarams.get("prefix")!=null){
 			prefix=queryprarams.get("prefix").trim();			
 		}
-		return s3uckerService.listFilesInVideoBucket(prefix);
+		return s3uckerService.listVideoFileItem(prefix);		
 	}
 	
 }

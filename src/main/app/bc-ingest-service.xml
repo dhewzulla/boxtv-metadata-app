@@ -15,8 +15,8 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	         <when expression="#[message.inboundProperties['http.method'] == 'OPTIONS']">
 	         	<transformer ref="doNothingTransformer"/>         	
 	  		 </when>
-	    	<otherwise>
-	        	<http:basic-security-filter realm="mule-realm"/>
+	    	<otherwise>	    	   
+	        	<http:basic-security-filter realm="mule-realm"/>	        	
 	        	<transformer ref="bcVideoIngestTransformer" doc:name="BC Video Ingest"/>    	
 	        </otherwise>
 	    </choice>

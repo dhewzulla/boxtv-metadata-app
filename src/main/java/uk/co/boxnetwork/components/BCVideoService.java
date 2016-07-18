@@ -235,13 +235,6 @@ public class BCVideoService {
 			HttpEntity<String> requestEntity = new HttpEntity<String>(requestInJson, headers);
 			
 			String ingestURL=configuration.ingestUrl(videoid);
-			
-//			if(true){
-//				BcIngestResponse response=new BcIngestResponse();
-//				response.setId("1111");
-//				return response;
-//			}
-			
 		     ResponseEntity<String> responseEntity = rest.exchange(ingestURL,HttpMethod.POST , requestEntity, String.class);
 			 
 		    
@@ -407,7 +400,7 @@ public class BCVideoService {
 		  Episode  episode=metadataRepository.findEpisodeById(ingestRequest.getEpisodeid());		  
 		  if(episode==null){
 			  throw new RuntimeException("The episodeid is not found in the database"); 
-		  }
+		  }		  
 		  if(episode.getBrightcoveId()==null){
 			  throw new RuntimeException("The episode is not published to brightcove:"+episode);			  
 		  }
