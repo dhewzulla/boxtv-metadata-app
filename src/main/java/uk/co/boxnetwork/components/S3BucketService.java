@@ -89,10 +89,9 @@ public class S3BucketService {
 		if(videoFileLocation.getFiles()!=null && videoFileLocation.getFiles().size()>0){
 			for(FileItem fitem:videoFileLocation.getFiles()){
 				String fullURL=getFullVideoURL(fitem.getFile());	
-				String presignedURL=generatedPresignedURL(fullURL,3600);
+				
 				VideoFileItem vitem=new VideoFileItem();
-				vitem.setFile(fitem.getFile());
-				vitem.setPresignedURL(presignedURL);
+				vitem.setFile(fitem.getFile());				
 				String materialId=GenericUtilities.fileNameToMaterialID(fitem.getFile());
 				List<Episode> matchedEpisodes=boxMetadataRepository.findEpisodesByMatId(materialId+"%");
 				if(matchedEpisodes.size()>0){

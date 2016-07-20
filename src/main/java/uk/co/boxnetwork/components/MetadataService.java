@@ -1,6 +1,7 @@
 package uk.co.boxnetwork.components;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.Programme;
+import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
@@ -35,12 +37,21 @@ public class MetadataService {
 	}
 	
 	
-	public List<Episode> getAllEpisodes(){
+	public List<uk.co.boxnetwork.data.Episode> getAllEpisodes(){
 		
-		return boxMetadataRepository.findAllEpisodes();
+		return toData(boxMetadataRepository.findAllEpisodes());
 	}
-	public List<Episode> findEpisodes(String search){
-		return boxMetadataRepository.findEpisodes(search);
+	public List<uk.co.boxnetwork.data.Episode> findEpisodes(String search){
+		List<Episode> eposides=boxMetadataRepository.findEpisodes(search);
+		return toData(eposides);
+	}
+	private  List<uk.co.boxnetwork.data.Episode>  toData(List<Episode> eposides){
+		List<uk.co.boxnetwork.data.Episode> ret=new ArrayList<uk.co.boxnetwork.data.Episode>();
+		for(Episode episode:eposides){
+			ret.add(new uk.co.boxnetwork.data.Episode(episode));
+		}
+		
+		return ret;
 	}
 	
 public List<Series> getAllSeries(){		
@@ -78,6 +89,51 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		boxMetadataRepository.update(existingEpisode);
 		
 	}
+	@Transactional
+	public uk.co.boxnetwork.data.Episode reicevedEpisodeByMaterialId(uk.co.boxnetwork.data.Episode episode){
+		String materiaId=episode.getMaterialId();
+		if(materiaId==null){
+			throw new RuntimeException("MaterialId is required");
+		}
+		materiaId=materiaId.trim();
+		if(materiaId.length()==0){
+			throw new RuntimeException("MaterialId is empty");
+		}
+		List<Episode> existingEpisodes=boxMetadataRepository.findEpisodesByMatId(materiaId);
+		if(existingEpisodes.size()==0){
+			throw new RuntimeException("episode not found");
+		}
+		if(existingEpisodes.size()>1){
+			throw new RuntimeException("more than one episodes matched to the materia id:"+materiaId);
+		}
+		Episode episodeToUpdate=existingEpisodes.get(0); 
+		episode.updateTo(episodeToUpdate);		
+		replaceCuePoints(episodeToUpdate,episode.getCuePoints());
+		
+		boxMetadataRepository.mergeEpisode(episodeToUpdate);
+		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episodeToUpdate);
+		ret.setComplianceInformations(episodeToUpdate.getComplianceInformations());
+		return ret;
+	}
+	
+	public void replaceCuePoints(Episode episodeToUpdate, List<uk.co.boxnetwork.data.CuePoint> cuePoints){
+		if(cuePoints==null|| cuePoints.size()==0){
+			return;
+		}		
+	    for(CuePoint cp:episodeToUpdate.getCuePoints()){	    	
+	    	boxMetadataRepository.remove(cp);	    	
+	    }
+	    episodeToUpdate.clearCuePoints();
+		for(uk.co.boxnetwork.data.CuePoint cuepoint:cuePoints){
+			     CuePoint cue=new CuePoint();
+			     cuepoint.update(cue);			     
+			     episodeToUpdate.addCuePoint(cue);
+			     cue.setEpisode(episodeToUpdate);
+			     boxMetadataRepository.merge(cue);
+			     
+		}		
+	}
+	
 	
 	@Transactional
 	public void update(long id, uk.co.boxnetwork.data.Series series){

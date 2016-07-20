@@ -1,8 +1,7 @@
 package uk.co.boxnetwork.data.s3;
 
 public class VideoFileItem {
-	private  String file;
-    private  String presignedURL;
+	private  String file;    
     private  String episodeTitle;
     private  Long episodeId;
 	public String getFile() {
@@ -11,12 +10,7 @@ public class VideoFileItem {
 	public void setFile(String file) {
 		this.file = file;
 	}
-	public String getPresignedURL() {
-		return presignedURL;
-	}
-	public void setPresignedURL(String presignedURL) {
-		this.presignedURL = presignedURL;
-	}
+	
 	public String getEpisodeTitle() {
 		return episodeTitle;
 	}

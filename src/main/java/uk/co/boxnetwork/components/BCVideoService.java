@@ -308,7 +308,7 @@ public class BCVideoService {
 		  if(episode.getBrightcoveId()==null){			 
 			  newbcVideoData.setName(newbcVideoData.getName());			  
 			  String reponse=createVideo(newbcVideoData);
-			  logger.info("create video respomse:"+reponse);
+			  logger.info("create video resposse:"+reponse);
 			  BCVideoData createdVideo=jsonToBCVideoData(reponse);
 			  logger.info("created video:"+createdVideo);
 			  episode.setBrightcoveId(createdVideo.getId());

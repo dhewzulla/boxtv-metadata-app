@@ -68,7 +68,7 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 					try {
 						return convertObjectToJson(returnObject);
 					} catch (JsonProcessingException e) {
-						logger.error("Unbale to convert the object to json: returnObject=p["+returnObject+"] class="+returnObject.getClass().getName() );
+						logger.error(e+":Unbale to convert the object to json: returnObject=p["+returnObject+"] class="+returnObject.getClass().getName() ,e);
 						return returnError("Unable to convert to json",message);
 					}
 				}

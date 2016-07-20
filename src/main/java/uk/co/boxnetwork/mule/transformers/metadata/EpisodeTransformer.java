@@ -39,8 +39,8 @@ public class EpisodeTransformer extends BoxRestTransformer{
 			
 			ParameterMap queryparams=message.getInboundProperty("http.query.params");
 			if(queryparams==null || queryparams.get("search") ==null || queryparams.get("search").length()==0){				
-					List<Episode> episodes=metadataService.getAllEpisodes();
-					return episodes;
+					return metadataService.getAllEpisodes();
+					
 			}
 			String search=queryparams.get("search");
 			if(search.indexOf("%")==-1){
@@ -79,5 +79,22 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		   metadataService.update(id,episode);
 		   
 		   return metadataService.getEpisodeById(id);						 
-		}                     
+		}  
+         
+    	protected Object processPOST(MuleMessage message, String outputEncoding){
+    		try{	
+	    		    String episodeInJson=(String)message.getPayloadAsString();		   
+				   logger.info("*****Posted a new episode:"+episodeInJson+"****");
+				   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
+				   objectMapper.setSerializationInclusion(Include.NON_NULL);
+				   uk.co.boxnetwork.data.Episode episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
+				   episode=metadataService.reicevedEpisodeByMaterialId(episode);
+				   return episode;
+    		}
+    		catch(Exception e){
+    			throw new RuntimeException("proesing post:"+e,e);    			
+    		}
+        }	
+         
+         
 }

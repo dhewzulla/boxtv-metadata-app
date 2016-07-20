@@ -1,6 +1,9 @@
 package uk.co.boxnetwork.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +12,7 @@ import javax.persistence.Column;
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.ComplianceInformation;
+
 import uk.co.boxnetwork.model.ScheduleEvent;
 
 
@@ -88,6 +92,10 @@ public class Episode {
 	private Date createdAt;
 	
 	private List<ComplianceInformation> ComplianceInformations;
+	
+	
+	private List<CuePoint> cuePoints=new ArrayList<CuePoint>();
+	
 
 	public Long getId() {
 		return id;
@@ -301,9 +309,16 @@ public Episode(){
 		this.ingestProfile=episode.getIngestProfile();
 		this.ingestSource=episode.getIngestSource();
 		this.txChannel=episode.getTxChannel();
-	}
-	public void update(uk.co.boxnetwork.model.Episode episode) {
+		if(episode.getCuePoints()!=null){
+			for(uk.co.boxnetwork.model.CuePoint cuep:episode.getCuePoints()){
+				this.addCuePoint(new CuePoint(cuep));
+			}
+			
+			
+		}
 		
+	}
+	public void update(uk.co.boxnetwork.model.Episode episode) {		
 		episode.setTitle(this.title);		
 		episode.setName(this.name);
 		episode.setAssetId(this.assetId);
@@ -342,10 +357,45 @@ public Episode(){
 		
 		episode.setIngestProfile(this.ingestProfile);
 		episode.setIngestSource(this.ingestSource);	
-		episode.setTxChannel(this.txChannel);
-		
+		episode.setTxChannel(this.txChannel);		
 	}
 
+
+	  public void updateTo(uk.co.boxnetwork.model.Episode episode) {
+		
+		episode.setTitle(this.title);		
+		if(this.number!=null){
+			episode.setNumber(this.number);
+		}
+		if(this.synopsis!=null){
+			episode.setSynopsis(this.synopsis);
+		}
+		if(this.certType!=null){
+			episode.setCertType(this.certType);
+		}
+		if(this.warningText!=null){
+			episode.setWarningText(this.warningText);
+		}
+		if(this.adsupport!=null){
+			episode.setAdsupport(this.adsupport);
+		}
+			
+		if(this.brightcoveId != null){
+			episode.setBrightcoveId(this.brightcoveId);
+		}
+		if(this.ingestProfile!=null){
+			episode.setIngestProfile(this.ingestProfile);
+		}
+		if(this.ingestSource!=null){
+			episode.setIngestSource(this.ingestSource);
+		}
+		if(this.txChannel!=null){
+			episode.setTxChannel(this.txChannel);
+		}
+		
+	}
+	
+	
 
 	public String[] getTags() {
 		return tags;
@@ -417,6 +467,19 @@ public Episode(){
 	}
 
 
+	public List<CuePoint> getCuePoints() {
+		return cuePoints;
+	}
+
+
+	public void setCuePoints(List<CuePoint> cuePoints) {
+		this.cuePoints = cuePoints;
+	}
+
+  public void addCuePoint(CuePoint cuePoint){
+	  this.cuePoints.add(cuePoint);
+	  Collections.sort(this.cuePoints);
+  }
 	
 	
 }

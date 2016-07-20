@@ -21,6 +21,7 @@ import uk.co.boxnetwork.model.CertificationCategory;
 import uk.co.boxnetwork.model.CertificationTime;
 import uk.co.boxnetwork.model.CertificationType;
 import uk.co.boxnetwork.model.ComplianceInformation;
+import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.MediaTag;
 import uk.co.boxnetwork.model.Programme;
@@ -67,12 +68,23 @@ public class BoxMedataRepository {
     	   episode.setLastModifiedAt(lastModifiedAt);    	   
 		   entityManager.persist(episode);
        }
+       public void merge(CuePoint cuePoint){
+    	   entityManager.merge(cuePoint);
+       }
+       public void persist(CuePoint cuePoint){
+    	   entityManager.persist(cuePoint);
+       }
+
+       
        public void persisSeries(Series series){
 		    	   Date lastModifiedAt=new Date();
 		    	   series.setLastModifiedAt(lastModifiedAt);
 		    	   series.setCreatedAt(lastModifiedAt);
 				   entityManager.persist(series);
 
+       }
+       public void remove(CuePoint cuePoint){    	   
+    		   entityManager.remove(cuePoint);    	   
        }
        public void mergeSeries(Series series){
     	   Date lastModifiedAt=new Date();
@@ -579,5 +591,6 @@ public class BoxMedataRepository {
     	   TypedQuery<BoxUser> query=entityManager.createQuery("SELECT u FROM user u", BoxUser.class);
 		   List<BoxUser> users=query.getResultList();
 		   return users;
-       }	   
+       }
+	   
 }

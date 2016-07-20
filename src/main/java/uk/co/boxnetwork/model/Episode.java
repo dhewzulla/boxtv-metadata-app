@@ -2,6 +2,7 @@ package uk.co.boxnetwork.model;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+
 
 import uk.co.boxnetwork.data.s3.FileItem;
 import uk.co.boxnetwork.util.GenericUtilities;
@@ -114,6 +117,11 @@ public class Episode {
 	)
 	@JoinColumn( name = "compliance_information_id", nullable = true )
 	private List<ComplianceInformation> complianceInformations;
+	
+	
+	@OneToMany(mappedBy="episode", fetch=FetchType.EAGER)	
+	private Set<CuePoint> cuePoints;
+	
 	
 	
 	public Date getLastModifiedAt() {
@@ -350,5 +358,25 @@ public class Episode {
 			 }
 			 return GenericUtilities.materialIdToFileName(materialID);
 	}
-	
+
+		
+   public void addCuePoint(CuePoint cuepoint){
+	   this.cuePoints.add(cuepoint);
+   }
+   public void rempveCuePoint(CuePoint cuepoint){
+	   this.cuePoints.remove(cuepoint);
+   }
+
+   public void clearCuePoints(){
+	   this.cuePoints.clear();
+   }
+
+public Set<CuePoint> getCuePoints() {
+	return cuePoints;
+}
+
+public void setCuePoints(Set<CuePoint> cuePoints) {
+	this.cuePoints = cuePoints;
+}
+   
 }

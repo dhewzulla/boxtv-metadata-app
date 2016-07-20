@@ -1,12 +1,15 @@
 package uk.co.boxnetwork.data.bc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.Episode;
@@ -22,7 +25,7 @@ public class BCVideoData {
 		  private String ad_keys;
 		  private boolean complete;
 		  private String created_at;
-		  private String[] cue_points;		  
+		  private CuePoint[] cue_points;		  
 		  private BCCustomFields custom_fields;
 		  private String description;
 		  private String digital_master_id;
@@ -89,9 +92,25 @@ public class BCVideoData {
 				 this.economics="AdSupported";				 
 			 }
 			custom_fields=new BCCustomFields(episode);
+			populateCuePoints(episode);
 			 
 		 }
-		 
+		 public void populateCuePoints(Episode episode){
+			 if(episode.getCuePoints()==null|| episode.getCuePoints().size()==0){
+				 return;
+			 }
+			 if(episode.getCuePoints()!=null){
+				    List<uk.co.boxnetwork.data.CuePoint> cuepoints=new ArrayList<uk.co.boxnetwork.data.CuePoint>();				    
+					for(uk.co.boxnetwork.model.CuePoint cuep:episode.getCuePoints()){
+						cuepoints.add(new uk.co.boxnetwork.data.CuePoint(cuep));						
+					}
+					Collections.sort(cuepoints);
+				    this.cue_points=new CuePoint[cuepoints.size()];
+				    for(int i=0;i<cuepoints.size();i++){
+				    	this.cue_points[i]=new CuePoint(cuepoints.get(i));				    	
+				    }
+				}
+		 }
 		 
 		 
 		public String getId() {
@@ -112,6 +131,15 @@ public class BCVideoData {
 		public void setAd_keys(String ad_keys) {
 			this.ad_keys = ad_keys;
 		}
+		
+		public CuePoint[] getCue_points() {
+			return cue_points;
+		}
+
+		public void setCue_points(CuePoint[] cue_points) {
+			this.cue_points = cue_points;
+		}
+
 		public boolean isComplete() {
 			return complete;
 		}
@@ -124,12 +152,7 @@ public class BCVideoData {
 		public void setCreated_at(String created_at) {
 			this.created_at = created_at;
 		}
-		public String[] getCue_points() {
-			return cue_points;
-		}
-		public void setCue_points(String[] cue_points) {
-			this.cue_points = cue_points;
-		}
+		
 		
 		public String getDescription() {
 			return description;
@@ -283,8 +306,7 @@ public class BCVideoData {
 			  this.name=bcVideo.getName();
 			  this.tags=bcVideo.getTags();
 			  this.schedule=bcVideo.getSchedule();
-			  this.custom_fields=bcVideo.getCustom_fields();
-			  
+			  this.custom_fields=bcVideo.getCustom_fields();			  
 		}
 		public void calculateSchedule(List<ScheduleEvent> schedules){
 			if(schedules==null||schedules.size()==0){
