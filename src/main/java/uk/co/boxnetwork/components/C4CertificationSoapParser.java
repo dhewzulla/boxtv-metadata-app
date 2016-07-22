@@ -5,8 +5,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -36,16 +38,16 @@ public class C4CertificationSoapParser {
 	@Autowired
 	private XMLDocumentParser xmlparser;
 		
-	public List<ComplianceInformation> parse(String complianceDocument) throws DocumentException{
+	public Set<ComplianceInformation> parse(String complianceDocument) throws DocumentException{
 		SAXReader reader = new SAXReader();		
 			Document document=reader.read(new CharArrayReader((complianceDocument.toCharArray())));
 			return parse(document);
 	}
 	
-	public List<ComplianceInformation> parse(Document document){
+	public Set<ComplianceInformation> parse(Document document){
 		Element comtainerElement=xmlparser.getElementByPaths(document,compliancepath);
 		
-		List<ComplianceInformation> compliances=new ArrayList<ComplianceInformation>();
+		Set<ComplianceInformation> compliances=new HashSet<ComplianceInformation>();
 		
 		
 		for ( Iterator<Element> i = comtainerElement.elementIterator(); i.hasNext(); ) {

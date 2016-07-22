@@ -2,7 +2,9 @@ package uk.co.boxnetwork.components;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.BoxUser;
@@ -138,23 +141,6 @@ public class BoxMedataRepository {
        @Transactional
 	   public void createEvent(ScheduleEvent newEvent){		    		   
 		    
-    	   Programme programme=createProgrammeFromScheduleEvent(newEvent);
-		    if(programme!=null){
-		    	List<Programme> matchedProgrammes=findProgrammeByTitle(programme.getTitle());
-		    	if(matchedProgrammes.size()==0){
-		    		persisProgramme(programme);		    		
-		    		newEvent.setProgramme(programme);
-		    	}
-		    	else{
-		    		if(matchedProgrammes.size()>1){
-		    			logger.warn("There are mot than matching programmes:title="+programme.getTitle());		    			
-		    		}
-		    		Programme existingProgramme=matchedProgrammes.get(0);		    		
-		    		newEvent.setProgramme(existingProgramme);		    		
-		    	}		    	
-		    }
-		    
-					    
 			if(GenericUtilities.isNotAValidId(newEvent.getScheduleEventID())){
 				newEvent.setEpisode(saveEpisode(newEvent.getEpisode()));
 				persisEvent(newEvent);				
@@ -180,6 +166,7 @@ public class BoxMedataRepository {
 			}
 					        		    				
 	   }	
+       /*
 	   private Programme createProgrammeFromScheduleEvent(ScheduleEvent newEvent){
 		   String programmeTitle=null;
 		   
@@ -206,7 +193,7 @@ public class BoxMedataRepository {
            programme.setContentType(ProgrammeContentType.LIVE_TV);		
            return programme;
 	   }
-	   
+	   */
 	   private Episode createNewEpisode(Episode episode){
 		    episode.setSeries(saveSeries(episode.getSeries()));		    
 		    persisEpisode(episode);		    
@@ -290,11 +277,11 @@ public class BoxMedataRepository {
 		   
 		   return programmeCertification;
 	   }
-	   public List<ComplianceInformation> saveComplianceInformations(List<ComplianceInformation> complianceInformations){		   
+	   public Set<ComplianceInformation> saveComplianceInformations(Set<ComplianceInformation> complianceInformations){		   
 		   if(complianceInformations.size()==0){
 			   return complianceInformations;
 		   }
-		   List<ComplianceInformation> ret=new ArrayList<ComplianceInformation>();
+		   Set<ComplianceInformation> ret=new HashSet<ComplianceInformation>();
 		   for(ComplianceInformation complianceInformation:complianceInformations){
 			   ret.add(saveComplianceInfo(complianceInformation));			   
 		   }
@@ -469,6 +456,7 @@ public class BoxMedataRepository {
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.materialId LIKE :matid", Episode.class);
 		   return query.setParameter("matid",matid).getResultList();
 	   }
+	   
 	   public List<Episode> findEpisodesByCtrPrg(String ctrPrg){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.ctrPrg=:ctrPrg", Episode.class);
 		   return query.setParameter("ctrPrg",ctrPrg).getResultList();

@@ -33,8 +33,6 @@ public class Programme {
 	
 	private String synopsis;
 	
-	@Column(name="content_type")
-	ProgrammeContentType contentType;
 	
 	@Column(name="last_modified_at")
 	private Date lastModifiedAt;
@@ -68,14 +66,7 @@ public class Programme {
 		this.synopsis = synopsis;
 	}
 
-	public ProgrammeContentType getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(ProgrammeContentType contentType) {
-		this.contentType = contentType;
-	}
-	
+		
 	
 
 }

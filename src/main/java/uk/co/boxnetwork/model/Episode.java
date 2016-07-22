@@ -39,6 +39,7 @@ public class Episode {
 	private String ctrPrg;
 	
 	
+	
 		
 	private Integer number;
 	
@@ -73,9 +74,6 @@ public class Episode {
 	private Series series;
 	
 	
-	@ManyToOne(optional=true, fetch=FetchType.EAGER)
-	@JoinColumn( name = "programme_id", nullable = true )
-	private Programme programme;
 	
 	
 	
@@ -96,6 +94,8 @@ public class Episode {
 	private String txChannel;
 	
 	
+	@Column(name="content_type")
+	ProgrammeContentType contentType;
 	
 	
 	
@@ -105,6 +105,16 @@ public class Episode {
 	
 	@Column(name="created_at")
 	private Date createdAt;
+	
+	@Column(name="duration_scheduled")
+	private Double durationScheduled;
+	
+	@Column(name="show_type")
+	private String showType;
+	
+	@Column(name="pr_auk")
+	private String prAuk;
+	
 	
 	
 	
@@ -116,7 +126,7 @@ public class Episode {
 		    inverseJoinColumns={ @JoinColumn(name="compliance_information_id", referencedColumnName="id") }
 	)
 	@JoinColumn( name = "compliance_information_id", nullable = true )
-	private List<ComplianceInformation> complianceInformations;
+	private Set<ComplianceInformation> complianceInformations;
 	
 	
 	@OneToMany(mappedBy="episode", fetch=FetchType.EAGER)	
@@ -272,17 +282,7 @@ public class Episode {
 		this.ctrPrg = ctrPrg;
 	}
 	
-	public Programme getProgramme() {
-		return programme;
-	}
-
-	public void setProgramme(Programme programme) {
-		this.programme = programme;
-		if(series!=null){
-			series.setProgramme(programme);
-		}
-	}
-	
+		
 
 	public String getBrightcoveId() {
 		return brightcoveId;
@@ -293,11 +293,11 @@ public class Episode {
 	}
 
 	     
-    public List<ComplianceInformation> getComplianceInformations() {
+    public Set<ComplianceInformation> getComplianceInformations() {
 		return complianceInformations;
 	}
 
-	public void setComplianceInformations(List<ComplianceInformation> complianceInformations) {
+	public void setComplianceInformations(Set<ComplianceInformation> complianceInformations) {
 		this.complianceInformations = complianceInformations;
 	}
 
@@ -378,5 +378,39 @@ public Set<CuePoint> getCuePoints() {
 public void setCuePoints(Set<CuePoint> cuePoints) {
 	this.cuePoints = cuePoints;
 }
+
+public ProgrammeContentType getContentType() {
+	return contentType;
+}
+
+public void setContentType(ProgrammeContentType contentType) {
+	this.contentType = contentType;
+}
+
+public Double getDurationScheduled() {
+	return durationScheduled;
+}
+
+public void setDurationScheduled(Double durationScheduled) {
+	this.durationScheduled = durationScheduled;
+}
+
+public String getShowType() {
+	return showType;
+}
+
+public void setShowType(String showType) {
+	this.showType = showType;
+}
+
+public String getPrAuk() {
+	return prAuk;
+}
+
+public void setPrAuk(String prAuk) {
+	this.prAuk = prAuk;
+}
+
+
    
 }

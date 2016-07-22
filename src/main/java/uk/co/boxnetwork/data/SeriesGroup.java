@@ -4,22 +4,21 @@ import java.util.Date;
 
 import uk.co.boxnetwork.model.ProgrammeContentType;
 
-public class Programme {
+public class SeriesGroup {
 	private Long id;	
 	private String title;
 	private String synopsis;
-	private ProgrammeContentType contentType;
+	
 	private Date lastModifiedAt;
 	private Date createdAt;
-	public Programme(uk.co.boxnetwork.model.Programme prg){
+	public SeriesGroup(uk.co.boxnetwork.model.Programme prg){
 		id=prg.getId();
 		title=prg.getTitle();
-		synopsis=prg.getSynopsis();
-		contentType=prg.getContentType();
+		synopsis=prg.getSynopsis();		
 		lastModifiedAt=prg.getLastModifiedAt();
 		createdAt=prg.getCreatedAt();
 	}
-	public Programme(){
+	public SeriesGroup(){
 		
 	}
 	public Long getId() {
@@ -40,12 +39,7 @@ public class Programme {
 	public void setSynopsis(String synopsis) {
 		this.synopsis = synopsis;
 	}
-	public ProgrammeContentType getContentType() {
-		return contentType;
-	}
-	public void setContentType(ProgrammeContentType contentType) {
-		this.contentType = contentType;
-	}
+	
 	public Date getLastModifiedAt() {
 		return lastModifiedAt;
 	}

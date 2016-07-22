@@ -1,21 +1,26 @@
 package uk.co.boxnetwork.data.bc;
 
-public class CuePoint {
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+public class BCCuePoint {
 	  private String id;
 	  private String name;
 	  private String type;
 	  private Double time;
 	  private String metadata;
 	  private Boolean force_stop;
-	  public CuePoint(){
+	  public BCCuePoint(){
 		  
 	  }
-	  public CuePoint(uk.co.boxnetwork.data.CuePoint cuepoint){
+	  public BCCuePoint(uk.co.boxnetwork.data.CuePoint cuepoint){
 		  this.name=cuepoint.getName();
 		  this.type=cuepoint.getType();
 		  this.time=cuepoint.getTime();
 		  this.force_stop=cuepoint.getForce_stop();
-		  this.metadata=cuepoint.getMetadata();		  
+		  if(cuepoint.getMetadata()!=null && cuepoint.getMetadata().getNumberOfAds()!=null){			  
+				this.metadata="{\"numberOfAds\":"+cuepoint.getMetadata().getNumberOfAds()+"}";				
+		  }
+		  		  
 	  }
 	public String getId() {
 		return id;

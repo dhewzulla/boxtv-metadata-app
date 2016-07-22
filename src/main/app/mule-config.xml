@@ -39,9 +39,9 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          
         <spring:bean id="dataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
     		<spring:property name="driverName" value="com.mysql.jdbc.Driver"/>
-    		<spring:property name="url" value="jdbc:mysql://mysql:3306/boxmetadata"/>
-    		<spring:property name="user" value="boxmetadata"/>
-    		<spring:property name="password" value="boxmetadata"/>
+    		<spring:property name="url" value="${db.url}"/>
+    		<spring:property name="user" value="${db.user}"/>
+    		<spring:property name="password" value="${db.password}"/>
 		</spring:bean>
         <context:component-scan base-package="uk.co.boxnetwork.components" />    
          

@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import uk.co.boxnetwork.data.CuepointMetadata;
+
 @Entity(name="cue_points")
 public class CuePoint {
 	@Id
@@ -25,6 +27,19 @@ public class CuePoint {
 	private String code;
 	
 	private Boolean force_stop;
+	
+	private String materiaId;
+	private String mediaType;
+	private String duration;
+	private Integer numberOfAds;
+	
+	private String artist;
+	private String track;
+	
+	private String certification;
+	
+	 
+	
 	
 	@ManyToOne
     @JoinColumn(name="episode_id") 
@@ -93,8 +108,87 @@ public class CuePoint {
 	public void setCode(String code) {
 		this.code = code;
 	}
+
+	public String getMateriaId() {
+		return materiaId;
+	}
+
+	public void setMateriaId(String materiaId) {
+		this.materiaId = materiaId;
+	}
+
+	public String getMediaType() {
+		return mediaType;
+	}
+
+	public void setMediaType(String mediaType) {
+		this.mediaType = mediaType;
+	}
+
+	public String getDuration() {
+		return duration;
+	}
+
+	public void setDuration(String duration) {
+		this.duration = duration;
+	}
+
+	public Integer getNumberOfAds() {
+		return numberOfAds;
+	}
+
+	public void setNumberOfAds(Integer numberOfAds) {
+		this.numberOfAds = numberOfAds;
+	}
+
+	public String getArtist() {
+		return artist;
+	}
+
+	public void setArtist(String artist) {
+		this.artist = artist;
+	}
+
+	public String getTrack() {
+		return track;
+	}
+
+	public void setTrack(String track) {
+		this.track = track;
+	}
+
+	public String getCertification() {
+		return certification;
+	}
+
+	public void setCertification(String certification) {
+		this.certification = certification;
+	}
 	
-	
+	public boolean metadataNotEmpty(){
+		return this.duration!=null || this.materiaId!=null || this.mediaType!=null || this.numberOfAds!=null || this.artist!=null || this.track!=null|| this.certification!=null;
+	}
+	public CuepointMetadata creatMetadata(){
+		if(metadataNotEmpty()){
+			return new CuepointMetadata(this.materiaId, this.mediaType, this.duration, this.numberOfAds, this.artist, this.track, this.certification);
+		}
+		else
+			return null;
+		
+	}
+	public void receiveMetadata(CuepointMetadata cueMetadata){
+		if(cueMetadata==null){
+			return;
+		}
+		this.duration=cueMetadata.getDuration();
+		this.materiaId=cueMetadata.getMaterialId();
+		this.mediaType=cueMetadata.getMediaType();
+		this.numberOfAds=cueMetadata.getNumberOfAds();
+		this.artist=cueMetadata.getArtist();
+		this.track=cueMetadata.getTrack();
+		this.certification=cueMetadata.getCertification();
+		
+	}
 	
 	
 	

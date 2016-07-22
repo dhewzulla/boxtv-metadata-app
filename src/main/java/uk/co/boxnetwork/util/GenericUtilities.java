@@ -247,5 +247,15 @@ public class GenericUtilities {
 	  else
 		  return null;
   }
+  public static String materialIdToProgrammeId(String materialId){
+	  String matParts[]=materialId.split("/");
+	  if(matParts.length<=2){
+		  return materialId;
+	  }
+	  else{
+		  return matParts[0]+"/"+matParts[1];
+	  }
+		 
+  }
   
 }

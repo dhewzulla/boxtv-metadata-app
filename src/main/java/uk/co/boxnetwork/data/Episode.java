@@ -1,19 +1,22 @@
 package uk.co.boxnetwork.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.Collections;
-import java.util.Comparator;
+
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.ComplianceInformation;
+import uk.co.boxnetwork.model.ProgrammeContentType;
 
-import uk.co.boxnetwork.model.ScheduleEvent;
+
+
 
 
 
@@ -29,7 +32,7 @@ public class Episode {
 	private String assetId;
 	
 	
-	private String ctrPrg;
+	private String programmeNumber;
 	
 	
 		
@@ -65,7 +68,7 @@ public class Episode {
 	
 	private Series series;
 	
-	private Programme programme;
+	
 	
 	 
 	
@@ -82,6 +85,9 @@ public class Episode {
 	
 	
 	
+	ProgrammeContentType contentType;
+	
+	
 	private List<ScheduleEvent> scheduleEvents=new ArrayList<ScheduleEvent>();
 	
 	
@@ -91,12 +97,22 @@ public class Episode {
 	
 	private Date createdAt;
 	
-	private List<ComplianceInformation> ComplianceInformations;
+	
+	
+	
+	private Set<ComplianceInformation> ComplianceInformations;
 	
 	
 	private List<CuePoint> cuePoints=new ArrayList<CuePoint>();
 	
+	
+	private Double durationScheduled;
+	
 
+	 private String showType;
+	
+	 private String prAuk;
+	 
 	public Long getId() {
 		return id;
 	}
@@ -137,15 +153,7 @@ public class Episode {
 	}
 
 
-	public String getCtrPrg() {
-		return ctrPrg;
-	}
-
-
-	public void setCtrPrg(String ctrPrg) {
-		this.ctrPrg = ctrPrg;
-	}
-
+	
 
 	public Integer getNumber() {
 		return number;
@@ -239,26 +247,14 @@ public class Episode {
 	}
 
 
-	public Programme getProgramme() {
-		return programme;
-	}
-
-
-	public void setProgramme(Programme programme) {
-		this.programme = programme;
-	}
-
+	
 
 	public List<ScheduleEvent> getScheduleEvents() {
 		return scheduleEvents;
 	}
 
 
-	public void setScheduleEvents(List<ScheduleEvent> scheduleEvents) {
-		for(ScheduleEvent evt:scheduleEvents){
-			evt.setEpisode(null);
-			evt.setProgramme(null);
-		}
+	public void setScheduleEvents(List<ScheduleEvent> scheduleEvents) {		
 		this.scheduleEvents = scheduleEvents;
 	}
 
@@ -275,18 +271,22 @@ public class Episode {
 public Episode(){
 	   
    }
-	public Episode(uk.co.boxnetwork.model.Episode episode) {
+	public Episode(uk.co.boxnetwork.model.Episode episode,List<uk.co.boxnetwork.model.ScheduleEvent> scheduleEvents) {
 		super();
 		this.id = episode.getId();
 		this.title = episode.getTitle();
 		this.name = episode.getName();
 		this.assetId = episode.getAssetId();
-		this.ctrPrg = episode.getCtrPrg();
+		this.programmeNumber = episode.getCtrPrg();
 		this.number = episode.getNumber();
 		this.synopsis = episode.getSynopsis();
 		this.materialId = episode.getMaterialId();
 		this.certType = episode.getCertType();
 		this.warningText = episode.getWarningText();
+		this.contentType=episode.getContentType();
+		this.durationScheduled=episode.getDurationScheduled();
+		this.showType=episode.getShowType();
+		this.prAuk=episode.getPrAuk();
 		
 		if(episode.getTags()==null){
 			this.tags =null;			
@@ -302,19 +302,24 @@ public Episode(){
 		this.endDate = episode.getEndDate();
 		this.brightcoveId=episode.getBrightcoveId();
 		this.series = new Series(episode.getSeries());
-		this.programme = new Programme(episode.getProgramme());
+		
 		this.lastModifiedAt=episode.getLastModifiedAt();
 		this.createdAt=episode.getCreatedAt();
 		
 		this.ingestProfile=episode.getIngestProfile();
 		this.ingestSource=episode.getIngestSource();
 		this.txChannel=episode.getTxChannel();
+		
+		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
 			for(uk.co.boxnetwork.model.CuePoint cuep:episode.getCuePoints()){
 				this.addCuePoint(new CuePoint(cuep));
 			}
-			
-			
+		}
+		if(scheduleEvents!=null){
+			for(uk.co.boxnetwork.model.ScheduleEvent evt:scheduleEvents){
+				addScheduleEvent(new ScheduleEvent(evt));			
+			}
 		}
 		
 	}
@@ -322,10 +327,14 @@ public Episode(){
 		episode.setTitle(this.title);		
 		episode.setName(this.name);
 		episode.setAssetId(this.assetId);
-		episode.setCtrPrg(this.ctrPrg);
+		episode.setCtrPrg(this.programmeNumber);
 		episode.setNumber(this.number);
 		episode.setSynopsis(this.synopsis);
 		episode.setMaterialId(this.materialId);
+		episode.setContentType(this.contentType);
+		episode.setDurationScheduled(this.durationScheduled);
+		episode.setShowType(this.showType);
+		episode.setPrAuk(this.prAuk);
 		if("".equals(this.certType)){
 			this.certType=null;
 		}
@@ -361,7 +370,7 @@ public Episode(){
 	}
 
 
-	  public void updateTo(uk.co.boxnetwork.model.Episode episode) {
+	  public void updateWhenReceivedByMaterialId(uk.co.boxnetwork.model.Episode episode) {
 		
 		episode.setTitle(this.title);		
 		if(this.number!=null){
@@ -379,6 +388,9 @@ public Episode(){
 		if(this.adsupport!=null){
 			episode.setAdsupport(this.adsupport);
 		}
+		if(this.durationScheduled!=null){
+			episode.setDurationScheduled(this.durationScheduled);
+		}
 			
 		if(this.brightcoveId != null){
 			episode.setBrightcoveId(this.brightcoveId);
@@ -391,6 +403,19 @@ public Episode(){
 		}
 		if(this.txChannel!=null){
 			episode.setTxChannel(this.txChannel);
+		}
+		if(this.getContentType()!=null){
+			episode.setContentType(this.contentType);
+		}
+
+		if(this.getMaterialId()!=null){
+			episode.setMaterialId(materialId);
+		}
+		if(this.showType!=null){
+			episode.setShowType(this.showType);
+		}
+		if(this.prAuk!=null){
+			episode.setPrAuk(this.prAuk);
 		}
 		
 	}
@@ -427,12 +452,12 @@ public Episode(){
 	}
 
 
-	public List<ComplianceInformation> getComplianceInformations() {
+	public Set<ComplianceInformation> getComplianceInformations() {
 		return ComplianceInformations;
 	}
 
 
-	public void setComplianceInformations(List<ComplianceInformation> complianceInformations) {
+	public void setComplianceInformations(Set<ComplianceInformation> complianceInformations) {
 		ComplianceInformations = complianceInformations;
 	}
 
@@ -480,6 +505,60 @@ public Episode(){
 	  this.cuePoints.add(cuePoint);
 	  Collections.sort(this.cuePoints);
   }
-	
+ public void addScheduleEvent(ScheduleEvent evt){
+	 this.scheduleEvents.add(evt);
+ }
+
+
+public String getProgrammeNumber() {
+	return programmeNumber;
+}
+
+
+public void setProgrammeNumber(String programmeNumber) {
+	this.programmeNumber = programmeNumber;
+}
+
+
+public ProgrammeContentType getContentType() {
+	return contentType;
+}
+
+
+public void setContentType(ProgrammeContentType contentType) {
+	this.contentType = contentType;
+}
+
+
+public Double getDurationScheduled() {
+	return durationScheduled;
+}
+
+
+public void setDurationScheduled(Double durationScheduled) {
+	this.durationScheduled = durationScheduled;
+}
+
+
+public String getShowType() {
+	return showType;
+}
+
+
+public void setShowType(String showType) {
+	this.showType = showType;
+}
+
+
+public String getPrAuk() {
+	return prAuk;
+}
+
+
+public void setPrAuk(String prAuk) {
+	this.prAuk = prAuk;
+}
+
+
 	
 }

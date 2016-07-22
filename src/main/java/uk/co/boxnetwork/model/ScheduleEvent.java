@@ -65,9 +65,6 @@ public class ScheduleEvent {
 	@JoinColumn( name = "episode_id", nullable = true )
 	private Episode episode;
 	
-	@ManyToOne(optional=true, fetch=FetchType.EAGER)
-	@JoinColumn( name = "programme_id", nullable = true )
-	private Programme programme;
 	
 	@Column(name="last_modified_at")
 	private Date lastModifiedAt;
@@ -216,18 +213,7 @@ public class ScheduleEvent {
 	}
 
 
-	public Programme getProgramme() {
-		return programme;
-	}
-
-
-	public void setProgramme(Programme programme) {
-		this.programme = programme;
-		if(this.episode!=null){
-			this.episode.setProgramme(programme);
-		}
-	}
-	
+		
     public Date getLastModifiedAt() {
 		return lastModifiedAt;
 	}
@@ -284,10 +270,7 @@ public class ScheduleEvent {
     	}
     	if(this.episode==null){
     		this.episode=event.getEpisode();
-    	}
-    	if(this.programme==null){
-    		this.programme=event.getProgramme();
-    	}
+    	}    	
     }
 
 	@Override

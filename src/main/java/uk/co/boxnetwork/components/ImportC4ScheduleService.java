@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -130,7 +131,7 @@ public class ImportC4ScheduleService {
 	 if(event.getEpisode()!=null){
 		 if(event.getEpisode().getAssetId()!=null && event.getEpisode().getAssetId().length()>0){
 			 String certificationResponse=requestCertification(event.getEpisode().getAssetId());
-			 List<ComplianceInformation> complianceInformations=c4CertificationSoapParser.parse(certificationResponse);			 
+			 Set<ComplianceInformation> complianceInformations=c4CertificationSoapParser.parse(certificationResponse);			 
 			 event.getEpisode().setComplianceInformations(complianceInformations);			 
 		 }
 		

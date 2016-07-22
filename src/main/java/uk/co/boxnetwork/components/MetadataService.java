@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.co.boxnetwork.data.Programme;
+import uk.co.boxnetwork.data.SeriesGroup;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;
@@ -27,11 +27,11 @@ public class MetadataService {
 	S3BucketService s3BucketService;
 	  	
 	
-	public List<Programme> getAllProgrammes(){
-		List<Programme> programmes=new ArrayList<Programme>();
+	public List<SeriesGroup> getAllProgrammes(){
+		List<SeriesGroup> programmes=new ArrayList<SeriesGroup>();
 		List<uk.co.boxnetwork.model.Programme> prgs=boxMetadataRepository.findAllProgramme();
 		for(uk.co.boxnetwork.model.Programme prg:prgs){
-			programmes.add(new Programme(prg));
+			programmes.add(new SeriesGroup(prg));
 		}
 		return programmes;
 	}
@@ -48,7 +48,7 @@ public class MetadataService {
 	private  List<uk.co.boxnetwork.data.Episode>  toData(List<Episode> eposides){
 		List<uk.co.boxnetwork.data.Episode> ret=new ArrayList<uk.co.boxnetwork.data.Episode>();
 		for(Episode episode:eposides){
-			ret.add(new uk.co.boxnetwork.data.Episode(episode));
+			ret.add(new uk.co.boxnetwork.data.Episode(episode,null));
 		}
 		
 		return ret;
@@ -66,7 +66,8 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	uk.co.boxnetwork.data.Series ret=new uk.co.boxnetwork.data.Series(series);
 	for(Episode episode:episodes){
 		episode.setSeries(null);
-		episode.setProgramme(null);
+		episode.setComplianceInformations(null);
+		episode.setCuePoints(null);
 	}
 	ret.setEpisodes(episodes);		
 	return ret;		
@@ -77,9 +78,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		Episode episode=boxMetadataRepository.findEpisodeById(id);
 		List<ScheduleEvent> scheduleEvents=boxMetadataRepository.findScheduleEventByEpisode(episode);
 		
-		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episode);
-		ret.setComplianceInformations(episode.getComplianceInformations());		
-		ret.setScheduleEvents(scheduleEvents);
+		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episode,scheduleEvents);
+				
+		
 		return ret;		
 	}
 	@Transactional
@@ -99,7 +100,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		if(materiaId.length()==0){
 			throw new RuntimeException("MaterialId is empty");
 		}
-		List<Episode> existingEpisodes=boxMetadataRepository.findEpisodesByMatId(materiaId);
+		String programmeId=GenericUtilities.materialIdToProgrammeId(materiaId);
+		
+		List<Episode> existingEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(programmeId);
 		if(existingEpisodes.size()==0){
 			throw new RuntimeException("episode not found");
 		}
@@ -107,24 +110,32 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			throw new RuntimeException("more than one episodes matched to the materia id:"+materiaId);
 		}
 		Episode episodeToUpdate=existingEpisodes.get(0); 
-		episode.updateTo(episodeToUpdate);		
+		episode.updateWhenReceivedByMaterialId(episodeToUpdate);		
 		replaceCuePoints(episodeToUpdate,episode.getCuePoints());
 		
 		boxMetadataRepository.mergeEpisode(episodeToUpdate);
-		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episodeToUpdate);
+		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episodeToUpdate,null);
 		ret.setComplianceInformations(episodeToUpdate.getComplianceInformations());
 		return ret;
 	}
 	
 	public void replaceCuePoints(Episode episodeToUpdate, List<uk.co.boxnetwork.data.CuePoint> cuePoints){
 		if(cuePoints==null|| cuePoints.size()==0){
+			logger.info("***number of cue points received is zero");
 			return;
-		}		
+			
+		}
+		else{
+			logger.info("***number of cue points received:"+cuePoints.size());
+		}
 	    for(CuePoint cp:episodeToUpdate.getCuePoints()){	    	
 	    	boxMetadataRepository.remove(cp);	    	
 	    }
 	    episodeToUpdate.clearCuePoints();
+	    
+	    
 		for(uk.co.boxnetwork.data.CuePoint cuepoint:cuePoints){
+			    logger.info("Received cue point:"+cuepoint); 
 			     CuePoint cue=new CuePoint();
 			     cuepoint.update(cue);			     
 			     episodeToUpdate.addCuePoint(cue);
@@ -143,8 +154,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 	}
 		
-	public List<ScheduleEvent> getAllScheduleEvent(){
-		return boxMetadataRepository.findAllScheduleEvent();
+	public List<uk.co.boxnetwork.data.ScheduleEvent> getAllScheduleEvent(){
+		List<ScheduleEvent> schedules= boxMetadataRepository.findAllScheduleEvent();
+		List<uk.co.boxnetwork.data.ScheduleEvent> ret=new ArrayList<uk.co.boxnetwork.data.ScheduleEvent>();
+		for(ScheduleEvent evt:schedules){
+			ret.add(new uk.co.boxnetwork.data.ScheduleEvent(evt));			
+		}
+		return ret;
 	}
 	public ScheduleEvent getScheduleEventById(Long id){
 		return boxMetadataRepository.findScheduleEventById(id);

@@ -15,27 +15,32 @@ public class CuePoint implements Comparable<CuePoint>{
 	
 	private Double time;
 	
-	private String metadata;
+	
 	
 	private String code;
 	
 	private Boolean force_stop;
+	private CuepointMetadata metadata;
+	
+	
 	public CuePoint(){
 		
 	}
     public CuePoint(uk.co.boxnetwork.model.CuePoint cuePoint){
     	this.name=cuePoint.getName();
     	this.type=cuePoint.getType();
-    	this.time=cuePoint.getTime();
-    	this.metadata=cuePoint.getMetadata();
-    	this.code=cuePoint.getCode();
+    	this.time=cuePoint.getTime();    
+    	this.code=cuePoint.getCode();    	
+    	this.metadata=cuePoint.creatMetadata();
+    	
     }
     public void update(uk.co.boxnetwork.model.CuePoint cuePoint){
     	cuePoint.setName(this.name);
     	cuePoint.setType(this.type);
     	cuePoint.setTime(this.time);
-    	cuePoint.setMetadata(this.metadata);
     	cuePoint.setCode(this.code);
+    	cuePoint.receiveMetadata(this.metadata);    		
+    	
     }
     
 	public String getName() {
@@ -62,14 +67,7 @@ public class CuePoint implements Comparable<CuePoint>{
 		this.time = time;
 	}
 
-	public String getMetadata() {
-		return metadata;
-	}
-
-	public void setMetadata(String metadata) {
-		this.metadata = metadata;
-	}
-
+	
 	public String getCode() {
 		return code;
 	}
@@ -88,6 +86,17 @@ public class CuePoint implements Comparable<CuePoint>{
 	@Override
 	public int compareTo(CuePoint o) {
 		return (int)(this.time-o.getTime());
+	}
+	public void setMetadata(CuepointMetadata metadata) {
+		this.metadata = metadata;
+	}
+	public CuepointMetadata getMetadata() {
+		return metadata;
+	}
+	@Override
+	public String toString() {
+		return "CuePoint [name=" + name + ", type=" + type + ", time=" + time + ", code=" + code + ", force_stop="
+				+ force_stop + ", metadata=" + metadata + "]";
 	}
 	
 	

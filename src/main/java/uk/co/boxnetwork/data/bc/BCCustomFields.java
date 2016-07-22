@@ -28,9 +28,9 @@ public class BCCustomFields {
 	  if(episode.getCertType()!=null){
 		  certificationtype=episode.getCertType().getBcName();
 	  }
-	  if(episode.getProgramme()!=null){
-		  programmetitle= episode.getProgramme().getTitle();
-		  programmesynopsis=episode.getProgramme().getSynopsis();
+	  if(episode.getSeries()!=null && episode.getSeries().getProgramme()!=null){
+		  programmetitle= episode.getSeries().getProgramme().getTitle();
+		  programmesynopsis=episode.getSeries().getProgramme().getSynopsis();
 	  }
 	  warningtext=episode.getWarningText();	  		 
 	  if(episode.getNumber()!=null){

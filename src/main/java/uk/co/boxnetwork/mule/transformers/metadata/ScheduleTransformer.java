@@ -25,8 +25,7 @@ public class ScheduleTransformer extends BoxRestTransformer{
 		String schduleid=MuleRestUtil.getPathPath(message);
 		
 		if(schduleid==null){			
-			List<ScheduleEvent> episodes=metadataService.getAllScheduleEvent();
-			return episodes;
+			return metadataService.getAllScheduleEvent();			
 		}
 		else{
 			Long id=Long.valueOf(schduleid);

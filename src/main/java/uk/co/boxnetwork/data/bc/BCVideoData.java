@@ -25,7 +25,7 @@ public class BCVideoData {
 		  private String ad_keys;
 		  private boolean complete;
 		  private String created_at;
-		  private CuePoint[] cue_points;		  
+		  private BCCuePoint[] cue_points;		  
 		  private BCCustomFields custom_fields;
 		  private String description;
 		  private String digital_master_id;
@@ -105,9 +105,9 @@ public class BCVideoData {
 						cuepoints.add(new uk.co.boxnetwork.data.CuePoint(cuep));						
 					}
 					Collections.sort(cuepoints);
-				    this.cue_points=new CuePoint[cuepoints.size()];
+				    this.cue_points=new BCCuePoint[cuepoints.size()];
 				    for(int i=0;i<cuepoints.size();i++){
-				    	this.cue_points[i]=new CuePoint(cuepoints.get(i));				    	
+				    	this.cue_points[i]=new BCCuePoint(cuepoints.get(i));				    	
 				    }
 				}
 		 }
@@ -132,11 +132,11 @@ public class BCVideoData {
 			this.ad_keys = ad_keys;
 		}
 		
-		public CuePoint[] getCue_points() {
+		public BCCuePoint[] getCue_points() {
 			return cue_points;
 		}
 
-		public void setCue_points(CuePoint[] cue_points) {
+		public void setCue_points(BCCuePoint[] cue_points) {
 			this.cue_points = cue_points;
 		}
 

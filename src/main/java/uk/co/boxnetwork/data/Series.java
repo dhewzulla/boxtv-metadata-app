@@ -9,7 +9,7 @@ public class Series {
 	private String primaryId;
 	private String name;
 	private String contractNumber;		
-	private Programme programme;
+	private SeriesGroup seriesGroup;
 	private Date lastModifiedAt;
 	private Date createdAt;
 	private List<uk.co.boxnetwork.model.Episode> episodes;
@@ -22,7 +22,9 @@ public class Series {
 		this.primaryId = series.getPrimaryId();
 		this.name = series.getName();
 		this.contractNumber = series.getContractNumber();
-		this.programme = new Programme(series.getProgramme());
+		if(series.getProgramme()!=null){
+			this.seriesGroup = new SeriesGroup(series.getProgramme());
+		}
 		this.lastModifiedAt=series.getLastModifiedAt();
 		this.createdAt=series.getCreatedAt();
 	}
@@ -66,12 +68,7 @@ public class Series {
 	public void setContractNumber(String contractNumber) {
 		this.contractNumber = contractNumber;
 	}
-	public Programme getProgramme() {
-		return programme;
-	}
-	public void setProgramme(Programme programme) {
-		this.programme = programme;
-	}
+	
 	public Date getLastModifiedAt() {
 		return lastModifiedAt;
 	}
@@ -89,6 +86,12 @@ public class Series {
 	}
 	public void setEpisodes(List<uk.co.boxnetwork.model.Episode> episodes) {
 		this.episodes = episodes;
+	}
+	public SeriesGroup getSeriesGroup() {
+		return seriesGroup;
+	}
+	public void setSeriesGroup(SeriesGroup seriesGroup) {
+		this.seriesGroup = seriesGroup;
 	}
 	
 	

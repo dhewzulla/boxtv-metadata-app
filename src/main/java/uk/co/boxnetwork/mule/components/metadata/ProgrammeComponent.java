@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 import uk.co.boxnetwork.components.MetadataService;
-import uk.co.boxnetwork.data.Programme;
+import uk.co.boxnetwork.data.SeriesGroup;
 
 
 public class ProgrammeComponent {
@@ -18,7 +18,7 @@ public class ProgrammeComponent {
 	MetadataService metadataService;
 	
 	public Object process(@Payload String payload, @Lookup MuleContext muleContext) throws Exception{
-		List<Programme> programmes=metadataService.getAllProgrammes();
+		List<SeriesGroup> programmes=metadataService.getAllProgrammes();
 		return programmes;		
 	}
 }
