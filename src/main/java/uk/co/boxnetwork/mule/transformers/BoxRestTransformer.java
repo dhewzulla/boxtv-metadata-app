@@ -1,10 +1,14 @@
 package uk.co.boxnetwork.mule.transformers;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Base64;
 import java.util.Map;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +32,47 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 		message.setOutboundProperty("http.status", 500);		
 		return "{error:\""+desc+"\"}";		
 	}
+	
+	public String getClientInfo(MuleMessage message){
+		try{			
+			  			  
+				String clientIPAdress=message.getProperty("http.remote.address", PropertyScope.INBOUND);
+				String realip=message.getProperty("X-Real-IP", PropertyScope.INBOUND);
+				String authorization=message.getProperty("authorization", PropertyScope.INBOUND);
+				String username=null;				
+				if(authorization!=null){
+					try{
+					 String base64Credentials = authorization.substring("Basic".length()).trim();
+				        String credentials = new String(Base64.getDecoder().decode(base64Credentials),
+				                Charset.forName("UTF-8"));
+				        // credentials = username:password
+				        final String[] values = credentials.split(":",2);
+				        username=values[0];
+					}
+					catch(Exception e){
+						logger.error(e+ "while decoding",e);
+					}
+				        
+				}
+				
+				String referer=message.getProperty("referer", PropertyScope.INBOUND);
+				
+				String requesturi=message.getProperty("http.request.uri", PropertyScope.INBOUND);
+				
+				String httpmethod=message.getProperty("http.method", PropertyScope.INBOUND);
+				return "Rceived the "+httpmethod+" request on "+requesturi+" from "+clientIPAdress+":"+realip+":"+username+":referer:"+referer;								
+		}
+		catch(Exception e){
+			logger.error(e+" whule logging client ip",e);
+			return "";
+		}
+		
+	}
+	
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
-		    logger.info("***Rest request received on "+this.getClass().getName());
+		    logger.info(getClientInfo(message)+":"+this.getClass().getName());
 	try{	
 				addCORS(message, outputEncoding);
 				String inboudMethod=message.getInboundProperty("http.method");

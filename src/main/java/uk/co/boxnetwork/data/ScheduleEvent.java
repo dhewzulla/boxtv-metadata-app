@@ -35,8 +35,10 @@ public class ScheduleEvent {
 		this.scheduleTimestamp=evt.getScheduleTimestamp();
 		this.lastModifiedAt=evt.getLastModifiedAt();
 		this.createdAt=evt.getCreatedAt();
-		this.episdeoTitle=evt.getEpisode().getTitle();
-		this.programmeNumber=evt.getEpisode().getMaterialId();		
+		if(evt.getEpisode()!=null){
+			this.episdeoTitle=evt.getEpisode().getTitle();
+			this.programmeNumber=evt.getEpisode().getMaterialId();
+		}
 	}
 	public Long getId() {
 		return id;
