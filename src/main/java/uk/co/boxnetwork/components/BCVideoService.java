@@ -273,7 +273,7 @@ public class BCVideoService {
 		} catch (IOException e) {
 			logger.error("error while parsing the brightcove video data",e);
 			logger.error(videoInJson);
-			return null;
+			throw new RuntimeException(e.getMessage(),e);
 		}
 	}
 	private BcIngestResponse jsonToBcIngestResponse(String responseInJson){

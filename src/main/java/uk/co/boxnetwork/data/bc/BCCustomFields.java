@@ -39,6 +39,12 @@ public class BCCustomFields {
 			  episodenumber="0"+episodenumber;
 		  }
 	  }
+	  if(episode.getTxChannel()!=null){
+		  txchannel=episode.getTxChannel();
+	  }
+	  if(episode.getContentType()!=null){
+		  contenttype=episode.getContentType().getName();
+	  }
 	  
   }
   public String getContenttype() {

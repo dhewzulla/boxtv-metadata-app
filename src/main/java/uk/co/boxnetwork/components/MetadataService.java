@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.co.boxnetwork.data.SeriesGroup;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.Programme;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.util.GenericUtilities;
@@ -27,7 +28,7 @@ public class MetadataService {
 	S3BucketService s3BucketService;
 	  	
 	
-	public List<SeriesGroup> getAllProgrammes(){
+	public List<SeriesGroup> getAllSeriesGroups(){
 		List<SeriesGroup> programmes=new ArrayList<SeriesGroup>();
 		List<uk.co.boxnetwork.model.Programme> prgs=boxMetadataRepository.findAllProgramme();
 		for(uk.co.boxnetwork.model.Programme prg:prgs){
@@ -35,7 +36,20 @@ public class MetadataService {
 		}
 		return programmes;
 	}
-	
+	public uk.co.boxnetwork.data.SeriesGroup getSeriesGroupById(Long id){
+		Programme programme=boxMetadataRepository.findProgrammeById(id);
+		if(programme==null){
+			return null;
+		}
+		List<Series> serieses=boxMetadataRepository.findSeriesByProgramme(programme);
+		uk.co.boxnetwork.data.SeriesGroup ret=new uk.co.boxnetwork.data.SeriesGroup(programme);
+		for(Series series:serieses){
+			series.setProgramme(null);
+			uk.co.boxnetwork.data.Series series2=new uk.co.boxnetwork.data.Series(series);			
+			ret.addSeries(series2);
+		}				
+		return ret;		
+	}
 	
 	public List<uk.co.boxnetwork.data.Episode> getAllEpisodes(){
 		

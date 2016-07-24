@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import uk.co.boxnetwork.components.MetadataMaintainanceService;
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.model.Episode;
@@ -23,6 +24,9 @@ public class EpisodeTransformer extends BoxRestTransformer{
 
 		@Autowired
 		MetadataService metadataService;
+		
+		@Autowired
+		MetadataMaintainanceService metadataMaintainanceService;
 		
 		@Override
 		protected Object processGET(MuleMessage message, String outputEncoding){				
@@ -88,6 +92,7 @@ public class EpisodeTransformer extends BoxRestTransformer{
 				   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
 				   objectMapper.setSerializationInclusion(Include.NON_NULL);
 				   uk.co.boxnetwork.data.Episode episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
+				   metadataMaintainanceService.fixTxChannel(episode);				   
 				   episode=metadataService.reicevedEpisodeByMaterialId(episode);
 				   return episode;
     		}

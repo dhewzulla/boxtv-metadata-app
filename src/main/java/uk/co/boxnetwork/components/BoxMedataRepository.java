@@ -409,6 +409,9 @@ public class BoxMedataRepository {
 	   public Series findSeriesById(Long id){
 		   return entityManager.find(Series.class, id);		   
 	   }
+	   public Programme findProgrammeById(Long id){
+		   return entityManager.find(Programme.class, id);		   
+	   }
 	   public List<Series> findAllSeries(){
 		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s", Series.class);
 		   return query.getResultList();
@@ -433,6 +436,11 @@ public class BoxMedataRepository {
 	   public List<Episode> findEpisodesBySeries(Series series){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.series=:series", Episode.class);
 		   return query.setParameter("series",series).getResultList();
+	   }
+
+	   public List<Series> findSeriesByProgramme(Programme programme){
+		   TypedQuery<Series> query=entityManager.createQuery("SELECT e FROM series e where e.programme=:programme", Series.class);
+		   return query.setParameter("programme",programme).getResultList();
 	   }
 
 	   public Episode findEpisodeById(Long id){
@@ -580,5 +588,7 @@ public class BoxMedataRepository {
 		   List<BoxUser> users=query.getResultList();
 		   return users;
        }
+	   
+	   
 	   
 }

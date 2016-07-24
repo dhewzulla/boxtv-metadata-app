@@ -52,10 +52,11 @@ public class BCVideoData {
 		 }
 		 
 		 private void buildRefereceId(Episode episode){
+			 
 			 if(episode.getMaterialId()!=null){
 				 String parts[]=episode.getMaterialId().split("/");
 				 StringBuilder builder=new StringBuilder();
-				 builder.append("v");				 
+				 builder.append("V");				 
 				 int counter=0;
 				 for(String p:parts){
 					 builder.append("_");
@@ -63,8 +64,7 @@ public class BCVideoData {
 					 counter++;					 
 				 }
 				 while(counter<4){
-					 builder.append("_001");
-					 builder.append("_");
+					 builder.append("_001");					 
 					 counter++;
 				 }
 				 this.reference_id=builder.toString();
@@ -89,7 +89,7 @@ public class BCVideoData {
 				 this.economics="Free";
 			 }
 			 else if(episode.getAdsupport()==AdSuport.AD_SUPPORTED){
-				 this.economics="AdSupported";				 
+				 this.economics="AD_SUPPORTED";				 
 			 }
 			custom_fields=new BCCustomFields(episode);
 			populateCuePoints(episode);
@@ -306,7 +306,10 @@ public class BCVideoData {
 			  this.name=bcVideo.getName();
 			  this.tags=bcVideo.getTags();
 			  this.schedule=bcVideo.getSchedule();
-			  this.custom_fields=bcVideo.getCustom_fields();			  
+			  this.custom_fields=bcVideo.getCustom_fields();	
+			  if(bcVideo.getReference_id()!=null){
+				  this.reference_id=bcVideo.getReference_id();
+			  }
 		}
 		public void calculateSchedule(List<ScheduleEvent> schedules){
 			if(schedules==null||schedules.size()==0){

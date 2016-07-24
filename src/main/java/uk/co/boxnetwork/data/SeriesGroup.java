@@ -1,6 +1,8 @@
 package uk.co.boxnetwork.data;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import uk.co.boxnetwork.model.ProgrammeContentType;
 
@@ -11,6 +13,8 @@ public class SeriesGroup {
 	
 	private Date lastModifiedAt;
 	private Date createdAt;
+	private List<Series> series=new ArrayList<Series>();
+	
 	public SeriesGroup(uk.co.boxnetwork.model.Programme prg){
 		id=prg.getId();
 		title=prg.getTitle();
@@ -52,6 +56,15 @@ public class SeriesGroup {
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
-	
+	public List<Series> getSeries() {
+		return series;
+	}
+	public void setSeries(List<Series> series) {
+		this.series = series;
+	}
+   public void addSeries(Series series){
+	   this.series.add(series);
+	   
+   }
 	
 }

@@ -11,36 +11,22 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
-    <flow name="programme-service">    
-       <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.programe}" doc:name="HTTP"/>
-        
+    <flow name="series-group-service">    
+       <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.seriesgroup}/*" doc:name="HTTP"/>
         <choice doc:name="Choice">
 	         <when expression="#[message.inboundProperties['http.method'] == 'OPTIONS']">
 	         	<transformer ref="doNothingTransformer"/>         	
 	  		 </when>
 	    	<otherwise>
 	        	<http:basic-security-filter realm="mule-realm"/>
-	        	 <component doc:name="Programme">
-         	 		<spring-object bean="programmeComponent"/>
-        		</component>    	
+	        	<transformer ref="seriesGroupService" doc:name="Transformer Series group Service"/>    	
 	        </otherwise>
 	    </choice>
-        
-        
-        
-        
-         
-        
-      
-          
-        
-        
-        
-           
-    
+
     </flow>
-
-
+        
+       
+       
 
 
 </mule>
