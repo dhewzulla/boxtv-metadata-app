@@ -58,7 +58,7 @@ public class SeriesTransformer  extends BoxRestTransformer{
 	   }
 	   else{			   
 		   		String seriesInJson=(String)message.getPayloadAsString();		   
-			   logger.info("*****"+seriesInJson+"****");
+			   logger.info("*****updating series"+seriesInJson+"****");
 			   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
 				
 				

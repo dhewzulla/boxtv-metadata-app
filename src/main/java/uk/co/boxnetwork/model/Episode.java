@@ -1,7 +1,7 @@
 package uk.co.boxnetwork.model;
 
 import java.util.Date;
-import java.util.List;
+
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -15,7 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import uk.co.boxnetwork.data.s3.FileItem;
+
 import uk.co.boxnetwork.util.GenericUtilities;
 
 
@@ -135,6 +135,12 @@ public class Episode {
 	@OneToOne(optional=true, fetch=FetchType.EAGER)
 	@JoinColumn( name = "status_id", nullable = true )
 	private EpisodeStatus episodeStatus;
+	
+	
+	@Column(name="excluded_devices")
+	private String excludeddevices;
+	
+	
 	
 	
 	
@@ -430,6 +436,15 @@ public void setPrAuk(String prAuk) {
 		}
 		this.episodeStatus.setVideoStatus(videoStatus);	
 	}
+
+	public String getExcludeddevices() {
+		return excludeddevices;
+	}
+
+	public void setExcludeddevices(String excludeddevices) {
+		this.excludeddevices = excludeddevices;
+	}
+
 
    
 }

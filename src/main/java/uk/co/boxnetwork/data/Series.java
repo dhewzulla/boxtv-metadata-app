@@ -22,8 +22,8 @@ public class Series {
 		this.primaryId = series.getPrimaryId();
 		this.name = series.getName();
 		this.contractNumber = series.getContractNumber();
-		if(series.getProgramme()!=null){
-			this.seriesGroup = new SeriesGroup(series.getProgramme());
+		if(series.getSeriesGroup()!=null){
+			this.seriesGroup = new SeriesGroup(series.getSeriesGroup());
 		}
 		this.lastModifiedAt=series.getLastModifiedAt();
 		this.createdAt=series.getCreatedAt();

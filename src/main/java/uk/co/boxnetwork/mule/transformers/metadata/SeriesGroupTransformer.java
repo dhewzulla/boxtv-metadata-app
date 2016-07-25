@@ -42,30 +42,30 @@ public class SeriesGroupTransformer extends BoxRestTransformer{
 		    return metadataService.getSeriesGroupById(id);		    
 	}
    
-    /*
+   
     @Override	
    protected Object processPUT(MuleMessage message, String outputEncoding) throws Exception{
-	   String seriesid=MuleRestUtil.getPathPath(message);
-	   if(seriesid==null||seriesid.length()==0){
-		   return new ErrorMessage("The episodeid is missing in DELETE");
+	   String seriesgroupid=MuleRestUtil.getPathPath(message);
+	   if(seriesgroupid==null||seriesgroupid.length()==0){
+		   return returnError("seriesgroupid is required",message);
 	   }
-	   Long id=Long.valueOf(seriesid);
-	   uk.co.boxnetwork.data.Series  series=null;
+	   Long id=Long.valueOf(seriesgroupid);
+	   uk.co.boxnetwork.data.SeriesGroup  seriesgroup=null;
 	   
-	   if(message.getPayload() instanceof uk.co.boxnetwork.data.Series){
-		   series=(uk.co.boxnetwork.data.Series)message.getPayload();			   
+	   if(message.getPayload() instanceof uk.co.boxnetwork.data.SeriesGroup){
+		   seriesgroup=(uk.co.boxnetwork.data.SeriesGroup)message.getPayload();			   
 	   }
 	   else{			   
-		   		String seriesInJson=(String)message.getPayloadAsString();		   
-			   logger.info("*****"+seriesInJson+"****");
+		   		String seriesGroupInJson=(String)message.getPayloadAsString();		   
+			   logger.info("*****updating:"+seriesGroupInJson+"****");
 			   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
 				
 				
 				objectMapper.setSerializationInclusion(Include.NON_NULL);
-				series = objectMapper.readValue(seriesInJson, uk.co.boxnetwork.data.Series.class);
+				seriesgroup = objectMapper.readValue(seriesGroupInJson, uk.co.boxnetwork.data.SeriesGroup.class);
 	   }
-	   metadataService.update(id,series);	   
-	   return metadataService.getSeriesById(id);						 
+	   metadataService.update(id,seriesgroup);	   
+	   return metadataService.getSeriesGroupById(id);						 
 	}
-	*/
+	
 }

@@ -14,6 +14,7 @@ public class BCCustomFields {
   private String warningtext;
   private String episodenumber;
   private String drm;
+  private String excludeddevices;
   
   
   
@@ -28,9 +29,9 @@ public class BCCustomFields {
 	  if(episode.getCertType()!=null){
 		  certificationtype=episode.getCertType().getBcName();
 	  }
-	  if(episode.getSeries()!=null && episode.getSeries().getProgramme()!=null){
-		  programmetitle= episode.getSeries().getProgramme().getTitle();
-		  programmesynopsis=episode.getSeries().getProgramme().getSynopsis();
+	  if(episode.getSeries()!=null && episode.getSeries().getSeriesGroup()!=null){
+		  programmetitle= episode.getSeries().getSeriesGroup().getTitle();
+		  programmesynopsis=episode.getSeries().getSeriesGroup().getSynopsis();
 	  }
 	  warningtext=episode.getWarningText();	  		 
 	  if(episode.getNumber()!=null){
@@ -44,6 +45,9 @@ public class BCCustomFields {
 	  }
 	  if(episode.getContentType()!=null){
 		  contenttype=episode.getContentType().getName();
+	  }
+	  if(episode.getExcludeddevices()!=null){
+		  excludeddevices=episode.getExcludeddevices();				 
 	  }
 	  
   }
@@ -106,6 +110,12 @@ public String getDrm() {
 }
 public void setDrm(String drm) {
 	this.drm = drm;
+}
+public String getExcludeddevices() {
+	return excludeddevices;
+}
+public void setExcludeddevices(String excludeddevices) {
+	this.excludeddevices = excludeddevices;
 }
 
  

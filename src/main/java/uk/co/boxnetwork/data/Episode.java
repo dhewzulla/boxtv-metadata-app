@@ -116,6 +116,9 @@ public class Episode {
 	
 	 private String prAuk;
 	 
+	 private String excludeddevices;
+	 
+	 
 	public Long getId() {
 		return id;
 	}
@@ -313,6 +316,7 @@ public Episode(){
 		this.ingestSource=episode.getIngestSource();
 		this.txChannel=episode.getTxChannel();
 		this.episodeStatus=episode.getEpisodeStatus();
+		this.excludeddevices=episode.getExcludeddevices();
 		
 		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
@@ -370,7 +374,8 @@ public Episode(){
 		
 		episode.setIngestProfile(this.ingestProfile);
 		episode.setIngestSource(this.ingestSource);	
-		episode.setTxChannel(this.txChannel);		
+		episode.setTxChannel(this.txChannel);	
+		episode.setExcludeddevices(this.excludeddevices);
 	}
 
 
@@ -571,6 +576,16 @@ public EpisodeStatus getEpisodeStatus() {
 
 public void setEpisodeStatus(EpisodeStatus episodeStatus) {
 	this.episodeStatus = episodeStatus;
+}
+
+
+public String getExcludeddevices() {
+	return excludeddevices;
+}
+
+
+public void setExcludeddevices(String excludeddevices) {
+	this.excludeddevices = excludeddevices;
 }
 
 

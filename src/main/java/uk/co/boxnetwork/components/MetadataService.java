@@ -10,14 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.co.boxnetwork.data.SeriesGroup;
+
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.MetadataStatus;
-import uk.co.boxnetwork.model.Programme;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.SeriesGroup;
 import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -31,23 +31,23 @@ public class MetadataService {
 	S3BucketService s3BucketService;
 	  	
 	
-	public List<SeriesGroup> getAllSeriesGroups(){
-		List<SeriesGroup> programmes=new ArrayList<SeriesGroup>();
-		List<uk.co.boxnetwork.model.Programme> prgs=boxMetadataRepository.findAllProgramme();
-		for(uk.co.boxnetwork.model.Programme prg:prgs){
-			programmes.add(new SeriesGroup(prg));
+	public List<uk.co.boxnetwork.data.SeriesGroup> getAllSeriesGroups(){
+		List<uk.co.boxnetwork.data.SeriesGroup> seriesgrps=new ArrayList<uk.co.boxnetwork.data.SeriesGroup>();
+		List<SeriesGroup> seriesgroups=boxMetadataRepository.findAllSeriesGroup();
+		for(SeriesGroup seriesgroup:seriesgroups){
+			seriesgrps.add(new uk.co.boxnetwork.data.SeriesGroup(seriesgroup));	
 		}
-		return programmes;
+		return seriesgrps;
 	}
 	public uk.co.boxnetwork.data.SeriesGroup getSeriesGroupById(Long id){
-		Programme programme=boxMetadataRepository.findProgrammeById(id);
-		if(programme==null){
+	SeriesGroup seriesGroup=boxMetadataRepository.findSeriesGroupById(id);
+		if(seriesGroup==null){
 			return null;
 		}
-		List<Series> serieses=boxMetadataRepository.findSeriesByProgramme(programme);
-		uk.co.boxnetwork.data.SeriesGroup ret=new uk.co.boxnetwork.data.SeriesGroup(programme);
+		List<Series> serieses=boxMetadataRepository.findSeriesBySeriesGroup(seriesGroup);
+		uk.co.boxnetwork.data.SeriesGroup ret=new uk.co.boxnetwork.data.SeriesGroup(seriesGroup);
 		for(Series series:serieses){
-			series.setProgramme(null);
+			series.setSeriesGroup(null);
 			uk.co.boxnetwork.data.Series series2=new uk.co.boxnetwork.data.Series(series);			
 			ret.addSeries(series2);
 		}				
@@ -144,6 +144,12 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		statusUpdateOnEpisodeUpdated(existingEpisode,oldIngestSource,oldIngestProfile);		
 		boxMetadataRepository.update(existingEpisode);
 		
+	}
+	@Transactional
+	public void update(long id, uk.co.boxnetwork.data.SeriesGroup seriesGroup){
+		SeriesGroup existingSeriesGroup=boxMetadataRepository.findSeriesGroupById(id);		
+		seriesGroup.update(existingSeriesGroup);
+		boxMetadataRepository.mergeSeriesGroup(existingSeriesGroup);
 	}
 	
 	private void statusUpde(Episode episode){

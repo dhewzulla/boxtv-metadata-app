@@ -29,9 +29,13 @@ public class Series {
 	@Column(name="contract_number")
 	private String contractNumber;
 	
+	
+	
 	@ManyToOne(optional=true, fetch=FetchType.EAGER)
-	@JoinColumn( name = "programme_id", nullable = true )
-	private Programme programme;
+	@JoinColumn( name = "series_group_id", nullable = true )
+	private SeriesGroup seriesGroup;
+	
+	
 	
 	
 	@Column(name="last_modified_at")
@@ -83,14 +87,7 @@ public class Series {
 		this.contractNumber = contractNumber;
 	}
 	
-	public Programme getProgramme() {
-		return programme;
-	}
-
-	public void setProgramme(Programme programme) {
-		this.programme = programme;
-	}
-
+	
 	public Date getLastModifiedAt() {
 		return lastModifiedAt;
 	}
@@ -122,8 +119,8 @@ public class Series {
 		if(GenericUtilities.isNotValidContractNumber(this.contractNumber)){
 			this.contractNumber=series.getContractNumber();			
 		}
-		if(this.programme==null){
-			this.programme=series.getProgramme();
+		if(this.seriesGroup==null){
+			this.seriesGroup=series.getSeriesGroup();
 		}
 	}
 	public void adjustBeforeSave(Episode episode){
@@ -131,5 +128,14 @@ public class Series {
 			episode.setMaterialId(contractNumber);
 		}
 	}
+
+	public SeriesGroup getSeriesGroup() {
+		return seriesGroup;
+	}
+
+	public void setSeriesGroup(SeriesGroup seriesGroup) {
+		this.seriesGroup = seriesGroup;
+	}
+	
 
 }

@@ -29,11 +29,11 @@ import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.MediaTag;
 import uk.co.boxnetwork.model.MetadataStatus;
-import uk.co.boxnetwork.model.Programme;
 import uk.co.boxnetwork.model.ProgrammeCertification;
 import uk.co.boxnetwork.model.ProgrammeContentType;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.SeriesGroup;
 import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -56,11 +56,11 @@ public class BoxMedataRepository {
     	   event.setLastModifiedAt(lastModifiedAt);			
     	   entityManager.merge(event);
        }
-       public void persisProgramme(Programme programme){
+       public void persisSeriesGroup(SeriesGroup seriesGroup){
     	    Date lastModifiedAt=new Date();
-   			programme.setLastModifiedAt(lastModifiedAt);
-   			programme.setCreatedAt(lastModifiedAt);
-   			entityManager.persist(programme);
+    	    seriesGroup.setLastModifiedAt(lastModifiedAt);
+    	    seriesGroup.setCreatedAt(lastModifiedAt);
+   			entityManager.persist(seriesGroup);
        }
        public void persisEpisode(Episode episode){    	   
     	   Date lastModifiedAt=new Date();
@@ -100,6 +100,25 @@ public class BoxMedataRepository {
     	   Date lastModifiedAt=new Date();
     	   series.setLastModifiedAt(lastModifiedAt);    	   
 		   entityManager.persist(series);
+       }
+       public void mergeSeriesGroup(SeriesGroup seriesGroup){
+    	   Date lastModifiedAt=new Date();
+    	   seriesGroup.setLastModifiedAt(lastModifiedAt);    	   
+		   entityManager.persist(seriesGroup);
+       }
+       public void removeSeriesGroup(SeriesGroup seriesGroup){
+    	   entityManager.remove(seriesGroup);
+       }
+       @Transactional
+       public void removeSeriesGroup(List<SeriesGroup> seriesGroup){
+    	   if(seriesGroup==null||seriesGroup.size()==0){
+    		   return;
+    	   }
+    	   for(SeriesGroup sg:seriesGroup){
+    		   SeriesGroup seriesgroup=findSeriesGroupById(sg.getId());
+    		   removeSeriesGroup(seriesgroup);
+    	   }
+    	   
        }
        public void persisMediaTag(MediaTag mediaTag){
     	   Date lastModifiedAt=new Date();
@@ -437,20 +456,20 @@ public class BoxMedataRepository {
 	   public Series findSeriesById(Long id){
 		   return entityManager.find(Series.class, id);		   
 	   }
-	   public Programme findProgrammeById(Long id){
-		   return entityManager.find(Programme.class, id);		   
+	   public SeriesGroup findSeriesGroupById(Long id){
+		   return entityManager.find(SeriesGroup.class, id);		   
 	   }
 	   public List<Series> findAllSeries(){
 		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s", Series.class);
 		   return query.getResultList();
 	   }
 	   
-	   public List<Programme> findProgrammeByTitle(String title){		   
-		   TypedQuery<Programme> query=entityManager.createQuery("SELECT p FROM programme p where p.title=:title", Programme.class);
+	   public List<SeriesGroup> findSeriesGroupByTitle(String title){		   
+		   TypedQuery<SeriesGroup> query=entityManager.createQuery("SELECT p FROM series_group p where p.title=:title", SeriesGroup.class);
 		   return query.setParameter("title",title).getResultList();
 	   }
-	   public List<Programme> findAllProgramme(){		   
-		   TypedQuery<Programme> query=entityManager.createQuery("SELECT p FROM programme p", Programme.class);
+	   public List<SeriesGroup> findAllSeriesGroup(){		   
+		   TypedQuery<SeriesGroup> query=entityManager.createQuery("SELECT p FROM series_group p", SeriesGroup.class);
 		   return query.getResultList();
 	   }
 	   public List<Episode> findEpisodesByName(String name){
@@ -466,9 +485,9 @@ public class BoxMedataRepository {
 		   return query.setParameter("series",series).getResultList();
 	   }
 
-	   public List<Series> findSeriesByProgramme(Programme programme){
-		   TypedQuery<Series> query=entityManager.createQuery("SELECT e FROM series e where e.programme=:programme", Series.class);
-		   return query.setParameter("programme",programme).getResultList();
+	   public List<Series> findSeriesBySeriesGroup(SeriesGroup seriesGroup){
+		   TypedQuery<Series> query=entityManager.createQuery("SELECT e FROM series e where e.seriesGroup=:seriesGroup", Series.class);
+		   return query.setParameter("seriesGroup",seriesGroup).getResultList();
 	   }
 
 	   public Episode findEpisodeById(Long id){

@@ -73,6 +73,8 @@ public class ScheduleEvent {
 	@Column(name="created_at")
 	private Date createdAt;
 	
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -272,6 +274,8 @@ public class ScheduleEvent {
     		this.episode=event.getEpisode();
     	}    	
     }
+
+
 
 	@Override
 	public String toString(){

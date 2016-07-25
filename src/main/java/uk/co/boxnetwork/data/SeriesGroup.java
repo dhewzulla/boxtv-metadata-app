@@ -15,12 +15,16 @@ public class SeriesGroup {
 	private Date createdAt;
 	private List<Series> series=new ArrayList<Series>();
 	
-	public SeriesGroup(uk.co.boxnetwork.model.Programme prg){
+	public SeriesGroup(uk.co.boxnetwork.model.SeriesGroup prg){
 		id=prg.getId();
 		title=prg.getTitle();
 		synopsis=prg.getSynopsis();		
 		lastModifiedAt=prg.getLastModifiedAt();
 		createdAt=prg.getCreatedAt();
+	}
+	public void update(uk.co.boxnetwork.model.SeriesGroup seriesgroup){
+		seriesgroup.setTitle(this.title);
+		seriesgroup.setSynopsis(this.synopsis);
 	}
 	public SeriesGroup(){
 		

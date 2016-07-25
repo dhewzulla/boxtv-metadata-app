@@ -1,10 +1,16 @@
 package uk.co.boxnetwork.components;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +18,9 @@ import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.MetadataStatus;
+import uk.co.boxnetwork.model.ScheduleEvent;
+import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.SeriesGroup;
 import uk.co.boxnetwork.model.TimedTask;
 import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.util.GenericUtilities;
@@ -27,7 +36,15 @@ public class MetadataMaintainanceService {
 
 	@Autowired
 	private TimedTaskService timedTasks;
+	
+	
+	@Autowired	
+	private EntityManager entityManager;
 
+	@Autowired
+    private DataSource datasource;
+	
+	
 	private static final Logger logger=LoggerFactory.getLogger(MetadataMaintainanceService.class);
 	
 	@Transactional
@@ -116,6 +133,69 @@ public class MetadataMaintainanceService {
     		repository.merge(episodeStatus);
     	}
     	episode.setEpisodeStatus(episodeStatus);    	
+    }
+    
+    
+    @Transactional     
+    public void replaceIngestProfiles(String oldIngestProfile,String newIngestProfile){
+    	logger.info("repacing the episode ingestProfile:oldIngestProfile="+oldIngestProfile+" newIngestProfile="+newIngestProfile);
+		List<Episode> episodes=repository.findAllEpisodes();		
+		for(Episode episode:episodes){
+			replaceIngestProfiles(episode,oldIngestProfile,newIngestProfile);												  					
+		}
+		logger.info("Completed the ingestprofile changes");
+    }
+    public void replaceIngestProfiles(Episode episode,String oldIngestProfile,String newIngestProfile){
+    	if(episode.getIngestProfile()==null || (!episode.getIngestProfile().equals(oldIngestProfile))){
+    		return;
+    	}
+    	episode.setIngestProfile(newIngestProfile);
+    	EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+    	if(episodeStatus.getVideoStatus()==VideoStatus.TRANSCODED){
+    		episodeStatus.setVideoStatus(VideoStatus.NEEDS_RETRANSCODE);
+    		repository.merge(episodeStatus);
+    	}
+    	repository.mergeEpisode(episode);    	
+    }
+    
+    
+    public void removeOrphantSeriesGroup(){
+    	List<SeriesGroup> seriesGroups=repository.findAllSeriesGroup();
+    	List<SeriesGroup> orphanned=new ArrayList<SeriesGroup>();
+    	
+    	for(SeriesGroup sg:seriesGroups){
+    		List<Series> series=repository.findSeriesBySeriesGroup(sg);
+    		if(series.size()==0){
+    			orphanned.add(sg);
+    		}
+    	}
+    	repository.removeSeriesGroup(orphanned);    	
+    }
+    
+    
+    
+    
+    
+    
+   
+    
+    public void dropProgrammeColumns(){
+    //	JdbcTemplate jdbcTemlate=new JdbcTemplate(datasource);
+    	//jdbcTemlate.execute("ALTER TABLE episode DROP COLUMN programme_id");
+    	//jdbcTemlate.execute("ALTER TABLE schedule_event DROP COLUMN programme_id");
+    	//jdbcTemlate.execute("ALTER TABLE series DROP COLUMN programme_id");
+    	
+//    	jdbcTemlate.execute("ALTER TABLE episode DROP FOREIGN KEY programme_id");
+//    	jdbcTemlate.execute("ALTER TABLE schedule_event DROP FOREIGN KEY programme_id");
+//    	jdbcTemlate.execute("ALTER TABLE series DROP FOREIGN KEY programme_id");
+    	//jdbcTemlate.execute("ALTER TABLE programme DROP FOREIGN KEY programme_id");
+    	    	
+    }
+    @Transactional
+    public void dropProgrammeTable(){
+    	JdbcTemplate jdbcTemlate=new JdbcTemplate(datasource);
+    	
+    	jdbcTemlate.execute("DROP TABLE programme");
     }
 
 }
