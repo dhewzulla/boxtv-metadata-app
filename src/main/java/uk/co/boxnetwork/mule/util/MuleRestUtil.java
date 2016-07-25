@@ -22,12 +22,16 @@ public class MuleRestUtil {
 	  }
 	  else{
 		  String restpath=requesturi.substring(listenerPath.length());
-		  ind=requesturi.indexOf("?");
+		  String basepath=requesturi.substring(0,listenerPath.length());
+		  if(basepath.endsWith("?")){
+			  return null;
+		  }
+		  ind=restpath.indexOf("?");
 		  if(ind==-1){
 			 return restpath;			  
 		  }
 		  else
-			  return null;
+			  return restpath.substring(0,ind);
 	  }
   }
   public static void printAllInboundProperties(MuleMessage message){

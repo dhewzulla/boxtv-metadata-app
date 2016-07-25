@@ -13,8 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-
+import javax.persistence.OneToOne;
 
 import uk.co.boxnetwork.data.s3.FileItem;
 import uk.co.boxnetwork.util.GenericUtilities;
@@ -133,7 +132,20 @@ public class Episode {
 	private Set<CuePoint> cuePoints;
 	
 	
+	@OneToOne(optional=true, fetch=FetchType.EAGER)
+	@JoinColumn( name = "status_id", nullable = true )
+	private EpisodeStatus episodeStatus;
 	
+	
+	
+	public EpisodeStatus getEpisodeStatus() {
+		return episodeStatus;
+	}
+
+	public void setEpisodeStatus(EpisodeStatus episodeStatus) {
+		this.episodeStatus = episodeStatus;
+	}
+
 	public Date getLastModifiedAt() {
 		return lastModifiedAt;
 	}
@@ -411,6 +423,13 @@ public void setPrAuk(String prAuk) {
 	this.prAuk = prAuk;
 }
 
+
+	public void applyVideoStatus( VideoStatus videoStatus){
+		if(episodeStatus==null){
+			this.episodeStatus=new EpisodeStatus();
+		}
+		this.episodeStatus.setVideoStatus(videoStatus);	
+	}
 
    
 }

@@ -33,14 +33,34 @@ public class VideoTransmer extends  BoxRestTransformer{
 			return videoService.listVideo(queryparams.get("limit"),queryparams.get("offset"),queryparams.get("sort"),queryparams.get("q"));
 		}
 		else{
-			ParameterMap queryparams=message.getInboundProperty("http.query.params");
-			if(queryparams!=null &&"true".equals(queryparams.get("raw"))){
-				return videoService.getViodeInJson(videoid);
+			if(videoid.endsWith("/sources")){
+				return getVideoSources(message,outputEncoding,videoid.substring(0,videoid.length()-"/soures".length()-1));
 			}
-			else{
-				return videoService.getVideo(videoid);
+			else{				
+				return getVideo(message,outputEncoding,videoid);
 			}
 		}
+	}
+	
+	private Object getVideo(MuleMessage message, String outputEncoding, String videoid){
+		ParameterMap queryparams=message.getInboundProperty("http.query.params");
+		if(queryparams!=null &&"true".equals(queryparams.get("raw"))){
+			return videoService.getViodeInJson(videoid);
+		}
+		else{
+			return videoService.getVideo(videoid);
+		}
+	}
+	private Object getVideoSources(MuleMessage message, String outputEncoding, String videoid){
+		ParameterMap queryparams=message.getInboundProperty("http.query.params");
+		if(queryparams!=null &&"true".equals(queryparams.get("raw"))){
+			return videoService.getViodeSourcesInJson(videoid);
+		}
+		else{
+			return videoService.getVideoSource(videoid);
+		}
+		
+		
 	}
 	
     

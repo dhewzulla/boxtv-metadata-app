@@ -13,6 +13,9 @@ import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.MetadataStatus;
+import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.mule.components.LoadResourceAsInputStream;
 
 public class GenericUtilities {
@@ -256,6 +259,34 @@ public class GenericUtilities {
 		  return matParts[0]+"/"+matParts[1];
 	  }
 		 
+  }
+  public static VideoStatus calculateVideoStatus(Episode episode){
+	   return  calculateVideoStatus(episode, episode.getIngestSource(), episode.getIngestProfile());  
+  }
+  public static VideoStatus calculateVideoStatus(Episode episode, String previousIngestSource, String previousIngestProfile){
+	   if(isEmpty(episode.getIngestSource())){
+			return VideoStatus.MISSING_VIDEO;		
+	   }
+	   else if(isEmpty(episode.getIngestProfile())){
+			return VideoStatus.MISSING_PROFILE;
+	   }
+	   else if(isEmpty(episode.getBrightcoveId())){
+			return VideoStatus.NO_PLACEHOLDER;
+	   }
+	   else if((!episode.getIngestSource().equals(previousIngestSource)) || (!episode.getIngestProfile().equals(previousIngestProfile))){
+		    return VideoStatus.NEEDS_RETRANSCODE;
+	   }
+	   else{
+		   return null;
+	   }
+		   	   
+ }
+  public static MetadataStatus calculateMetadataStatus(Episode episode){
+	  if(isEmpty(episode.getBrightcoveId())){
+			return MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER;			
+	   }
+	  else
+		    return null; 
   }
   
 }

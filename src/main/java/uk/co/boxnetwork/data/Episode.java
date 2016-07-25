@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.ComplianceInformation;
+import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.ProgrammeContentType;
 
 
@@ -86,6 +87,8 @@ public class Episode {
 	
 	
 	ProgrammeContentType contentType;
+	
+	private EpisodeStatus episodeStatus;
 	
 	
 	private List<ScheduleEvent> scheduleEvents=new ArrayList<ScheduleEvent>();
@@ -309,6 +312,7 @@ public Episode(){
 		this.ingestProfile=episode.getIngestProfile();
 		this.ingestSource=episode.getIngestSource();
 		this.txChannel=episode.getTxChannel();
+		this.episodeStatus=episode.getEpisodeStatus();
 		
 		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
@@ -557,6 +561,16 @@ public String getPrAuk() {
 
 public void setPrAuk(String prAuk) {
 	this.prAuk = prAuk;
+}
+
+
+public EpisodeStatus getEpisodeStatus() {
+	return episodeStatus;
+}
+
+
+public void setEpisodeStatus(EpisodeStatus episodeStatus) {
+	this.episodeStatus = episodeStatus;
 }
 
 

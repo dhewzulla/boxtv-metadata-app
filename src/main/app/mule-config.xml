@@ -140,6 +140,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.TagsTransformer" name="tagsService" doc:name="Tags Services"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
+   
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoPublisher" name="bcVideoPublisher" doc:name="BC Video Publisher"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCIngestTransformer" name="bcVideoIngestTransformer" doc:name="BC Video Ingest"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCIngestNotificationTransformer" name="bcNotification" doc:name="BC Ingest Notification"/>

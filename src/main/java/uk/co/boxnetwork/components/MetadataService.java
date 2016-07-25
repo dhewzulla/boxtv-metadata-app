@@ -13,9 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.co.boxnetwork.data.SeriesGroup;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.EpisodeStatus;
+import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.Programme;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.util.GenericUtilities;
 
 @Service
@@ -97,13 +100,75 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 		return ret;		
 	}
+	public void statusUpdateOnEpisodeUpdated(Episode existingEpisode, String oldIngestSource, String oldIngstProfile){
+		EpisodeStatus episodeStatus=existingEpisode.getEpisodeStatus();
+		MetadataStatus metadataStatus=GenericUtilities.calculateMetadataStatus(existingEpisode);
+		if(metadataStatus!=null){
+			episodeStatus.setMetadataStatus(metadataStatus);
+		}
+		else{
+			episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+		}
+		VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(existingEpisode,oldIngestSource,oldIngstProfile);
+		if(videoStatus!=null){
+			episodeStatus.setVideoStatus(videoStatus);
+		}
+		if(episodeStatus.getId()==null){
+			boxMetadataRepository.persist(episodeStatus);
+    	}
+    	else{
+    		boxMetadataRepository.merge(episodeStatus);
+    	}
+ 	   
+    }
+	
+	public void statusBoundSourceVideo(Episode existingEpisode){
+		EpisodeStatus episodeStatus=existingEpisode.getEpisodeStatus();
+ 	   VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(existingEpisode);
+ 	    if(videoStatus!=null){
+ 	    	episodeStatus.setVideoStatus(videoStatus); 	    	
+ 	    }
+ 	    else{
+ 	    	episodeStatus.setVideoStatus(VideoStatus.NEEDS_RETRANSCODE);
+ 	    	
+ 	    } 	   
+ 	    boxMetadataRepository.merge(episodeStatus);
+    }
+
 	@Transactional
 	public void update(long id, uk.co.boxnetwork.data.Episode episode){
 		Episode existingEpisode=boxMetadataRepository.findEpisodeById(id);
+		String oldIngestSource=existingEpisode.getIngestSource();
+		String oldIngestProfile=existingEpisode.getIngestProfile();
 		episode.update(existingEpisode);
+		statusUpdateOnEpisodeUpdated(existingEpisode,oldIngestSource,oldIngestProfile);		
 		boxMetadataRepository.update(existingEpisode);
 		
 	}
+	
+	private void statusUpde(Episode episode){
+		EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+		MetadataStatus metadataStatus=GenericUtilities.calculateMetadataStatus(episode);
+		if(metadataStatus!=null){
+			episodeStatus.setMetadataStatus(metadataStatus);
+		}
+		else{
+			episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+		}
+		VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(episode);
+		if(videoStatus!=null){
+			episodeStatus.setVideoStatus(videoStatus);
+		}
+		
+		if(episodeStatus.getId()==null){
+			boxMetadataRepository.persist(episodeStatus);
+    	}
+    	else{
+    		boxMetadataRepository.merge(episodeStatus);
+    	}
+		
+	}
+	
 	@Transactional
 	public uk.co.boxnetwork.data.Episode reicevedEpisodeByMaterialId(uk.co.boxnetwork.data.Episode episode){
 		String materiaId=episode.getMaterialId();
@@ -126,7 +191,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		Episode episodeToUpdate=existingEpisodes.get(0); 
 		episode.updateWhenReceivedByMaterialId(episodeToUpdate);		
 		replaceCuePoints(episodeToUpdate,episode.getCuePoints());
-		
+		statusUpde(episodeToUpdate);
 		boxMetadataRepository.mergeEpisode(episodeToUpdate);
 		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episodeToUpdate,null);
 		ret.setComplianceInformations(episodeToUpdate.getComplianceInformations());
@@ -192,13 +257,16 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	   else if(matchedEpisodes.size()==1){
 		   Episode episode=matchedEpisodes.get(0);
 		   episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
-		   boxMetadataRepository.mergeEpisode(episode);		   
+		   statusBoundSourceVideo(episode);
+		   boxMetadataRepository.mergeEpisode(episode);
+		   
 	   }
 	   else{
 		   logger.warn("more than epsiode matching the materialId=["+materialId+"] while binding video file:"+ingestFile+"]");
 		   for(Episode episode: matchedEpisodes){
 			   if(episode.getIngestSource()!=null){
 				   episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
+				   statusBoundSourceVideo(episode);
 				   boxMetadataRepository.mergeEpisode(episode);
 			   }
 		   }

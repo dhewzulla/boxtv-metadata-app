@@ -32,10 +32,14 @@ import uk.co.boxnetwork.data.bc.BCAccessToken;
 import uk.co.boxnetwork.data.bc.BCConfiguration;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.bc.BCVideoIngestRequest;
+import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.data.bc.BcIngestResponse;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.EpisodeStatus;
+import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.ScheduleEvent;
+import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.util.GenericUtilities;
 
 
@@ -50,6 +54,36 @@ public class BCVideoService {
 	
 	@Autowired
 	BoxMedataRepository metadataRepository;
+	
+	
+	public void statusPublishedToBrightCove(Episode episode){
+		   EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+		   episodeStatus.setMetadataStatus(MetadataStatus.PUBLISHED);
+		   VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(episode);
+	    	if(videoStatus!=null){
+	    		episodeStatus.setVideoStatus(videoStatus);
+	    	}
+	    	else{
+	    			BCVideoSource[] videos=getVideoSource(episode.getBrightcoveId());
+	    			if(videos!=null && videos.length>2){
+	    				episodeStatus.setVideoStatus(VideoStatus.TRANSCODED);
+	    				episodeStatus.setNumberOfTranscodedFiles(videos.length);
+	    			}
+	    			else{
+	    				episodeStatus.setVideoStatus(VideoStatus.NEEDS_TRANSCODE);
+	    			}
+	    	}	 	  
+	 	   metadataRepository.merge(episodeStatus);
+	    }
+	public void statusUnpublishedFromBrightCove(Episode episode){
+	   episode.getEpisodeStatus().setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
+	   episode.getEpisodeStatus().setVideoStatus(VideoStatus.NO_PLACEHOLDER);
+	   metadataRepository.merge(episode.getEpisodeStatus());	
+    }
+	public void statusIngestVideoToBrightCove(Episode episode){    	   
+	   	 episode.getEpisodeStatus().setVideoStatus(VideoStatus.TRANSCODED);    		   
+	   	metadataRepository.merge(episode.getEpisodeStatus());
+  }
 	
 	public String  listVideo(String limit, String offset, String sort,String q){
 		return listVideo(GenericUtilities.bcInteger(limit),GenericUtilities.bcInteger(offset),GenericUtilities.bcString(sort),GenericUtilities.bcString(q));		
@@ -81,10 +115,26 @@ public class BCVideoService {
 	    ResponseEntity<String> responseEntity = rest.exchange(configuration.videoURL(videoid), HttpMethod.GET, requestEntity, String.class);
 	    responseEntity.getStatusCode();	    
 	    HttpStatus statusCode=responseEntity.getStatusCode();
-	    logger.info(":::::::::statuscode:"+statusCode);
+	    logger.info("::::::getViodeInJson:::statuscode:"+statusCode);
 	    return responseEntity.getBody();
 	    
    }
+	public String  getViodeSourcesInJson(String videoid){			
+	    BCAccessToken accessToken=bcAccessToenService.getAccessToken();
+		RestTemplate rest=new RestTemplate();
+		//rest.setErrorHandler(new RestResponseHandler());
+		HttpHeaders headers=new HttpHeaders();			
+	    headers.add("Accept", "*/*");
+		headers.add("Authorization", "Bearer " + accessToken.getAccess_token());
+		HttpEntity<String> requestEntity = new HttpEntity<String>("", headers);		
+	    ResponseEntity<String> responseEntity = rest.exchange(configuration.videoURL(videoid)+"/sources", HttpMethod.GET, requestEntity, String.class);
+	    responseEntity.getStatusCode();	    
+	    HttpStatus statusCode=responseEntity.getStatusCode();
+	    logger.info("::::::getViodeSourcesInJson:::statuscode:"+statusCode);
+	    return responseEntity.getBody();
+	    
+   }
+	
 	public String updateVideo(BCVideoData videodata, String brightcoveid){
 		   BCAccessToken accessToken=bcAccessToenService.getAccessToken();			
 		   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();				
@@ -276,6 +326,20 @@ public class BCVideoService {
 			throw new RuntimeException(e.getMessage(),e);
 		}
 	}
+	public  BCVideoSource[] jsonToBCVideoSource(String videoInJson){
+		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+		objectMapper.setSerializationInclusion(Include.NON_NULL);					
+		try {
+			return  objectMapper.readValue(videoInJson, BCVideoSource[].class);
+						
+		} catch (IOException e) {
+			logger.error("error while parsing the brightcove video source data",e);
+			logger.error(videoInJson);
+			throw new RuntimeException(e.getMessage(),e);
+		}
+	}
+	
+	
 	private BcIngestResponse jsonToBcIngestResponse(String responseInJson){
 		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);	
@@ -295,6 +359,11 @@ public class BCVideoService {
 	    return jsonToBCVideoData(videoInJson);		
 	    
    }
+	public BCVideoSource[]  getVideoSource(String videoid){			
+	    String videoInJson=getViodeSourcesInJson(videoid);
+	    return jsonToBCVideoSource(videoInJson);			    
+   }
+	
 	
 	@Transactional
 	public BCVideoData publishEpisodeToBrightcove(long episodeid){
@@ -312,6 +381,7 @@ public class BCVideoService {
 			  BCVideoData createdVideo=jsonToBCVideoData(reponse);
 			  logger.info("created video:"+createdVideo);
 			  episode.setBrightcoveId(createdVideo.getId());
+			  statusPublishedToBrightCove(episode);
 			  metadataRepository.update(episode);
 			  return createdVideo;
 		  }
@@ -348,6 +418,7 @@ public class BCVideoService {
 				  logger.info("update video respomse:"+reponse);
 				  BCVideoData updatedVideo=jsonToBCVideoData(reponse);
 				  logger.info("updatedVideo video:"+updatedVideo);
+				  statusPublishedToBrightCove(episode);
 				  return updatedVideo;
 			  }
 			  else{
@@ -359,6 +430,7 @@ public class BCVideoService {
 		  
 		  
 	}
+	
 	
 	@Transactional
 	public String deleteEpisodeFromBrightcove(long episodeid){
@@ -381,6 +453,7 @@ public class BCVideoService {
 				  String reponse=deleteVideo(episode.getBrightcoveId());
 				  logger.info("successfully deleted:"+episode.getBrightcoveId()+" for episode=["+episode+"]reponse=["+reponse+"]");
 				  episode.setBrightcoveId(null);
+				  statusUnpublishedFromBrightCove(episode);
 				  metadataRepository.update(episode);
 				  return reponse;
 			  }
@@ -412,10 +485,11 @@ public class BCVideoService {
 		  }	
 		  else{
 			  	  BCVideoIngestRequest bcVideoIngestRequest=new BCVideoIngestRequest(episode,configuration);			  	  
-				  return ingestVideo(bcVideoIngestRequest,episode.getBrightcoveId());
-			  }
-			  
-		  
+			  	  BcIngestResponse response=ingestVideo(bcVideoIngestRequest,episode.getBrightcoveId());
+			  	  statusIngestVideoToBrightCove(episode);
+			  	  
+			  	  return response;
+		  }
 	}
 	@Transactional
 	public void persist(BCNotification bcNotification){

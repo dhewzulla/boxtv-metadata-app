@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.BoxUser;
 import uk.co.boxnetwork.model.CertificationCategory;
@@ -26,12 +26,15 @@ import uk.co.boxnetwork.model.CertificationType;
 import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.MediaTag;
+import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.Programme;
 import uk.co.boxnetwork.model.ProgrammeCertification;
 import uk.co.boxnetwork.model.ProgrammeContentType;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.util.GenericUtilities;
 
 
@@ -43,7 +46,7 @@ public class BoxMedataRepository {
 
 	    
        public void persisEvent(ScheduleEvent newEvent){
-    	   Date lastModifiedAt=new Date();
+    	   	Date lastModifiedAt=new Date();
 			newEvent.setLastModifiedAt(lastModifiedAt);
 			newEvent.setCreatedAt(lastModifiedAt);
 			entityManager.persist(newEvent);
@@ -59,7 +62,7 @@ public class BoxMedataRepository {
    			programme.setCreatedAt(lastModifiedAt);
    			entityManager.persist(programme);
        }
-       public void persisEpisode(Episode episode){
+       public void persisEpisode(Episode episode){    	   
     	   Date lastModifiedAt=new Date();
     	   episode.setLastModifiedAt(lastModifiedAt);
     	   episode.setCreatedAt(lastModifiedAt);
@@ -69,7 +72,7 @@ public class BoxMedataRepository {
        public void mergeEpisode(Episode episode){
     	   Date lastModifiedAt=new Date();
     	   episode.setLastModifiedAt(lastModifiedAt);    	   
-		   entityManager.persist(episode);
+		   entityManager.merge(episode);
        }
        public void merge(CuePoint cuePoint){
     	   entityManager.merge(cuePoint);
@@ -77,8 +80,12 @@ public class BoxMedataRepository {
        public void persist(CuePoint cuePoint){
     	   entityManager.persist(cuePoint);
        }
-
-       
+      public void persist(EpisodeStatus episodeStatus){
+    	  entityManager.persist(episodeStatus);
+      }
+      public void merge(EpisodeStatus episodeStatus){
+    	  entityManager.persist(episodeStatus);
+      }
        public void persisSeries(Series series){
 		    	   Date lastModifiedAt=new Date();
 		    	   series.setLastModifiedAt(lastModifiedAt);
@@ -166,35 +173,54 @@ public class BoxMedataRepository {
 			}
 					        		    				
 	   }	
-       /*
-	   private Programme createProgrammeFromScheduleEvent(ScheduleEvent newEvent){
-		   String programmeTitle=null;
-		   
-		   if(newEvent.getEpisode()!=null){
-			   if(newEvent.getEpisode().getSeries()!=null){				   
-					   if(!GenericUtilities.isNotValidTitle(newEvent.getEpisode().getSeries().getName())){						   
-						   programmeTitle=newEvent.getEpisode().getSeries().getName();
-					   }
-			   }
-		   }
-		   if(programmeTitle==null){
-				   if(GenericUtilities.isNotValidTitle(newEvent.getAssetName())){							   
-					   programmeTitle=programmeTitle=newEvent.getGroupName();
-				   }
-				   else{
-					   programmeTitle=newEvent.getAssetName();
-				   }
-		   }			   
-	      if(GenericUtilities.isNotValidTitle(programmeTitle)){
-				   return null;
-		   }
-		   Programme programme=new Programme();
-		   programme.setTitle(programmeTitle);
-           programme.setContentType(ProgrammeContentType.LIVE_TV);		
-           return programme;
-	   }
-	   */
-	   private Episode createNewEpisode(Episode episode){
+      
+      
+              
+       
+       
+       
+       public void statusUpdateFromC4Created(Episode episode){
+    	   EpisodeStatus episodeStatus=new EpisodeStatus();
+    	   MetadataStatus metadataStatus=GenericUtilities.calculateMetadataStatus(episode);
+       	   if(metadataStatus!=null){
+       		 episodeStatus.setMetadataStatus(metadataStatus);
+       	    }
+       	    else{
+       		      episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+       	     }
+       	   	 VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(episode);
+    	     if(videoStatus!=null){
+    		    episodeStatus.setVideoStatus(videoStatus);
+    	      }    	
+    	     if(episodeStatus.getId()==null){
+    		    persist(episodeStatus);
+    	      }
+    	     else{
+    	    	 	merge(episodeStatus);
+    	     }
+    	     episode.setEpisodeStatus(episodeStatus); 
+    	
+       }
+       
+       public void statusUpdateFromC4Updated(Episode episode){
+    	   EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+    	   MetadataStatus metadataStatus=GenericUtilities.calculateMetadataStatus(episode);
+       	   if(metadataStatus!=null){
+       		   episodeStatus.setMetadataStatus(metadataStatus);
+       	    }
+       	    else{
+       		      episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+       	     }
+       	   	 VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(episode);
+    	     if(videoStatus!=null){
+    		    episodeStatus.setVideoStatus(videoStatus);
+    	      }    	    	     
+    	    merge(episodeStatus);
+       }
+       
+       
+       
+	   private Episode createEpisode(Episode episode){
 		    episode.setSeries(saveSeries(episode.getSeries()));		    
 		    persisEpisode(episode);		    
 		   	saveTags(episode.getTags());
@@ -203,7 +229,8 @@ public class BoxMedataRepository {
 	   
 	   private Episode returnExistingEpisodeOrPersist(Episode episode,List<Episode> matchedEpisodes,String messageOnDuplication){
 		   if(matchedEpisodes.size()==0){
-			   return createNewEpisode(episode);			   
+			   statusUpdateFromC4Created(episode);
+			   return createEpisode(episode);			   
 		   }
 		   else{
 			   if(matchedEpisodes.size()>1){
@@ -213,6 +240,7 @@ public class BoxMedataRepository {
 			   			   
 			   
 			   existingEpisode.setSeries(saveSeries(episode.getSeries()));
+			   statusUpdateFromC4Updated(existingEpisode);
 			   update(existingEpisode);
 			   return existingEpisode;
 		   }		   
@@ -312,7 +340,7 @@ public class BoxMedataRepository {
 				   if(GenericUtilities.isNotValidCrid(episode.getCtrPrg())){
 					   if(GenericUtilities.isNotValidTitle(episode.getTitle())){
 						   if(GenericUtilities.isNotValidTitle(episode.getName())){
-							   return createNewEpisode(episode);							      
+							   return createEpisode(episode);							      
 						   }
 						   else{
 							   List<Episode> matchedEpisodes=findEpisodesByName(episode.getName());
