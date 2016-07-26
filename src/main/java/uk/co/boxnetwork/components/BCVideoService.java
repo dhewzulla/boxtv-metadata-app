@@ -382,7 +382,7 @@ public class BCVideoService {
 			  logger.info("created video:"+createdVideo);
 			  episode.setBrightcoveId(createdVideo.getId());
 			  statusPublishedToBrightCove(episode);
-			  metadataRepository.update(episode);
+			  metadataRepository.persist(episode);
 			  return createdVideo;
 		  }
 		  else{
@@ -454,7 +454,7 @@ public class BCVideoService {
 				  logger.info("successfully deleted:"+episode.getBrightcoveId()+" for episode=["+episode+"]reponse=["+reponse+"]");
 				  episode.setBrightcoveId(null);
 				  statusUnpublishedFromBrightCove(episode);
-				  metadataRepository.update(episode);
+				  metadataRepository.persist(episode);
 				  return reponse;
 			  }
 			  else{

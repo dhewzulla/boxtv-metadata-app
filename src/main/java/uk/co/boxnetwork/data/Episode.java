@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Column;
+
 
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.CertType;
@@ -117,6 +117,8 @@ public class Episode {
 	 private String prAuk;
 	 
 	 private String excludeddevices;
+	 
+	 private String geoAllowedCountries;
 	 
 	 
 	public Long getId() {
@@ -307,7 +309,9 @@ public Episode(){
 		this.startDate = episode.getStartDate();
 		this.endDate = episode.getEndDate();
 		this.brightcoveId=episode.getBrightcoveId();
-		this.series = new Series(episode.getSeries());
+		if(episode.getSeries()!=null){
+			this.series = new Series(episode.getSeries());
+		}
 		
 		this.lastModifiedAt=episode.getLastModifiedAt();
 		this.createdAt=episode.getCreatedAt();
@@ -329,6 +333,7 @@ public Episode(){
 				addScheduleEvent(new ScheduleEvent(evt));			
 			}
 		}
+		this.geoAllowedCountries=episode.getGeoAllowedCountries();
 		
 	}
 	public void update(uk.co.boxnetwork.model.Episode episode) {		
@@ -376,6 +381,7 @@ public Episode(){
 		episode.setIngestSource(this.ingestSource);	
 		episode.setTxChannel(this.txChannel);	
 		episode.setExcludeddevices(this.excludeddevices);
+		episode.setGeoAllowedCountries(this.geoAllowedCountries);
 	}
 
 
@@ -426,7 +432,9 @@ public Episode(){
 		if(this.prAuk!=null){
 			episode.setPrAuk(this.prAuk);
 		}
-		
+		if(this.geoAllowedCountries!=null){
+			episode.setGeoAllowedCountries(geoAllowedCountries);
+		}
 	}
 	
 	
@@ -586,6 +594,16 @@ public String getExcludeddevices() {
 
 public void setExcludeddevices(String excludeddevices) {
 	this.excludeddevices = excludeddevices;
+}
+
+
+public String getGeoAllowedCountries() {
+	return geoAllowedCountries;
+}
+
+
+public void setGeoAllowedCountries(String geoAllowedCountries) {
+	this.geoAllowedCountries = geoAllowedCountries;
 }
 
 

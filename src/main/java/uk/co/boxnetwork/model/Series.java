@@ -46,6 +46,7 @@ public class Series {
 	private Date createdAt;
 	
 	
+	private String synopsis;
 	
 	public Long getId() {
 		return id;
@@ -135,6 +136,14 @@ public class Series {
 
 	public void setSeriesGroup(SeriesGroup seriesGroup) {
 		this.seriesGroup = seriesGroup;
+	}
+
+	public String getSynopsis() {
+		return synopsis;
+	}
+
+	public void setSynopsis(String synopsis) {
+		this.synopsis = synopsis;
 	}
 	
 

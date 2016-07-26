@@ -250,15 +250,34 @@ public class GenericUtilities {
 	  else
 		  return null;
   }
-  public static String materialIdToProgrammeId(String materialId){
-	  String matParts[]=materialId.split("/");
-	  if(matParts.length<=2){
-		  return materialId;
+  
+  public static String getProgrammeNumber(uk.co.boxnetwork.data.Episode episode){
+	  
+	  if(isNotValidCrid(episode.getProgrammeNumber())){
+		  String materialId=episode.getMaterialId();
+		  String matParts[]=materialId.split("/");
+		  if(matParts.length<=2){
+			  return materialId;
+		  }
+		  else{
+			  return matParts[0]+"/"+matParts[1];
+		  }
 	  }
-	  else{
-		  return matParts[0]+"/"+matParts[1];
+	  else
+		  return episode.getProgrammeNumber();
+	  
+	  
+  }
+  public static String getContractNumber(uk.co.boxnetwork.data.Episode episode){
+	  String pid=episode.getProgrammeNumber();
+	  if(isNotValidCrid(pid)){
+		  pid=episode.getMaterialId();
 	  }
-		 
+	  if(isNotValidCrid(pid)){
+		  return null;
+	  }
+	  String matParts[]=pid.split("/");
+	  return matParts[0];
   }
   public static VideoStatus calculateVideoStatus(Episode episode){
 	   return  calculateVideoStatus(episode, episode.getIngestSource(), episode.getIngestProfile());  
@@ -288,5 +307,16 @@ public class GenericUtilities {
 	  else
 		    return null; 
   }
-  
+  public static String validateEpisode(uk.co.boxnetwork.data.Episode episode){
+		if(isNotValidCrid(episode.getProgrammeNumber())){
+			   return "programNumber is not valid";
+		}
+		if(isNotValidTitle(episode.getTitle())){
+			   return "title is not valid";
+		}
+		if(isNotValidCrid(episode.getMaterialId())){
+			episode.setMaterialId(episode.getProgrammeNumber());
+		}
+		return null;		
+	}
 }

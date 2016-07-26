@@ -13,6 +13,7 @@ public class Series {
 	private Date lastModifiedAt;
 	private Date createdAt;
 	private List<uk.co.boxnetwork.model.Episode> episodes;
+	private String synopsis;
 	
 	
 	public Series(uk.co.boxnetwork.model.Series series) {
@@ -27,12 +28,14 @@ public class Series {
 		}
 		this.lastModifiedAt=series.getLastModifiedAt();
 		this.createdAt=series.getCreatedAt();
+		this.synopsis=series.getSynopsis();		
 	}
 	public void update(uk.co.boxnetwork.model.Series series){		
 		series.setAssetId(this.assetId);
 		series.setPrimaryId(this.primaryId);
 		series.setName(this.name);
 		series.setContractNumber(this.contractNumber);	
+		series.setSynopsis(this.synopsis);
 	}
 	public Series(){
 		
@@ -92,6 +95,12 @@ public class Series {
 	}
 	public void setSeriesGroup(SeriesGroup seriesGroup) {
 		this.seriesGroup = seriesGroup;
+	}
+	public String getSynopsis() {
+		return synopsis;
+	}
+	public void setSynopsis(String synopsis) {
+		this.synopsis = synopsis;
 	}
 	
 	

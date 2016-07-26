@@ -32,7 +32,7 @@ public class BCVideoData {
 		  private Integer duration;
 		  private String economics;
 		  private String folder_id;
-		  private String geo;
+		  private BCGeo geo;
 		  private BCImages images;
 		  private String link;
 		  private String long_description;
@@ -93,6 +93,9 @@ public class BCVideoData {
 			 }
 			custom_fields=new BCCustomFields(episode);
 			populateCuePoints(episode);
+			if(episode.getGeoAllowedCountries()!=null && episode.getGeoAllowedCountries().trim().length()>0){
+				geo=new BCGeo(episode);				
+			}
 			 
 		 }
 		 public void populateCuePoints(Episode episode){
@@ -179,13 +182,16 @@ public class BCVideoData {
 		public void setFolder_id(String folder_id) {
 			this.folder_id = folder_id;
 		}
-		public String getGeo() {
+		
+		
+		public BCGeo getGeo() {
 			return geo;
 		}
-		public void setGeo(String geo) {
+
+		public void setGeo(BCGeo geo) {
 			this.geo = geo;
 		}
-		
+
 		public String getLink() {
 			return link;
 		}

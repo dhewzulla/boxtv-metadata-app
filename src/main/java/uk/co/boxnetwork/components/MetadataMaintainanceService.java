@@ -54,7 +54,7 @@ public class MetadataMaintainanceService {
 		
 		for(Episode episode:episodes){
 			if(fixTxChannel(episode)){													  
-				repository.mergeEpisode(episode);
+				repository.persist(episode);
 			}			
 		}
 	}
@@ -82,7 +82,7 @@ public class MetadataMaintainanceService {
 		for(Episode episode:episodes){
 			if(episode.getEpisodeStatus()==null){													  
 				fixEpisodeStatusIfEmpty(episode);
-				repository.mergeEpisode(episode);
+				repository.persist(episode);
 			}			
 		}
 		logger.info("Completed the fixing the episode status");
@@ -155,7 +155,7 @@ public class MetadataMaintainanceService {
     		episodeStatus.setVideoStatus(VideoStatus.NEEDS_RETRANSCODE);
     		repository.merge(episodeStatus);
     	}
-    	repository.mergeEpisode(episode);    	
+    	repository.persist(episode);    	
     }
     
     

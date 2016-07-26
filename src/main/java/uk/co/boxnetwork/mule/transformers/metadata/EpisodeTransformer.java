@@ -19,6 +19,7 @@ import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 public class EpisodeTransformer extends BoxRestTransformer{
 
@@ -92,14 +93,31 @@ public class EpisodeTransformer extends BoxRestTransformer{
 				   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
 				   objectMapper.setSerializationInclusion(Include.NON_NULL);
 				   uk.co.boxnetwork.data.Episode episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
-				   metadataMaintainanceService.fixTxChannel(episode);				   
+				   metadataMaintainanceService.fixTxChannel(episode);
+				   String validationError=GenericUtilities.validateEpisode(episode);
+				   if(validationError!=null){
+					   return returnError(validationError,message);
+				   }				   
 				   episode=metadataService.reicevedEpisodeByMaterialId(episode);
 				   return episode;
     		}
     		catch(Exception e){
     			throw new RuntimeException("proesing post:"+e,e);    			
     		}
-        }	
-         
+        }
+    	@Override
+    	protected Object processDELETE(MuleMessage message, String outputEncoding){	
+    		String episodeid=MuleRestUtil.getPathPath(message);
+			if(episodeid==null || episodeid.length()==0){
+				return returnError("Do not support delete all episodes",message);
+			}
+			else{
+				Long id=Long.valueOf(episodeid);
+				uk.co.boxnetwork.data.Episode episode=metadataService.getEpisodeById(id);
+				metadataService.deleteEpisodeById(id);
+				logger.info("Episode is deleted successfully id="+id);
+				return episode;
+			}			 
+    	}         
          
 }

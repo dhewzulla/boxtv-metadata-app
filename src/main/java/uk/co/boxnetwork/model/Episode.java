@@ -142,6 +142,10 @@ public class Episode {
 	
 	
 	
+	@Column(name="geo_allowed_countries")
+	private String geoAllowedCountries;
+	
+
 	
 	
 	public EpisodeStatus getEpisodeStatus() {
@@ -445,6 +449,30 @@ public void setPrAuk(String prAuk) {
 		this.excludeddevices = excludeddevices;
 	}
 
+	public String getGeoAllowedCountries() {
+		return geoAllowedCountries;
+	}
+
+	public void setGeoAllowedCountries(String geoAllowedCountries) {
+		this.geoAllowedCountries = geoAllowedCountries;
+	}
+
+	@Override
+	public String toString() {
+		return "Episode [id=" + id + ", title=" + title + ", name=" + name + ", assetId=" + assetId + ", ctrPrg="
+				+ ctrPrg + ", number=" + number + ", synopsis=" + synopsis + ", materialId=" + materialId
+				+ ", certType=" + certType + ", warningText=" + warningText + ", tags=" + tags + ", adsupport="
+				+ adsupport + ", startDate=" + startDate + ", endDate=" + endDate + ", series=" + series
+				+ ", primaryId=" + primaryId + ", brightcoveId=" + brightcoveId + ", ingestProfile=" + ingestProfile
+				+ ", ingestSource=" + ingestSource + ", txChannel=" + txChannel + ", contentType=" + contentType
+				+ ", lastModifiedAt=" + lastModifiedAt + ", createdAt=" + createdAt + ", durationScheduled="
+				+ durationScheduled + ", showType=" + showType + ", prAuk=" + prAuk + ", complianceInformations="
+				+ complianceInformations + ", cuePoints=" + cuePoints + ", episodeStatus=" + episodeStatus
+				+ ", excludeddevices=" + excludeddevices + ", geoAllowedCountries=" + geoAllowedCountries + "]";
+	}
+
+	
+	
 
    
 }
