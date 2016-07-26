@@ -56,6 +56,9 @@ public class ImportC4ScheduleService {
   @Autowired
   S3BucketService s3BucketService;
   
+  @Autowired
+  MetadataService metadataService;
+  
  public String requestSchedulService(ImportScheduleRequest request){	
 		RestTemplate rest=new RestTemplate();
 		
@@ -109,23 +112,11 @@ public class ImportC4ScheduleService {
   
  public void requestS3(ScheduleEvent event) throws DocumentException{
 	 if(event.getEpisode()!=null){
-		 requestS3(event.getEpisode()); 		 
+		 metadataService.requestS3(event.getEpisode()); 		 
 	 }	 
  }
  
- private void requestS3(Episode episode){
-	 String fileNameFilter=episode.calculateSourceVideoFilePrefix();
-	 if(fileNameFilter==null){
-		 return;
-	 }
-	 VideoFilesLocation matchedfiles=s3BucketService.listFilesInVideoBucket(fileNameFilter);
-	 String ingestFile=matchedfiles.highestVersion();
-	 if(ingestFile!=null){
-		 episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
-	 }	 
-	 	
- }
-    
+     
   public void requestCertification(ScheduleEvent event) throws DocumentException{
 	 
 	 if(event.getEpisode()!=null){

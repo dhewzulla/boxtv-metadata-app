@@ -97,6 +97,9 @@ public class GenericUtilities {
 	 }
 	 return false;	 
   }
+  public static boolean isNotValidName(String v){
+	  return isNotValidTitle(v);
+  }
   public static String readStream(InputStream is) {
 	    StringBuilder sb = new StringBuilder(512);
 	    try {

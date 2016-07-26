@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import uk.co.boxnetwork.data.s3.VideoFilesLocation;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
@@ -147,6 +147,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 		boxMetadataRepository.saveTags(episode.getTags());
 		logger.info("After upating the episode:"+existingEpisode);
+		checkS3ToUpdateVidoStatus(existingEpisode);
 		boxMetadataRepository.persist(existingEpisode);		
 	}
 	
@@ -212,7 +213,31 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 	}
 	
-	
+	private void whenVideoAvailable(EpisodeStatus episodeStatus, String ingestProfile){
+		if(episodeStatus.getVideoStatus()==VideoStatus.MISSING_VIDEO){
+			if(GenericUtilities.isNotValidName(ingestProfile)){
+				episodeStatus.setVideoStatus(VideoStatus.MISSING_PROFILE);									
+			}
+			else{
+				episodeStatus.setVideoStatus(VideoStatus.NEEDS_TRANSCODE);
+									
+			}
+			boxMetadataRepository.merge(episodeStatus);
+		}
+	}
+		
+	public void checkS3ToUpdateVidoStatus(Episode episode){
+		
+		if(!GenericUtilities.isNotValidName(episode.getIngestSource())){
+			whenVideoAvailable(episode.getEpisodeStatus(),episode.getIngestProfile());			
+		}
+		else{			
+				requestS3(episode);
+				if(!GenericUtilities.isNotValidName(episode.getIngestSource())){
+					whenVideoAvailable(episode.getEpisodeStatus(),episode.getIngestProfile());
+				}
+		}
+	}
 	@Transactional
 	public uk.co.boxnetwork.data.Episode reicevedEpisodeByMaterialId(uk.co.boxnetwork.data.Episode episode){
 		String materiaId=episode.getMaterialId();
@@ -258,7 +283,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				
 		}
 		replaceCuePoints(existingEpisode,episode.getCuePoints());
+		checkS3ToUpdateVidoStatus(existingEpisode);
 		if(existingEpisode.getId()==null){
+			
 			boxMetadataRepository.persist(existingEpisode);
 		}
 		else{		
@@ -512,7 +539,19 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	   
    }
    
-	
+   public  void requestS3(Episode episode){
+		 String fileNameFilter=episode.calculateSourceVideoFilePrefix();
+		 if(fileNameFilter==null){
+			 return;
+		 }
+		 VideoFilesLocation matchedfiles=s3BucketService.listFilesInVideoBucket(fileNameFilter);
+		 String ingestFile=matchedfiles.highestVersion();
+		 if(ingestFile!=null){
+			 episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
+		 }	 
+		 	
+	 }
+
 	
 	
 }
