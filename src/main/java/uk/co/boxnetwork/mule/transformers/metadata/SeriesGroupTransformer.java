@@ -67,5 +67,21 @@ public class SeriesGroupTransformer extends BoxRestTransformer{
 	   metadataService.update(id,seriesgroup);	   
 	   return metadataService.getSeriesGroupById(id);						 
 	}
+    
+    @Override
+	protected Object processDELETE(MuleMessage message, String outputEncoding){	
+		String seriesgroupid=MuleRestUtil.getPathPath(message);
+		if(seriesgroupid==null || seriesgroupid.length()==0){
+			return returnError("Do not support delete all seriesgroup",message);
+		}
+		else{
+			Long id=Long.valueOf(seriesgroupid);
+			uk.co.boxnetwork.data.SeriesGroup series=metadataService.getSeriesGroupById(id);
+			metadataService.deleteSeriesGroupById(id);
+			
+			logger.info("SeriesGroup is deleted successfully id="+id);
+			return series;
+		}			 
+	}
 	
 }

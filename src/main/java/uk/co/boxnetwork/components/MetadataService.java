@@ -534,8 +534,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		   	boxMetadataRepository.remove(episode.getEpisodeStatus());
 	   }
 	   
-	   
-	   
+   }
+   
+   public void deleteSeriesGroupById(Long seriesgroupid){
+	   boxMetadataRepository.removeSeriesGroupById(seriesgroupid);	   
+   }
+   public void deleteSeriesById(Long seriesid){
+	   boxMetadataRepository.removeSeriesById(seriesid);
 	   
    }
    

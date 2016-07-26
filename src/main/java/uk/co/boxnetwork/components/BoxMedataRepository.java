@@ -94,6 +94,16 @@ public class BoxMedataRepository {
     	  EpisodeStatus st=entityManager.find(EpisodeStatus.class, episodeStatus.getId());
     	  entityManager.remove(st);
       }
+      @Transactional
+      public void removeSeriesById(Long seriesid){
+    	  Series series=entityManager.find(Series.class, seriesid);
+    	  entityManager.remove(series);
+      }
+      @Transactional
+      public void removeSeriesGroupById(Long seriesid){
+    	  SeriesGroup seriesgroup=entityManager.find(SeriesGroup.class, seriesid);
+    	  entityManager.remove(seriesgroup);
+      }
       public void merge(EpisodeStatus episodeStatus){
     	  entityManager.merge(episodeStatus);
       }

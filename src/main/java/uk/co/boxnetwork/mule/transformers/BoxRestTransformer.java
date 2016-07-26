@@ -60,7 +60,7 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 				String requesturi=message.getProperty("http.request.uri", PropertyScope.INBOUND);
 				
 				String httpmethod=message.getProperty("http.method", PropertyScope.INBOUND);
-				return "Rceived the "+httpmethod+" request on "+requesturi+" from "+clientIPAdress+":"+realip+":"+username+":referer:"+referer;								
+				return "Received the "+httpmethod+" request on "+requesturi+" from "+clientIPAdress+":"+realip+":"+username+":referer:"+referer;								
 		}
 		catch(Exception e){
 			logger.error(e+" whule logging client ip",e);
