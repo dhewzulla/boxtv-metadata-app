@@ -16,6 +16,7 @@ import uk.co.boxnetwork.data.SeriesGroup;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 public class SeriesGroupTransformer extends BoxRestTransformer{
 	@Autowired
@@ -83,5 +84,25 @@ public class SeriesGroupTransformer extends BoxRestTransformer{
 			return series;
 		}			 
 	}
+    
+    @Override
+    protected Object processPOST(MuleMessage message, String outputEncoding){
+		try{	
+    		    String episodeInJson=(String)message.getPayloadAsString();		   
+			   logger.info("*****Posted a new series group:"+episodeInJson+"****");
+			   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
+			   objectMapper.setSerializationInclusion(Include.NON_NULL);
+			   uk.co.boxnetwork.data.SeriesGroup seriesgroup = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.SeriesGroup.class);
+			   if(GenericUtilities.isNotValidTitle(seriesgroup.getTitle())){
+				   return returnError("Series group title is not valid",message);				  
+			   }			   				   
+			   uk.co.boxnetwork.data.SeriesGroup sr=metadataService.createANewSeriesGroup(seriesgroup);
+			   return sr;
+			   
+		}
+		catch(Exception e){
+			throw new RuntimeException("proesing post:"+e,e);    			
+		}
+    }
 	
 }

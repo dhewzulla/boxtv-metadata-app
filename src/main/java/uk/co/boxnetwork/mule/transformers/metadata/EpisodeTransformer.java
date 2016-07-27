@@ -114,6 +114,9 @@ public class EpisodeTransformer extends BoxRestTransformer{
 			else{
 				Long id=Long.valueOf(episodeid);
 				uk.co.boxnetwork.data.Episode episode=metadataService.getEpisodeById(id);
+				if(episode==null){
+					returnError("episode seems aready have been deleted",message);
+				}
 				metadataService.deleteEpisodeById(id);
 				logger.info("Episode is deleted successfully id="+id);
 				return episode;
