@@ -93,6 +93,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 
 	public uk.co.boxnetwork.data.Episode getEpisodeById(Long id){
 		Episode episode=boxMetadataRepository.findEpisodeById(id);
+		if(episode==null){
+			return null;
+		}
 		List<ScheduleEvent> scheduleEvents=boxMetadataRepository.findScheduleEventByEpisode(episode);
 		
 		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(episode,scheduleEvents);
@@ -250,8 +253,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		}
 		
 		String contractNumber=GenericUtilities.getContractNumber(episode);		
-		
-		Series series=createNewSeries(episode.getSeries(),contractNumber);
+		Series series=null;
+		if(episode.getSeries()!=null && episode.getSeries().getId()!=null ){
+			series=boxMetadataRepository.findSeriesById(episode.getSeries().getId());
+		}
+		else{
+				series=createNewSeries(episode.getSeries(),contractNumber);
+		}
 		
 		String programmeId=GenericUtilities.getProgrammeNumber(episode);
 		Episode existingEpisode=null;
@@ -297,6 +305,11 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		return ret;
 	}
 	
+	@Transactional
+	public uk.co.boxnetwork.data.Series createNewSeries(uk.co.boxnetwork.data.Series series){
+		Series ser=createNewSeries(series, series.getContractNumber());
+		return new uk.co.boxnetwork.data.Series(ser);
+	}
 	public Series createNewSeries(uk.co.boxnetwork.data.Series series, String contractNumber){
 		if(series==null){
 			return null;
@@ -312,6 +325,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				else{
 					existingSeries=new Series();					
 					series.update(existingSeries);
+					if(GenericUtilities.isNotValidCrid(series.getContractNumber())){
+						series.setContractNumber(contractNumber);
+					}
 					existingSeries.setSeriesGroup(sg);
 					boxMetadataRepository.persisSeries(existingSeries);
 					return existingSeries;
@@ -401,9 +417,39 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 		
 	}
+	
+	
+	@Transactional
+	public uk.co.boxnetwork.data.SeriesGroup createANewSeriesGroup(uk.co.boxnetwork.data.SeriesGroup seriesGroup){
+		if(seriesGroup==null){
+			throw new RuntimeException("nul value for seriesGroup");
+		}				
+		if(GenericUtilities.isNotValidTitle(seriesGroup.getTitle())){
+			throw new RuntimeException("not valid title for seriesGroup");			
+		}
+		List<SeriesGroup> seriesGroups=boxMetadataRepository.findSeriesGroupByTitle(seriesGroup.getTitle());
+		if(seriesGroups.size()==0){
+			SeriesGroup newSeriesGroup=new SeriesGroup();
+			seriesGroup.update(newSeriesGroup);			
+			boxMetadataRepository.persisSeriesGroup(newSeriesGroup);
+			return new uk.co.boxnetwork.data.SeriesGroup(newSeriesGroup);
+		}
+		else{
+								
+			   throw new RuntimeException("There is already a seriesgroup with the same title");	
+		}
+	}
+	
 	public SeriesGroup createNewSeriesGroup(uk.co.boxnetwork.data.SeriesGroup seriesGroup){
 		if(seriesGroup==null){
 			return null;
+		}
+		
+		if(seriesGroup.getId()!=null){
+			SeriesGroup seriesgroup=boxMetadataRepository.findSeriesGroupById(seriesGroup.getId());
+			if(seriesgroup!=null){
+				return seriesgroup;
+			}			
 		}
 		if(GenericUtilities.isNotValidTitle(seriesGroup.getTitle())){
 			return null;			
