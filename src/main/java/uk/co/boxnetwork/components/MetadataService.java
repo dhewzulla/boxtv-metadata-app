@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.s3.VideoFilesLocation;
+import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
@@ -604,5 +605,12 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	 }
 
 	
-	
+  public void notifyTranscode(BCNotification notification){
+	  if("FAILED".equals(notification.getStatus())){
+		  boxMetadataRepository.markVideoTranscodeAsFailed(notification.getVideoId());		  
+	  }
+	  else if("SUCCESS".equals(notification.getStatus()) && "TITLE".equals(notification.getEntityType())){
+		  boxMetadataRepository.markVideoTranscodeAsComplete(notification.getVideoId());		  
+	  }
+  }
 }

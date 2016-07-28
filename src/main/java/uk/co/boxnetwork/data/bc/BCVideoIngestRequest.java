@@ -17,7 +17,8 @@ public class BCVideoIngestRequest {
 		master.setUrl(episode.getIngestSource());
 	    profile=episode.getIngestProfile();
 		callbacks=new String[1];
-		callbacks[0]=configuration.getIngestCallback();
+		
+		callbacks=configuration.retrieveIngestCallbackUrls();
 	}
 	public BCMasterVideo getMaster() {
 		return master;

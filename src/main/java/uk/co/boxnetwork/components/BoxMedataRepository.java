@@ -535,6 +535,10 @@ public class BoxMedataRepository {
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title=:title", Episode.class);
 		   return query.setParameter("title",title).getResultList();
 	   }
+	   public List<Episode> findEpisodesByBrightcoveId(String brightcoveId){
+		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.brightcoveId=:brightcoveId", Episode.class);
+		   return query.setParameter("brightcoveId",brightcoveId).getResultList();
+	   }
 	   public List<Episode> findEpisodesBySeries(Series series){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.series=:series", Episode.class);
 		   return query.setParameter("series",series).getResultList();
@@ -545,6 +549,8 @@ public class BoxMedataRepository {
 		   return query.setParameter("seriesGroup",seriesGroup).getResultList();
 	   }
 
+	   
+	   
 	   public Episode findEpisodeById(Long id){
 		   return entityManager.find(Episode.class, id);		   
 	   }
@@ -681,6 +687,21 @@ public class BoxMedataRepository {
 		   return users;
        }
 	   
-	   
+	   @Transactional
+       public void markVideoTranscodeAsFailed(String bcVideoId){
+		   	List<Episode> matchedEpisodes=findEpisodesByBrightcoveId(bcVideoId);
+		   	for(Episode ep:matchedEpisodes){
+		   		EpisodeStatus epstatus=ep.getEpisodeStatus();
+		   		epstatus.setVideoStatus(VideoStatus.TRANSCODE_FAILED);
+		   	}		   
+       }
+	   @Transactional
+       public void markVideoTranscodeAsComplete(String bcVideoId){
+		   	List<Episode> matchedEpisodes=findEpisodesByBrightcoveId(bcVideoId);
+		   	for(Episode ep:matchedEpisodes){
+		   		EpisodeStatus epstatus=ep.getEpisodeStatus();
+		   		epstatus.setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
+		   	}		   
+       }
 	   
 }

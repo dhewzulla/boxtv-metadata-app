@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import uk.co.boxnetwork.components.BCVideoService;
+import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.FileIngestRequest;
 import uk.co.boxnetwork.model.BCNotification;
@@ -17,6 +18,8 @@ public class BCIngestNotificationTransformer extends BoxRestTransformer{
 	@Autowired
 	BCVideoService bcVideoService;
 	
+	@Autowired
+	MetadataService medataService;
 	
 	
 	@Override
@@ -29,6 +32,7 @@ public class BCIngestNotificationTransformer extends BoxRestTransformer{
 							logger.info("Received bc notification:"+notificationInJson);
 							BCNotification bcNotification = objectMapper.readValue(notificationInJson, BCNotification.class);
 							bcVideoService.persist(bcNotification);
+							medataService.notifyTranscode(bcNotification);							
 							return bcNotification;
 												
 				} catch (Exception e) {

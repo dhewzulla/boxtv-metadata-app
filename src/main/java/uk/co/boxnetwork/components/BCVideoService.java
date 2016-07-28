@@ -62,26 +62,17 @@ public class BCVideoService {
 		   VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(episode);
 	    	if(videoStatus!=null){
 	    		episodeStatus.setVideoStatus(videoStatus);
-	    	}
-	    	else{
-	    			BCVideoSource[] videos=getVideoSource(episode.getBrightcoveId());
-	    			if(videos!=null && videos.length>2){
-	    				episodeStatus.setVideoStatus(VideoStatus.TRANSCODED);
-	    				episodeStatus.setNumberOfTranscodedFiles(videos.length);
-	    			}
-	    			else{
-	    				episodeStatus.setVideoStatus(VideoStatus.NEEDS_TRANSCODE);
-	    			}
-	    	}	 	  
-	 	   metadataRepository.merge(episodeStatus);
+	    	}	    		 	  
+	    	metadataRepository.merge(episodeStatus);
 	    }
 	public void statusUnpublishedFromBrightCove(Episode episode){
 	   episode.getEpisodeStatus().setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
 	   episode.getEpisodeStatus().setVideoStatus(VideoStatus.NO_PLACEHOLDER);
 	   metadataRepository.merge(episode.getEpisodeStatus());	
     }
-	public void statusIngestVideoToBrightCove(Episode episode){    	   
-	   	 episode.getEpisodeStatus().setVideoStatus(VideoStatus.TRANSCODED);    		   
+	public void statusIngestVideoToBrightCove(Episode episode, String jobId){    	   
+	   	 episode.getEpisodeStatus().setVideoStatus(VideoStatus.TRANSCODING);
+	   	episode.getEpisodeStatus().setTranscodeJobId(jobId);
 	   	metadataRepository.merge(episode.getEpisodeStatus());
   }
 	
@@ -294,7 +285,8 @@ public class BCVideoService {
 		    String responseBody= responseEntity.getBody();
 		    logger.info("The Ingest response:"+responseBody);
 		    BcIngestResponse response= jsonToBcIngestResponse(responseBody);
-		    response.setCallback(configuration.getIngestCallback()+"/"+response.getId());
+		    String callbackurl=configuration.retrieveIngestCallbackUrls(0);		    
+		    response.setCallback(callbackurl+"/"+response.getId());
 		    return response;
 		
 		} catch (Exception e) {
@@ -486,7 +478,11 @@ public class BCVideoService {
 		  else{
 			  	  BCVideoIngestRequest bcVideoIngestRequest=new BCVideoIngestRequest(episode,configuration);			  	  
 			  	  BcIngestResponse response=ingestVideo(bcVideoIngestRequest,episode.getBrightcoveId());
-			  	  statusIngestVideoToBrightCove(episode);
+			  	  String jobid=null;
+			  	  if(response!=null){
+			  		jobid=response.getId();
+			  	  }
+			  	  statusIngestVideoToBrightCove(episode,jobid);
 			  	  
 			  	  return response;
 		  }

@@ -113,7 +113,19 @@ public class BCConfiguration {
 	public void setIngestCallback(String ingestCallback) {
 		this.ingestCallback = ingestCallback;
 	}
-	
+	public String[] retrieveIngestCallbackUrls(){
+		if(ingestCallback==null){
+			return null;
+		}
+		return ingestCallback.split(",");
+	}
+	public String retrieveIngestCallbackUrls(int index){
+		String urls[]=retrieveIngestCallbackUrls();
+		if(urls==null){
+			return null;
+		}
+		return urls[0];		
+	} 
 	
 	public String basicAuthentication(){
 		String plainCreds = clientId+":"+clientSecret;

@@ -115,8 +115,8 @@ public class MetadataMaintainanceService {
     	else{
     			BCVideoSource[] videos=videoService.getVideoSource(episode.getBrightcoveId());
     			
-    			if(videos!=null && videos.length>2){
-    				episodeStatus.setVideoStatus(VideoStatus.TRANSCODED);
+    			if(videos!=null && videos.length>=2){
+    				episodeStatus.setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
     				episodeStatus.setNumberOfTranscodedFiles(videos.length);
     			}
     			else{
@@ -151,7 +151,7 @@ public class MetadataMaintainanceService {
     	}
     	episode.setIngestProfile(newIngestProfile);
     	EpisodeStatus episodeStatus=episode.getEpisodeStatus();
-    	if(episodeStatus.getVideoStatus()==VideoStatus.TRANSCODED){
+    	if(episodeStatus.getVideoStatus()==VideoStatus.TRANSCODE_COMPLETE ||episodeStatus.getVideoStatus()==VideoStatus.TRANSCODING){
     		episodeStatus.setVideoStatus(VideoStatus.NEEDS_RETRANSCODE);
     		repository.merge(episodeStatus);
     	}

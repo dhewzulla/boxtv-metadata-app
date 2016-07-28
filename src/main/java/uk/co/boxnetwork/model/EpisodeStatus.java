@@ -21,8 +21,9 @@ public class EpisodeStatus {
 	@Column(name="numberOfTranscodedFiles")
 	private Integer numberOfTranscodedFiles=0;
 
-	
-	
+	@Column(name="transcode_job_id")			
+	private String transcodeJobId;
+			
 	public Long getId() {
 		return id;
 	}
@@ -54,6 +55,14 @@ public class EpisodeStatus {
 
 	public void setNumberOfTranscodedFiles(Integer numberOfTranscodedFiles) {
 		this.numberOfTranscodedFiles = numberOfTranscodedFiles;
+	}
+
+	public String getTranscodeJobId() {
+		return transcodeJobId;
+	}
+
+	public void setTranscodeJobId(String transcodeJobId) {
+		this.transcodeJobId = transcodeJobId;
 	}
 	
 	
