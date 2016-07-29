@@ -63,17 +63,17 @@ public class BCVideoService {
 	    	if(videoStatus!=null){
 	    		episodeStatus.setVideoStatus(videoStatus);
 	    	}	    		 	  
-	    	metadataRepository.merge(episodeStatus);
+	    	metadataRepository.persistEpisodeStatus(episodeStatus);
 	    }
 	public void statusUnpublishedFromBrightCove(Episode episode){
 	   episode.getEpisodeStatus().setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
 	   episode.getEpisodeStatus().setVideoStatus(VideoStatus.NO_PLACEHOLDER);
-	   metadataRepository.merge(episode.getEpisodeStatus());	
+	   metadataRepository.persistEpisodeStatus(episode.getEpisodeStatus());	
     }
 	public void statusIngestVideoToBrightCove(Episode episode, String jobId){    	   
 	   	 episode.getEpisodeStatus().setVideoStatus(VideoStatus.TRANSCODING);
 	   	episode.getEpisodeStatus().setTranscodeJobId(jobId);
-	   	metadataRepository.merge(episode.getEpisodeStatus());
+	   	metadataRepository.persistEpisodeStatus(episode.getEpisodeStatus());
   }
 	
 	public String  listVideo(String limit, String offset, String sort,String q){
@@ -356,6 +356,14 @@ public class BCVideoService {
 	    return jsonToBCVideoSource(videoInJson);			    
    }
 	
+    public BCVideoData changeVideoStatus(String brightcoveid, String status){
+    	BCVideoData updateVideo=new BCVideoData();
+		updateVideo.setState(status);			   				   
+	    String reponse=updateVideo(updateVideo,brightcoveid);
+	    logger.info("activate  video respomse:"+reponse);
+	    BCVideoData updatedVideo=jsonToBCVideoData(reponse);	   			  
+	    return updatedVideo;
+    }
 	
 	@Transactional
 	public BCVideoData publishEpisodeToBrightcove(long episodeid){

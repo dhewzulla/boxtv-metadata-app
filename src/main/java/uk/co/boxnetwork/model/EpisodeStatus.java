@@ -23,7 +23,10 @@ public class EpisodeStatus {
 
 	@Column(name="transcode_job_id")			
 	private String transcodeJobId;
-			
+	
+	@Column(name="published_status")
+	private PublishedStatus publishedStatus=PublishedStatus.INACTIVE;
+	
 	public Long getId() {
 		return id;
 	}
@@ -64,7 +67,32 @@ public class EpisodeStatus {
 	public void setTranscodeJobId(String transcodeJobId) {
 		this.transcodeJobId = transcodeJobId;
 	}
+
+	public PublishedStatus getPublishedStatus() {
+		return publishedStatus;
+	}
+
+	public void setPublishedStatus(PublishedStatus publishedStatus) {
+		this.publishedStatus = publishedStatus;
+	}
 	
+	public boolean  update(EpisodeStatus episodeStatus){
+		boolean changed=false;
+		
+		if(this.metadataStatus!=null){
+			episodeStatus.setMetadataStatus(this.metadataStatus);
+			changed=true;
+		}
+		if(this.publishedStatus!=null){
+			episodeStatus.setPublishedStatus(this.publishedStatus);
+			changed=true;
+		}
+		if(this.videoStatus!=null){
+			episodeStatus.setVideoStatus(this.videoStatus);
+			changed=true;
+		}
+		return changed;
+	}
 	
    
 }

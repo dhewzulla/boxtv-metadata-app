@@ -13,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import uk.co.boxnetwork.components.BCVideoService;
 import uk.co.boxnetwork.components.MetadataMaintainanceService;
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.ErrorMessage;
+import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
 import uk.co.boxnetwork.util.GenericUtilities;
@@ -28,6 +31,8 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		
 		@Autowired
 		MetadataMaintainanceService metadataMaintainanceService;
+		
+		
 		
 		@Override
 		protected Object processGET(MuleMessage message, String outputEncoding){				
@@ -82,9 +87,10 @@ public class EpisodeTransformer extends BoxRestTransformer{
 					episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
 		   }
 		   metadataService.update(id,episode);
-		   
-		   return metadataService.getEpisodeById(id);						 
+		   return metadataService.publishMetadatatoBCByEpisodeId(id);
 		}  
+         
+         
          
     	protected Object processPOST(MuleMessage message, String outputEncoding){
     		try{	
@@ -93,13 +99,18 @@ public class EpisodeTransformer extends BoxRestTransformer{
 				   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
 				   objectMapper.setSerializationInclusion(Include.NON_NULL);
 				   uk.co.boxnetwork.data.Episode episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
-				   metadataMaintainanceService.fixTxChannel(episode);
-				   String validationError=GenericUtilities.validateEpisode(episode);
-				   if(validationError!=null){
-					   return returnError(validationError,message);
-				   }				   
-				   episode=metadataService.reicevedEpisodeByMaterialId(episode);
-				   return episode;
+				   if(episode.getId()==null){
+					   metadataMaintainanceService.fixTxChannel(episode);
+					   String validationError=GenericUtilities.validateEpisode(episode);
+					   if(validationError!=null){
+						   return returnError(validationError,message);
+					   }				   
+					   episode=metadataService.reicevedEpisodeByMaterialId(episode);					   
+				   }
+				   else{
+					   episode=metadataService.updateEpisodeById(episode);	
+				   }
+				   return metadataService.publishMetadatatoBCByEpisodeId(episode.getId());				   
     		}
     		catch(Exception e){
     			throw new RuntimeException("proesing post:"+e,e);    			

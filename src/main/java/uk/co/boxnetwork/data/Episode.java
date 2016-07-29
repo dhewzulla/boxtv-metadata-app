@@ -15,6 +15,7 @@ import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.ProgrammeContentType;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 
 
@@ -385,56 +386,75 @@ public Episode(){
 	}
 
 
-	  public void updateWhenReceivedByMaterialId(uk.co.boxnetwork.model.Episode episode) {
-		
-		episode.setTitle(this.title);		
+	  public boolean updateWhenReceivedByMaterialId(uk.co.boxnetwork.model.Episode episode) {		
+		boolean changed=false;
+		if(!GenericUtilities.isNotValidTitle(this.title)){
+			episode.setTitle(this.title);
+			changed=true;
+		}				
 		if(this.number!=null){
 			episode.setNumber(this.number);
+			changed=true;
 		}
 		if(this.synopsis!=null){
 			episode.setSynopsis(this.synopsis);
+			changed=true;
 		}
 		if(this.certType!=null){
 			episode.setCertType(this.certType);
+			changed=true;
 		}
 		if(this.warningText!=null){
 			episode.setWarningText(this.warningText);
+			changed=true;
 		}
 		if(this.adsupport!=null){
 			episode.setAdsupport(this.adsupport);
+			changed=true;
 		}
 		if(this.durationScheduled!=null){
 			episode.setDurationScheduled(this.durationScheduled);
+			changed=true;
 		}
 			
 		if(this.brightcoveId != null){
 			episode.setBrightcoveId(this.brightcoveId);
+			changed=true;
 		}
 		if(this.ingestProfile!=null){
 			episode.setIngestProfile(this.ingestProfile);
+			changed=true;
 		}
 		if(this.ingestSource!=null){
 			episode.setIngestSource(this.ingestSource);
+			changed=true;
 		}
 		if(this.txChannel!=null){
 			episode.setTxChannel(this.txChannel);
+			changed=true;
 		}
 		if(this.getContentType()!=null){
 			episode.setContentType(this.contentType);
+			changed=true;
 		}
 
 		if(this.getMaterialId()!=null){
 			episode.setMaterialId(materialId);
+			changed=true;
 		}
 		if(this.showType!=null){
 			episode.setShowType(this.showType);
+			changed=true;
 		}
 		if(this.prAuk!=null){
 			episode.setPrAuk(this.prAuk);
+			changed=true;
 		}
 		if(this.geoAllowedCountries!=null){
 			episode.setGeoAllowedCountries(geoAllowedCountries);
+			changed=true;
 		}
+		return changed;
 	}
 	
 	

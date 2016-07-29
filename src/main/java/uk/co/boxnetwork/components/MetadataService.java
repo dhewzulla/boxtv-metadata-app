@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.s3.VideoFilesLocation;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.MetadataStatus;
+import uk.co.boxnetwork.model.PublishedStatus;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.model.SeriesGroup;
@@ -31,6 +33,8 @@ public class MetadataService {
 	@Autowired
 	S3BucketService s3BucketService;
 	  	
+	@Autowired
+	BCVideoService videoService;
 	
 	public List<uk.co.boxnetwork.data.SeriesGroup> getAllSeriesGroups(){
 		List<uk.co.boxnetwork.data.SeriesGroup> seriesgrps=new ArrayList<uk.co.boxnetwork.data.SeriesGroup>();
@@ -118,10 +122,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			episodeStatus.setVideoStatus(videoStatus);
 		}
 		if(episodeStatus.getId()==null){
-			boxMetadataRepository.persist(episodeStatus);
+			boxMetadataRepository.persistEpisodeStatus(episodeStatus);
     	}
     	else{
-    		boxMetadataRepository.merge(episodeStatus);
+    		boxMetadataRepository.persistEpisodeStatus(episodeStatus);
     	}
  	   
     }
@@ -136,7 +140,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
  	    	episodeStatus.setVideoStatus(VideoStatus.NEEDS_RETRANSCODE);
  	    	
  	    } 	   
- 	    boxMetadataRepository.merge(episodeStatus);
+ 	    boxMetadataRepository.persistEpisodeStatus(episodeStatus);
     }
 
 	@Transactional
@@ -209,10 +213,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		}
 		
 		if(episodeStatus.getId()==null){
-			boxMetadataRepository.persist(episodeStatus);
+			boxMetadataRepository.persistEpisodeStatus(episodeStatus);
     	}
     	else{
-    		boxMetadataRepository.merge(episodeStatus);
+    		boxMetadataRepository.persistEpisodeStatus(episodeStatus);
     	}
 		
 	}
@@ -226,7 +230,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				episodeStatus.setVideoStatus(VideoStatus.NEEDS_TRANSCODE);
 									
 			}
-			boxMetadataRepository.merge(episodeStatus);
+			boxMetadataRepository.persistEpisodeStatus(episodeStatus);
 		}
 	}
 		
@@ -242,6 +246,57 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				}
 		}
 	}
+	
+	@Transactional
+	public uk.co.boxnetwork.data.Episode updateEpisodeById(uk.co.boxnetwork.data.Episode episode){
+		Episode episodeInDB=boxMetadataRepository.findEpisodeById(episode.getId());
+		if(episodeInDB==null){
+			logger.info("not found");
+			return null;
+		}
+		if(episode.updateWhenReceivedByMaterialId(episodeInDB)){
+			boxMetadataRepository.persist(episodeInDB);
+		}
+		changeEpisodeStatus(episode,episodeInDB);
+		return new uk.co.boxnetwork.data.Episode(episodeInDB,null);
+	}
+	public void  changeEpisodeStatus(uk.co.boxnetwork.data.Episode episode,Episode episodeInDB){
+		
+		EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+		EpisodeStatus episodeStatusInDB=episodeInDB.getEpisodeStatus();
+		if(episodeStatus.getPublishedStatus()==PublishedStatus.ACTIVE){
+			
+			if(episodeInDB.getBrightcoveId()==null){
+				logger.info("bcid is null");
+				return;
+			}
+			
+			BCVideoData videodata=videoService.changeVideoStatus(episodeInDB.getBrightcoveId(),"ACTIVE");
+			
+			logger.info("*****"+videodata);
+			episodeStatusInDB.setPublishedStatus(PublishedStatus.ACTIVE);
+			boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+		}
+		else if(episodeStatus.getPublishedStatus()==PublishedStatus.INACTIVE){
+			if(episodeInDB.getBrightcoveId()==null){
+				episodeStatusInDB.setPublishedStatus(PublishedStatus.INACTIVE);
+				boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+				logger.info("INACTIVE because bcid is null");
+				return;
+			}
+			BCVideoData videodata=videoService.changeVideoStatus(episodeInDB.getBrightcoveId(),"INACTIVE");
+			logger.info("INACTIVE is set");
+			episodeStatusInDB.setPublishedStatus(PublishedStatus.INACTIVE);
+			boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+		}
+		else{
+			logger.info("****:"+episodeStatus.getPublishedStatus());
+		}
+		
+//		if(episodeStatus.update(episodeStatusInDB)){        	
+//			boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+//		}
+    }
 	@Transactional
 	public uk.co.boxnetwork.data.Episode reicevedEpisodeByMaterialId(uk.co.boxnetwork.data.Episode episode){
 		String materiaId=episode.getMaterialId();
@@ -275,7 +330,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
 			episodeStatus.setVideoStatus(VideoStatus.NO_PLACEHOLDER);
 			
-			boxMetadataRepository.persist(episodeStatus);
+			boxMetadataRepository.persistEpisodeStatus(episodeStatus);
 			existingEpisode.setEpisodeStatus(episodeStatus);
 			boxMetadataRepository.saveTags(episode.getTags());
 		}
@@ -293,14 +348,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		}
 		replaceCuePoints(existingEpisode,episode.getCuePoints());
 		checkS3ToUpdateVidoStatus(existingEpisode);
-		if(existingEpisode.getId()==null){
-			
-			boxMetadataRepository.persist(existingEpisode);
-		}
-		else{		
-				logger.info("After upating the episode with material id:"+existingEpisode);
-				boxMetadataRepository.persist(existingEpisode);
-		}				
+		
+		logger.info("After upating the episode with material id:"+existingEpisode);
+		boxMetadataRepository.persist(existingEpisode);						
 		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(existingEpisode,null);
 		ret.setComplianceInformations(existingEpisode.getComplianceInformations());
 		return ret;
@@ -613,4 +663,60 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		  boxMetadataRepository.markVideoTranscodeAsComplete(notification.getVideoId());		  
 	  }
   }
+  
+  @Transactional
+  public void updatePublishedStatus(Episode episode){
+	  EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+	  if(episode.getBrightcoveId()==null){		  
+		  if(episodeStatus.getPublishedStatus()!=PublishedStatus.NOT_PUBLISHED){
+			  episodeStatus.setPublishedStatus(PublishedStatus.NOT_PUBLISHED);
+			  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
+		  }		  
+	  }
+	  else{
+		  BCVideoData videoData=videoService.getVideo(episode.getBrightcoveId());
+		  if("INACTIVE".equals(videoData.getState())){
+			  if(episodeStatus.getPublishedStatus()!=PublishedStatus.INACTIVE){
+				  episodeStatus.setPublishedStatus(PublishedStatus.INACTIVE);
+				  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
+			  }	  
+		  }
+		  if("ACTIVE".equals(videoData.getState())){
+			  if(episodeStatus.getPublishedStatus()!=PublishedStatus.ACTIVE){
+				  episodeStatus.setPublishedStatus(PublishedStatus.ACTIVE);
+				  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
+			  }	  
+		  }
+		  
+	  }
+  }
+  public  uk.co.boxnetwork.data.Episode publishMetadatatoBCByEpisodeId(Long id){
+	  Episode uptoDateEpisode=boxMetadataRepository.findEpisodeById(id);	  
+	  if(uptoDateEpisode.getBrightcoveId()!=null){		  		  
+			  BCVideoData videoData=videoService.publishEpisodeToBrightcove(id);
+			  logger.info("The changes is pushed to the bc:"+videoData);
+			  uptoDateEpisode=boxMetadataRepository.findEpisodeById(id);		  
+	  }	  
+	  return new uk.co.boxnetwork.data.Episode(uptoDateEpisode,null);
+  }
+  public  uk.co.boxnetwork.data.Series publishMetadatatoBCBySeriesId(Long id){
+	  Series series=boxMetadataRepository.findSeriesById(id);
+	  List<Episode> episodes=boxMetadataRepository.findEpisodesBySeries(series);
+	  logger.info("Publishing all the episodes in this series");
+	  for(Episode ep:episodes){
+		  publishMetadatatoBCByEpisodeId(ep.getId()); 
+	  }	    
+	  return new uk.co.boxnetwork.data.Series(series);
+  }
+  
+  public  uk.co.boxnetwork.data.SeriesGroup publishMetadatatoBCBySeriesGroupId(Long id){
+	  SeriesGroup seriesgroup=boxMetadataRepository.findSeriesGroupById(id);
+	  List<Series> series=boxMetadataRepository.findSeriesBySeriesGroup(seriesgroup);
+	  logger.info("Publishing all the episodes in this series group");
+	  for(Series sr:series){
+		  publishMetadatatoBCBySeriesId(sr.getId()); 
+	  }	    
+	  return new uk.co.boxnetwork.data.SeriesGroup(seriesgroup);
+  }
+  
 }

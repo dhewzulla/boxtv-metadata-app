@@ -44,6 +44,8 @@ public class MetadataMaintainanceService {
 	@Autowired
     private DataSource datasource;
 	
+	@Autowired
+	MetadataService metataService;
 	
 	private static final Logger logger=LoggerFactory.getLogger(MetadataMaintainanceService.class);
 	
@@ -127,10 +129,10 @@ public class MetadataMaintainanceService {
     			}
     	}
     	if(episodeStatus.getId()==null){
-    		repository.persist(episodeStatus);
+    		repository.persistEpisodeStatus(episodeStatus);
     	}
     	else{
-    		repository.merge(episodeStatus);
+    		repository.persistEpisodeStatus(episodeStatus);
     	}
     	episode.setEpisodeStatus(episodeStatus);    	
     }
@@ -153,7 +155,7 @@ public class MetadataMaintainanceService {
     	EpisodeStatus episodeStatus=episode.getEpisodeStatus();
     	if(episodeStatus.getVideoStatus()==VideoStatus.TRANSCODE_COMPLETE ||episodeStatus.getVideoStatus()==VideoStatus.TRANSCODING){
     		episodeStatus.setVideoStatus(VideoStatus.NEEDS_RETRANSCODE);
-    		repository.merge(episodeStatus);
+    		repository.persistEpisodeStatus(episodeStatus);
     	}
     	repository.persist(episode);    	
     }
@@ -198,4 +200,14 @@ public class MetadataMaintainanceService {
     	jdbcTemlate.execute("DROP TABLE programme");
     }
 
+    public void updateAllPublishedStatys(){
+    	List<Episode> episodes=repository.findAllEpisodes();
+		
+		for(Episode episode:episodes){
+			updatePublishedStatus(episode);  
+		}
+    }
+    private void updatePublishedStatus(Episode episode){
+    	metataService.updatePublishedStatus(episode);
+    }
 }

@@ -66,7 +66,7 @@ public class SeriesGroupTransformer extends BoxRestTransformer{
 				seriesgroup = objectMapper.readValue(seriesGroupInJson, uk.co.boxnetwork.data.SeriesGroup.class);
 	   }
 	   metadataService.update(id,seriesgroup);	   
-	   return metadataService.getSeriesGroupById(id);						 
+	   return metadataService.publishMetadatatoBCBySeriesGroupId(id);						 
 	}
     
     @Override

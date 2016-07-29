@@ -67,7 +67,7 @@ public class SeriesTransformer  extends BoxRestTransformer{
 				series = objectMapper.readValue(seriesInJson, uk.co.boxnetwork.data.Series.class);
 	   }
 	   metadataService.update(id,series);	   
-	   return metadataService.getSeriesById(id);						 
+	   return metadataService.publishMetadatatoBCBySeriesId(id);						 
 	}
     @Override
 	protected Object processDELETE(MuleMessage message, String outputEncoding){	

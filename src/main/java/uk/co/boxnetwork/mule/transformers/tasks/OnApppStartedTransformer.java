@@ -28,6 +28,9 @@ private MetadataMaintainanceService metadataMaintainanceService;
 		//metadataMaintainanceService.removeAllReferenceToPrgrammes();
 		//metadataMaintainanceService.removeAllProgrammes();
 		//metadataMaintainanceService.removeOrphantSeriesGroup();
+		//metadataMaintainanceService.updateAllPublishedStatys();
+		
+		
 		return message.getPayload();
 	}
 	

@@ -86,9 +86,15 @@ public class BoxMedataRepository {
        public void persist(CuePoint cuePoint){
     	   entityManager.persist(cuePoint);
        }
-      public void persist(EpisodeStatus episodeStatus){
-    	  entityManager.persist(episodeStatus);
+      public void persistEpisodeStatus(EpisodeStatus episodeStatus){
+    	  if(episodeStatus.getId()==null){
+    		  entityManager.persist(episodeStatus);
+    	  }
+    	  else{
+    		  entityManager.merge(episodeStatus);
+    	  }
       }
+      
       @Transactional
       public void remove(EpisodeStatus episodeStatus){
     	  EpisodeStatus st=entityManager.find(EpisodeStatus.class, episodeStatus.getId());
@@ -104,9 +110,7 @@ public class BoxMedataRepository {
     	  SeriesGroup seriesgroup=entityManager.find(SeriesGroup.class, seriesid);
     	  entityManager.remove(seriesgroup);
       }
-      public void merge(EpisodeStatus episodeStatus){
-    	  entityManager.merge(episodeStatus);
-      }
+      
        public void persisSeries(Series series){
 		    	   Date lastModifiedAt=new Date();
 		    	   series.setLastModifiedAt(lastModifiedAt);
@@ -267,10 +271,10 @@ public class BoxMedataRepository {
     		    episodeStatus.setVideoStatus(videoStatus);
     	      }    	
     	     if(episodeStatus.getId()==null){
-    		    persist(episodeStatus);
+    		    persistEpisodeStatus(episodeStatus);
     	      }
     	     else{
-    	    	 	merge(episodeStatus);
+    	    	 persistEpisodeStatus(episodeStatus);
     	     }
     	     episode.setEpisodeStatus(episodeStatus); 
     	
@@ -289,7 +293,7 @@ public class BoxMedataRepository {
     	     if(videoStatus!=null){
     		    episodeStatus.setVideoStatus(videoStatus);
     	      }    	    	     
-    	    merge(episodeStatus);
+    	     persistEpisodeStatus(episodeStatus);
        }
        
        
