@@ -138,6 +138,7 @@ public class ImportC4ScheduleService {
 				requestCertification(event);
 				requestS3(event);
 				boxMetadataRepository.createEvent(event);
+				
 			}
 			
 		} catch (DocumentException e) {

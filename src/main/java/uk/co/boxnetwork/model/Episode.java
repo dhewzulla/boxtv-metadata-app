@@ -131,6 +131,9 @@ public class Episode {
 	@OneToMany(mappedBy="episode", fetch=FetchType.EAGER)	
 	private Set<CuePoint> cuePoints;
 	
+	@OneToMany(mappedBy="episode", fetch=FetchType.EAGER)	
+	private Set<AvailabilityWindow> availabilities;
+	
 	
 	@OneToOne(optional=true, fetch=FetchType.EAGER)
 	@JoinColumn( name = "status_id", nullable = true )
@@ -455,6 +458,14 @@ public void setPrAuk(String prAuk) {
 
 	public void setGeoAllowedCountries(String geoAllowedCountries) {
 		this.geoAllowedCountries = geoAllowedCountries;
+	}
+
+	public Set<AvailabilityWindow> getAvailabilities() {
+		return availabilities;
+	}
+
+	public void setAvailabilities(Set<AvailabilityWindow> availabilities) {
+		this.availabilities = availabilities;
 	}
 
 	@Override

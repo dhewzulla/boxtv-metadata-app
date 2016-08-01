@@ -285,6 +285,9 @@ public class GenericUtilities {
   public static VideoStatus calculateVideoStatus(Episode episode){
 	   return  calculateVideoStatus(episode, episode.getIngestSource(), episode.getIngestProfile());  
   }
+  public static boolean transcodeConditionNotStasfied(VideoStatus status){
+  	return status==VideoStatus.MISSING_PROFILE || status==VideoStatus.MISSING_VIDEO || status == VideoStatus.NO_PLACEHOLDER;
+  }
   public static VideoStatus calculateVideoStatus(Episode episode, String previousIngestSource, String previousIngestProfile){
 	   if(isEmpty(episode.getIngestSource())){
 			return VideoStatus.MISSING_VIDEO;		
@@ -297,6 +300,9 @@ public class GenericUtilities {
 	   }
 	   else if((!episode.getIngestSource().equals(previousIngestSource)) || (!episode.getIngestProfile().equals(previousIngestProfile))){
 		    return VideoStatus.NEEDS_RETRANSCODE;
+	   }
+	   else if(episode.getEpisodeStatus()==null || episode.getEpisodeStatus().getVideoStatus()==null || transcodeConditionNotStasfied(episode.getEpisodeStatus().getVideoStatus())){		   
+		   return VideoStatus.NEEDS_TRANSCODE;
 	   }
 	   else{
 		   return null;

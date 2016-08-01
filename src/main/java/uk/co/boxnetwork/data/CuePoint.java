@@ -27,6 +27,7 @@ public class CuePoint implements Comparable<CuePoint>{
 		
 	}
     public CuePoint(uk.co.boxnetwork.model.CuePoint cuePoint){
+    	
     	this.name=cuePoint.getName();
     	this.type=cuePoint.getType();
     	this.time=cuePoint.getTime();    

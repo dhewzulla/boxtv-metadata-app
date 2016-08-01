@@ -110,7 +110,9 @@ public class EpisodeTransformer extends BoxRestTransformer{
 				   else{
 					   episode=metadataService.updateEpisodeById(episode);	
 				   }
-				   return metadataService.publishMetadatatoBCByEpisodeId(episode.getId());				   
+				   
+					return metadataService.publishMetadatatoBCByEpisodeId(episode.getId());
+				   
     		}
     		catch(Exception e){
     			throw new RuntimeException("proesing post:"+e,e);    			

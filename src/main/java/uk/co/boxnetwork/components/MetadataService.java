@@ -692,7 +692,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   }
   public  uk.co.boxnetwork.data.Episode publishMetadatatoBCByEpisodeId(Long id){
 	  Episode uptoDateEpisode=boxMetadataRepository.findEpisodeById(id);	  
-	  if(uptoDateEpisode.getBrightcoveId()!=null){		  		  
+	  if(!GenericUtilities.isNotValidCrid(uptoDateEpisode.getBrightcoveId())){		  		  
 			  BCVideoData videoData=videoService.publishEpisodeToBrightcove(id);
 			  logger.info("The changes is pushed to the bc:"+videoData);
 			  uptoDateEpisode=boxMetadataRepository.findEpisodeById(id);		  

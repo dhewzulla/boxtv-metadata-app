@@ -26,6 +26,7 @@ public class BoxUsersTransformer extends BoxRestTransformer{
 	@Override
 	protected Object processDELETE(MuleMessage message, String outputEncoding){	
 	   String username=MuleRestUtil.getPathPath(message);
+	   logger.info("****** user name to delrte:"+username);
  	   if(username==null||username.length()==0){
  		   return new ErrorMessage("The username is missing in DELETE");
  	   }

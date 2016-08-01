@@ -56,13 +56,28 @@ public class BCVideoService {
 	BoxMedataRepository metadataRepository;
 	
 	
-	public void statusPublishedToBrightCove(Episode episode){
+	public void statusPublishedToBrightCove(Episode episode, BCVideoData video){
 		   EpisodeStatus episodeStatus=episode.getEpisodeStatus();
 		   episodeStatus.setMetadataStatus(MetadataStatus.PUBLISHED);
 		   VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(episode);
 	    	if(videoStatus!=null){
 	    		episodeStatus.setVideoStatus(videoStatus);
-	    	}	    		 	  
+	    	}
+	    	else{
+	    		videoStatus=episodeStatus.getVideoStatus();
+	    	}
+	    	if(videoStatus==VideoStatus.TRANSCODED || videoStatus == VideoStatus.TRANSCODE_COMPLETE){
+	    		if(video!=null && video.getComplete()!=null && (!video.getComplete()) ){
+	    			episodeStatus.setVideoStatus(VideoStatus.NOT_COMPLETE_STATE);
+	    		}	    		 
+	    	}	    	
+	    	else if(episodeStatus.getVideoStatus()==VideoStatus.NOT_COMPLETE_STATE){
+	    		if(video!=null && video.getComplete()!=null && (video.getComplete()) ){
+	    			episodeStatus.setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
+	    		}			
+	    	}
+	    	
+	    		
 	    	metadataRepository.persistEpisodeStatus(episodeStatus);
 	    }
 	public void statusUnpublishedFromBrightCove(Episode episode){
@@ -371,9 +386,10 @@ public class BCVideoService {
 		  if(episode==null){
 			  throw new RuntimeException("The episodeid is not found in the database"); 
 		  }
+		  
 		  List<ScheduleEvent> schedules=metadataRepository.findScheduleEventByEpisode(episode);
-		  BCVideoData newbcVideoData=new BCVideoData(episode);
-		  newbcVideoData.calculateSchedule(schedules);
+		  BCVideoData newbcVideoData=new BCVideoData(episode,schedules);
+		  
 		  if(episode.getBrightcoveId()==null){			 
 			  newbcVideoData.setName(newbcVideoData.getName());			  
 			  String reponse=createVideo(newbcVideoData);
@@ -381,7 +397,7 @@ public class BCVideoService {
 			  BCVideoData createdVideo=jsonToBCVideoData(reponse);
 			  logger.info("created video:"+createdVideo);
 			  episode.setBrightcoveId(createdVideo.getId());
-			  statusPublishedToBrightCove(episode);
+			  statusPublishedToBrightCove(episode,createdVideo);
 			  metadataRepository.persist(episode);
 			  return createdVideo;
 		  }
@@ -414,11 +430,12 @@ public class BCVideoService {
 			   updateVideo.setState(null);			   
 			   updateVideo.copyFrom(newbcVideoData);
 			   if(existingbcVideoData.getId().equals(episode.getBrightcoveId())){
+				   updateVideo.setReference_id(null);
 				  String reponse=updateVideo(updateVideo,episode.getBrightcoveId());
 				  logger.info("update video respomse:"+reponse);
 				  BCVideoData updatedVideo=jsonToBCVideoData(reponse);
 				  logger.info("updatedVideo video:"+updatedVideo);
-				  statusPublishedToBrightCove(episode);
+				  statusPublishedToBrightCove(episode,updatedVideo);
 				  return updatedVideo;
 			  }
 			  else{

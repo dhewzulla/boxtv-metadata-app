@@ -1,7 +1,10 @@
 package uk.co.boxnetwork.mule.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 import java.util.Set;
+
 
 import org.mule.api.MuleMessage;
 import org.slf4j.Logger;
@@ -27,11 +30,16 @@ public class MuleRestUtil {
 			  return null;
 		  }
 		  ind=restpath.indexOf("?");
-		  if(ind==-1){
-			 return restpath;			  
+		  if(ind!=-1){
+			  restpath=restpath.substring(0,ind);
 		  }
-		  else
-			  return restpath.substring(0,ind);
+		  
+			 try {
+				return URLDecoder.decode(restpath,"utf-8");
+			} catch (UnsupportedEncodingException e) {
+				logger.error(e+ "while decoding restpath:"+restpath,e);
+				return restpath;
+			}			  		  
 	  }
   }
   public static void printAllInboundProperties(MuleMessage message){

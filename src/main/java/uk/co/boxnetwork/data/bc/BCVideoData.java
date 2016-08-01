@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 
 import uk.co.boxnetwork.model.AdSuport;
+import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;
 
@@ -23,7 +25,7 @@ public class BCVideoData {
 		  private String id;
 		  private String account_id;
 		  private String ad_keys;
-		  private boolean complete;
+		  private Boolean complete;
 		  private String created_at;
 		  private BCCuePoint[] cue_points;		  
 		  private BCCustomFields custom_fields;
@@ -74,7 +76,7 @@ public class BCVideoData {
 			 }
 		 }
 		 
-		 public BCVideoData(Episode episode){			 	
+		 public BCVideoData(Episode episode,List<ScheduleEvent> schedules){			 	
 			 this.name=episode.getTitle();		
 			 if(episode.getTags()!=null){
 				 this.tags=episode.getTags().split(",");
@@ -82,8 +84,6 @@ public class BCVideoData {
 			 
 			 buildRefereceId(episode);
 			 this.description=episode.getSynopsis();
-			 
-			 
 			 
 			 if(episode.getAdsupport()==AdSuport.FREE){
 				 this.economics="Free";
@@ -96,7 +96,10 @@ public class BCVideoData {
 			if(episode.getGeoAllowedCountries()!=null && episode.getGeoAllowedCountries().trim().length()>0){
 				geo=new BCGeo(episode);				
 			}
-			 
+			if(schedules!=null && schedules.size()>0){
+				calculateSchedule(episode, schedules);
+			}
+			
 		 }
 		 public void populateCuePoints(Episode episode){
 			 if(episode.getCuePoints()==null|| episode.getCuePoints().size()==0){
@@ -143,12 +146,7 @@ public class BCVideoData {
 			this.cue_points = cue_points;
 		}
 
-		public boolean isComplete() {
-			return complete;
-		}
-		public void setComplete(boolean complete) {
-			this.complete = complete;
-		}
+		
 		public String getCreated_at() {
 			return created_at;
 		}
@@ -289,6 +287,8 @@ public class BCVideoData {
 			this.schedule = schedule;
 		}
 
+		
+		
 		@Override
 		public String toString() {
 			return "BCVideoData [id=" + id + ", account_id=" + account_id + ", ad_keys=" + ad_keys + ", complete="
@@ -301,6 +301,7 @@ public class BCVideoData {
 					+ ", sharing=" + sharing + ", state=" + state + ", tags=" + Arrays.toString(tags) + ", text_tracks="
 					+ Arrays.toString(text_tracks) + ", updated_at=" + updated_at + "]";
 		}
+
 		public void copyFrom(BCVideoData bcVideo){			  
 			  
 			  if(bcVideo.getCue_points()!=null){
@@ -317,8 +318,33 @@ public class BCVideoData {
 				  this.reference_id=bcVideo.getReference_id();
 			  }
 		}
-		public void calculateSchedule(List<ScheduleEvent> schedules){
-			if(schedules==null||schedules.size()==0){
+		public void calculateSchedule(Episode episode,List<ScheduleEvent> schedules){
+			Set<AvailabilityWindow> availabilityWindows=episode.getAvailabilities();			
+			Date today=new Date();
+			AvailabilityWindow 	availabilityWindow=null;
+			if(availabilityWindows!=null && availabilityWindows.size()>0){
+					if(availabilityWindows.size()==1){
+						availabilityWindow=availabilityWindows.iterator().next();
+						schedule =new BCSchedule(availabilityWindow.getStart(),availabilityWindow.getEnd());
+						return;
+					}
+					else{
+						List<AvailabilityWindow> sortedAvailabilityWindows=new ArrayList<AvailabilityWindow>(availabilityWindows);
+						Collections.sort(sortedAvailabilityWindows);
+						
+						for(int i=0;i<sortedAvailabilityWindows.size();i++){
+							availabilityWindow=sortedAvailabilityWindows.get(i);
+							if(today.before(availabilityWindow.getEnd())){																
+								schedule =new BCSchedule(availabilityWindow.getStart(),availabilityWindow.getEnd());
+								return;									
+																
+							}							
+						}
+						schedule =new BCSchedule(availabilityWindow.getStart(),availabilityWindow.getEnd());
+						return;								
+					}							
+			}
+		   if(schedules==null||schedules.size()==0){
 				return;				
 			}
 			Date fromDate=schedules.get(0).getScheduleTimestamp();
@@ -331,11 +357,17 @@ public class BCVideoData {
 				}
 				if(d.after(toDate)){
 					toDate=d;
-				}
-				
+				}				
 			}
-			schedule =new BCSchedule(fromDate,toDate);
-			
+			schedule =new BCSchedule(fromDate,toDate);			
+		}
+
+		public Boolean getComplete() {
+			return complete;
+		}
+
+		public void setComplete(Boolean complete) {
+			this.complete = complete;
 		}
 		
 		 

@@ -11,6 +11,7 @@ import java.util.Set;
 
 
 import uk.co.boxnetwork.model.AdSuport;
+import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.EpisodeStatus;
@@ -108,7 +109,7 @@ public class Episode {
 	
 	
 	private List<CuePoint> cuePoints=new ArrayList<CuePoint>();
-	
+	private Set<AvailabilityWindow> availabilities;
 	
 	private Double durationScheduled;
 	
@@ -328,6 +329,9 @@ public Episode(){
 			for(uk.co.boxnetwork.model.CuePoint cuep:episode.getCuePoints()){
 				this.addCuePoint(new CuePoint(cuep));
 			}
+		}
+		if(episode.getAvailabilities()!=null){
+			
 		}
 		if(scheduleEvents!=null){
 			for(uk.co.boxnetwork.model.ScheduleEvent evt:scheduleEvents){
@@ -624,6 +628,16 @@ public String getGeoAllowedCountries() {
 
 public void setGeoAllowedCountries(String geoAllowedCountries) {
 	this.geoAllowedCountries = geoAllowedCountries;
+}
+
+
+public Set<AvailabilityWindow> getAvailabilities() {
+	return availabilities;
+}
+
+
+public void setAvailabilities(Set<AvailabilityWindow> availabilities) {
+	this.availabilities = availabilities;
 }
 
 
