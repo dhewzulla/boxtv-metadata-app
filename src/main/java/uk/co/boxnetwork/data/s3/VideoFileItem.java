@@ -1,9 +1,12 @@
 package uk.co.boxnetwork.data.s3;
 
+import java.util.Date;
+
 public class VideoFileItem {
 	private  String file;    
     private  String episodeTitle;
     private  Long episodeId;
+    private Date lastModifidDate;
 	public String getFile() {
 		return file;
 	}
@@ -22,6 +25,12 @@ public class VideoFileItem {
 	}
 	public void setEpisodeId(Long episodeId) {
 		this.episodeId = episodeId;
+	}
+	public Date getLastModifidDate() {
+		return lastModifidDate;
+	}
+	public void setLastModifidDate(Date lastModifidDate) {
+		this.lastModifidDate = lastModifidDate;
 	}
 	
     

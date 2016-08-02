@@ -80,11 +80,14 @@ public class BoxMedataRepository {
 		}
        
        
-       public void merge(CuePoint cuePoint){
-    	   entityManager.merge(cuePoint);
-       }
+       
        public void persist(CuePoint cuePoint){
-    	   entityManager.persist(cuePoint);
+    	   if(cuePoint.getId()!=null){
+    		   entityManager.merge(cuePoint);
+    	   }
+    	   else{
+    		   	entityManager.persist(cuePoint);
+    	   }
        }
       public void persistEpisodeStatus(EpisodeStatus episodeStatus){
     	  if(episodeStatus.getId()==null){
@@ -527,6 +530,18 @@ public class BoxMedataRepository {
 		   TypedQuery<SeriesGroup> query=entityManager.createQuery("SELECT p FROM series_group p where p.title=:title", SeriesGroup.class);
 		   return query.setParameter("title",title).getResultList();
 	   }
+	   public SeriesGroup retrieveDefaultSeriesGroup(){
+		   String defaultSeriesGroupTitle="Default Series Group";
+		   List<SeriesGroup> matchedSeriesGroups=findSeriesGroupByTitle(defaultSeriesGroupTitle);
+		   if(matchedSeriesGroups.size()>0){
+			   return matchedSeriesGroups.get(0);			   
+		   }
+		   SeriesGroup defaultSeriesGroup=new SeriesGroup();
+		   defaultSeriesGroup.setTitle(defaultSeriesGroupTitle);
+		   persisSeriesGroup(defaultSeriesGroup);
+		   return defaultSeriesGroup;
+		   
+	   }
 	   public List<SeriesGroup> findAllSeriesGroup(){		   
 		   TypedQuery<SeriesGroup> query=entityManager.createQuery("SELECT p FROM series_group p order by p.title", SeriesGroup.class);
 		   return query.getResultList();
@@ -552,6 +567,7 @@ public class BoxMedataRepository {
 		   TypedQuery<Series> query=entityManager.createQuery("SELECT e FROM series e where e.seriesGroup=:seriesGroup", Series.class);
 		   return query.setParameter("seriesGroup",seriesGroup).getResultList();
 	   }
+	   
 
 	   
 	   

@@ -114,6 +114,8 @@ public class Episode {
 	@Column(name="pr_auk")
 	private String prAuk;
 	
+	@Column(name="number_of_ads_per_break")
+	private String numberOfAdsPerBreak;
 	
 	
 	
@@ -480,6 +482,14 @@ public void setPrAuk(String prAuk) {
 				+ durationScheduled + ", showType=" + showType + ", prAuk=" + prAuk + ", complianceInformations="
 				+ complianceInformations + ", cuePoints=" + cuePoints + ", episodeStatus=" + episodeStatus
 				+ ", excludeddevices=" + excludeddevices + ", geoAllowedCountries=" + geoAllowedCountries + "]";
+	}
+
+	public String getNumberOfAdsPerBreak() {
+		return numberOfAdsPerBreak;
+	}
+
+	public void setNumberOfAdsPerBreak(String numberOfAdsPerBreak) {
+		this.numberOfAdsPerBreak = numberOfAdsPerBreak;
 	}
 
 	

@@ -69,6 +69,8 @@ public class S3BucketService {
             }                            
             FileItem itm=new FileItem();
             itm.setFile(key);
+            itm.setLastModifiedDate(objectSummary.getLastModified());
+            objectSummary.getLastModified();
             ret.add(itm);                    	
         }
         return ret;
@@ -88,10 +90,9 @@ public class S3BucketService {
 		
 		if(videoFileLocation.getFiles()!=null && videoFileLocation.getFiles().size()>0){
 			for(FileItem fitem:videoFileLocation.getFiles()){
-				String fullURL=getFullVideoURL(fitem.getFile());	
-				
 				VideoFileItem vitem=new VideoFileItem();
-				vitem.setFile(fitem.getFile());				
+				vitem.setFile(fitem.getFile());	
+				vitem.setLastModifidDate(fitem.getLastModifiedDate());
 				String materialId=GenericUtilities.fileNameToMaterialID(fitem.getFile());
 				List<Episode> matchedEpisodes=boxMetadataRepository.findEpisodesByMatId(materialId+"%");
 				if(matchedEpisodes.size()>0){

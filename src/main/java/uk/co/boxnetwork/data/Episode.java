@@ -103,7 +103,7 @@ public class Episode {
 	private Date createdAt;
 	
 	
-	
+	private String numberOfAdsPerBreak;
 	
 	private Set<ComplianceInformation> ComplianceInformations;
 	
@@ -297,6 +297,7 @@ public Episode(){
 		this.durationScheduled=episode.getDurationScheduled();
 		this.showType=episode.getShowType();
 		this.prAuk=episode.getPrAuk();
+		this.numberOfAdsPerBreak=episode.getNumberOfAdsPerBreak();
 		
 		if(episode.getTags()==null){
 			this.tags =null;			
@@ -327,7 +328,9 @@ public Episode(){
 		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
 			for(uk.co.boxnetwork.model.CuePoint cuep:episode.getCuePoints()){
-				this.addCuePoint(new CuePoint(cuep));
+				if(cuep.getTime()!=null){
+					this.addCuePoint(new CuePoint(cuep));
+				}
 			}
 		}
 		if(episode.getAvailabilities()!=null){
@@ -358,6 +361,7 @@ public Episode(){
 		}
 		episode.setCertType(this.certType);
 		episode.setWarningText(this.warningText);
+		episode.setNumberOfAdsPerBreak(numberOfAdsPerBreak);
 		if(this.tags==null ||this.tags.length==0){
 			episode.setTags(null);	
 		}
@@ -638,6 +642,16 @@ public Set<AvailabilityWindow> getAvailabilities() {
 
 public void setAvailabilities(Set<AvailabilityWindow> availabilities) {
 	this.availabilities = availabilities;
+}
+
+
+public String getNumberOfAdsPerBreak() {
+	return numberOfAdsPerBreak;
+}
+
+
+public void setNumberOfAdsPerBreak(String numberOfAdsPerBreak) {
+	this.numberOfAdsPerBreak = numberOfAdsPerBreak;
 }
 
 

@@ -65,6 +65,7 @@ public class MetadataService {
 	}
 	public List<uk.co.boxnetwork.data.Episode> findEpisodes(String search){
 		List<Episode> eposides=boxMetadataRepository.findEpisodes(search);
+		logger.info("For search:"+search+" found matching:"+eposides.size());
 		return toData(eposides);
 	}
 	private  List<uk.co.boxnetwork.data.Episode>  toData(List<Episode> eposides){
@@ -300,6 +301,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	@Transactional
 	public uk.co.boxnetwork.data.Episode reicevedEpisodeByMaterialId(uk.co.boxnetwork.data.Episode episode){
 		String materiaId=episode.getMaterialId();
+		
 		if(materiaId==null){
 			throw new RuntimeException("MaterialId is required");
 		}
@@ -308,49 +310,92 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			throw new RuntimeException("MaterialId is empty");
 		}
 		
-		String contractNumber=GenericUtilities.getContractNumber(episode);		
-		Series series=null;
-		if(episode.getSeries()!=null && episode.getSeries().getId()!=null ){
-			series=boxMetadataRepository.findSeriesById(episode.getSeries().getId());
-		}
-		else{
-				series=createNewSeries(episode.getSeries(),contractNumber);
-		}
-		
+		String contractNumber=GenericUtilities.getContractNumber(episode);
 		String programmeId=GenericUtilities.getProgrammeNumber(episode);
-		Episode existingEpisode=null;
+		logger.info("contractNumber:"+contractNumber+" programmeId=["+programmeId+"]");
+		Series existingSeries=null;
+		SeriesGroup existingEeriesGroup=null;	
+		Episode existingEpisode=null;		
 		
+		List<Episode> matchedEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(programmeId);		
 		
-		List<Episode> existingEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(programmeId);
-		if(existingEpisodes.size()==0){
-			existingEpisode=new Episode();
-			existingEpisode.setSeries(series);
-			episode.update(existingEpisode);
-			EpisodeStatus episodeStatus=new EpisodeStatus();
-			episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
-			episodeStatus.setVideoStatus(VideoStatus.NO_PLACEHOLDER);
-			
-			boxMetadataRepository.persistEpisodeStatus(episodeStatus);
-			existingEpisode.setEpisodeStatus(episodeStatus);
-			boxMetadataRepository.saveTags(episode.getTags());
+		if(matchedEpisodes.size()==0){
+			logger.info("matching episode number not found programmeId:"+programmeId);
 		}
-		else if(existingEpisodes.size()>1){
+		else if(matchedEpisodes.size()>1){
 			throw new RuntimeException("more than one episodes matched to the materia id:"+materiaId);
 		}
 		else{
-				existingEpisode=existingEpisodes.get(0);
-				logger.info("Before upating the episode with material id:"+existingEpisode);
-				existingEpisode.setSeries(series);
+				existingEpisode=matchedEpisodes.get(0);
+				existingSeries=existingEpisode.getSeries();
+				if(existingSeries!=null){
+					existingEeriesGroup=existingSeries.getSeriesGroup();
+				}
+		}	
+	    if(existingSeries==null && (!GenericUtilities.isNotValidCrid(contractNumber))){
+		     List<Series> matchSeries=boxMetadataRepository.findSeriesByContractNumber(contractNumber);
+		     if(matchSeries.size()==0){
+		    	 logger.info("matching series not found contractNumber:"+contractNumber);
+		     }
+		     else if(matchSeries.size()>1){
+		    	 throw new RuntimeException("more than one series matching the contractNumber:"+contractNumber);
+		     }
+		     else{
+		    	 	existingSeries=matchSeries.get(0);		    	 	
+		    	 	existingEeriesGroup=existingSeries.getSeriesGroup();
+		     }
+	    }   
+		if(existingEeriesGroup==null && episode.getSeries() !=null && episode.getSeries().getSeriesGroup() !=null && (!GenericUtilities.isNotValidTitle(episode.getSeries().getSeriesGroup().getTitle()))){
+			List<SeriesGroup> matchedSeriesGroups=boxMetadataRepository.findSeriesGroupByTitle(episode.getSeries().getSeriesGroup().getTitle());
+			if(matchedSeriesGroups.size()>0){
+				existingEeriesGroup=matchedSeriesGroups.get(0);
+			}
+			else{
+					existingEeriesGroup=new SeriesGroup();
+					episode.getSeries().getSeriesGroup().update(existingEeriesGroup);
+					boxMetadataRepository.persisSeriesGroup(existingEeriesGroup);
+					logger.info("created a nw series group:"+existingEeriesGroup);
+			}
+		}
+		else if(existingEeriesGroup==null){
+			existingEeriesGroup=boxMetadataRepository.retrieveDefaultSeriesGroup();
+		}
+		
+		if(existingSeries==null && episode.getSeries()!=null && GenericUtilities.isNotValidTitle(episode.getSeries().getName())){
+			existingSeries=new Series();					
+			episode.getSeries().update(existingSeries);						
+			if(GenericUtilities.isNotValidCrid(existingSeries.getContractNumber())){
+				existingSeries.setContractNumber(contractNumber);
+			}									
+			existingSeries.setSeriesGroup(existingEeriesGroup);
+			boxMetadataRepository.persisSeries(existingSeries);
+		}
+		if(existingEpisode==null){
+			logger.info("creating a new episode");
+			existingEpisode=new Episode();			
+			episode.update(existingEpisode);
+			existingEpisode.setSeries(existingSeries);
+			EpisodeStatus episodeStatus=new EpisodeStatus();
+			episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
+			episodeStatus.setVideoStatus(VideoStatus.NO_PLACEHOLDER);				
+			boxMetadataRepository.persistEpisodeStatus(episodeStatus);
+			existingEpisode.setEpisodeStatus(episodeStatus);
+			boxMetadataRepository.saveTags(episode.getTags());
+			boxMetadataRepository.persist(existingEpisode);
+		}		
+		else{	
+			   logger.info("Upating the existing episode");
+			    existingEpisode.setSeries(existingSeries);
 				episode.updateWhenReceivedByMaterialId(existingEpisode);
 				statusUpde(existingEpisode);
 				boxMetadataRepository.saveTags(episode.getTags());
-				
+				existingEpisode.getEpisodeStatus().setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+				boxMetadataRepository.persistEpisodeStatus(existingEpisode.getEpisodeStatus());
+				boxMetadataRepository.persist(existingEpisode);
 		}
-		replaceCuePoints(existingEpisode,episode.getCuePoints());
-		checkS3ToUpdateVidoStatus(existingEpisode);
-		
-		logger.info("After upating the episode with material id:"+existingEpisode);
-		boxMetadataRepository.persist(existingEpisode);						
+		replaceCuePoints(existingEpisode,episode.getCuePoints());		
+		checkS3ToUpdateVidoStatus(existingEpisode);		
+		boxMetadataRepository.persist(existingEpisode);	
 		uk.co.boxnetwork.data.Episode ret=new uk.co.boxnetwork.data.Episode(existingEpisode,null);
 		ret.setComplianceInformations(existingEpisode.getComplianceInformations());
 		return ret;
@@ -358,14 +403,14 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	
 	@Transactional
 	public uk.co.boxnetwork.data.Series createNewSeries(uk.co.boxnetwork.data.Series series){
-		Series ser=createNewSeries(series, series.getContractNumber());
+		Series ser=createOrUpdateSeries(series, series.getContractNumber());
 		return new uk.co.boxnetwork.data.Series(ser);
 	}
-	public Series createNewSeries(uk.co.boxnetwork.data.Series series, String contractNumber){
+	public Series createOrUpdateSeries(uk.co.boxnetwork.data.Series series, String contractNumber){
 		if(series==null){
 			return null;
 		}		
-		SeriesGroup sg=createNewSeriesGroup(series.getSeriesGroup());
+		SeriesGroup sg=createOrUpdateSeriesGroup(series.getSeriesGroup());
 		Series existingSeries=null;
 		if(contractNumber!=null){
 			List<Series> matchSeries=boxMetadataRepository.findSeriesByContractNumber(contractNumber);
@@ -491,19 +536,24 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		}
 	}
 	
-	public SeriesGroup createNewSeriesGroup(uk.co.boxnetwork.data.SeriesGroup seriesGroup){
+	public SeriesGroup createOrUpdateSeriesGroup(uk.co.boxnetwork.data.SeriesGroup seriesGroup){
 		if(seriesGroup==null){
-			return null;
+			return boxMetadataRepository.retrieveDefaultSeriesGroup();
 		}
 		
 		if(seriesGroup.getId()!=null){
 			SeriesGroup seriesgroup=boxMetadataRepository.findSeriesGroupById(seriesGroup.getId());
 			if(seriesgroup!=null){
 				return seriesgroup;
-			}			
+			}
+			else{
+				logger.error("The series group with the id not found id:"+seriesGroup.getId());
+				return boxMetadataRepository.retrieveDefaultSeriesGroup();
+			}
 		}
 		if(GenericUtilities.isNotValidTitle(seriesGroup.getTitle())){
-			return null;			
+			logger.info("The series group title is not there, so ");
+			return boxMetadataRepository.retrieveDefaultSeriesGroup();		
 		}
 		List<SeriesGroup> seriesGroups=boxMetadataRepository.findSeriesGroupByTitle(seriesGroup.getTitle());
 		if(seriesGroups.size()==0){
@@ -553,12 +603,20 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	    
 	    
 		for(uk.co.boxnetwork.data.CuePoint cuepoint:cuePoints){
-			    logger.info("Received cue point:"+cuepoint); 
+			    logger.info("Received cue point:"+cuepoint);
+			    if(cuepoint.getTime()==null){
+			    	logger.info("Ignoring the cue points that time is null");
+			    	continue;
+
+			    }
 			     CuePoint cue=new CuePoint();
 			     cuepoint.update(cue);			     
+			     logger.info("after update:"+cue);
 			     episodeToUpdate.addCuePoint(cue);
 			     cue.setEpisode(episodeToUpdate);
-			     boxMetadataRepository.merge(cue);
+			     
+			     
+			     boxMetadataRepository.persist(cue);
 			     
 		}		
 	}
@@ -569,6 +627,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		Series existingSeries=boxMetadataRepository.findSeriesById(id);
 		series.update(existingSeries);
 		boxMetadataRepository.update(existingSeries);
+		if(existingSeries.getSeriesGroup()==null){
+			existingSeries.setSeriesGroup(boxMetadataRepository.retrieveDefaultSeriesGroup());
+			boxMetadataRepository.update(existingSeries);
+		}
 		
 	}
 		

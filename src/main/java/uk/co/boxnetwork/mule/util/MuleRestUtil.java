@@ -2,7 +2,6 @@ package uk.co.boxnetwork.mule.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Map;
 import java.util.Set;
 
 
