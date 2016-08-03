@@ -109,6 +109,14 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 		return ret;		
 	}
+	public uk.co.boxnetwork.data.CuePoint getCuePointById(Long id){
+		CuePoint cuepoint=boxMetadataRepository.findCuePoint(id);
+		if(cuepoint==null){
+			return null;			
+		}
+		return new uk.co.boxnetwork.data.CuePoint(cuepoint);
+		
+	}
 	public void statusUpdateOnEpisodeUpdated(Episode existingEpisode, String oldIngestSource, String oldIngstProfile){
 		EpisodeStatus episodeStatus=existingEpisode.getEpisodeStatus();
 		MetadataStatus metadataStatus=GenericUtilities.calculateMetadataStatus(existingEpisode);
@@ -780,5 +788,37 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	  }	    
 	  return new uk.co.boxnetwork.data.SeriesGroup(seriesgroup);
   }
+
   
+  public void createNewCuepoint(Long episodeid, uk.co.boxnetwork.data.CuePoint cuePoint){
+	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
+	  CuePoint cue=new CuePoint();
+	  cuePoint.update(cue);
+	  boxMetadataRepository.persistCuePoint(cue,episode);
+	  cuePoint.setId(cue.getId());
+  }
+  
+  public void updateCuepoint(Long episodeid,Long cueid, uk.co.boxnetwork.data.CuePoint cuePoint){
+	  CuePoint cue=boxMetadataRepository.findCuePoint(cueid);
+	  if(!cue.getId().equals(cueid)){
+		  throw new RuntimeException("Not permitted to update not matching cue cueid=["+cueid+"]cuePoint=["+cuePoint);  
+	  }
+	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
+	  if(!episode.getId().equals(episodeid)){
+		  throw new RuntimeException("Not permitted to update not matching cue episodeid=["+episodeid+"]");
+	  }
+	  boxMetadataRepository.updateCue(cuePoint);	  
+	  
+  }
+  public uk.co.boxnetwork.data.CuePoint deleteCuepoint(Long episodeid, Long cueid){	  	  
+	  CuePoint cue=boxMetadataRepository.findCuePoint(cueid);
+	  if(cue.getEpisode().getId().equals(episodeid)){
+		  boxMetadataRepository.removeCuePoint(cueid);		  
+		  return new uk.co.boxnetwork.data.CuePoint(cue);
+	  }
+	  else{		  	
+		  throw new RuntimeException("Not permitted to delete not matching cue cueid=["+cueid+"]episodeid=["+episodeid);		  
+	  }
+	  
+  }
 }

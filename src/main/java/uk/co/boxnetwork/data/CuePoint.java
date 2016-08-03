@@ -8,6 +8,8 @@ import javax.persistence.ManyToOne;
 import uk.co.boxnetwork.model.Episode;
 
 public class CuePoint implements Comparable<CuePoint>{
+
+	private Long id;
 	
 	private String name;
 	
@@ -31,7 +33,8 @@ public class CuePoint implements Comparable<CuePoint>{
     	this.name=cuePoint.getName();
     	this.type=cuePoint.getType();
     	this.time=cuePoint.getTime();    
-    	this.code=cuePoint.getCode();    	
+    	this.code=cuePoint.getCode();    
+    	this.id=cuePoint.getId();
     	this.metadata=cuePoint.creatMetadata();
     	
     }
@@ -93,6 +96,16 @@ public class CuePoint implements Comparable<CuePoint>{
 	}
 	public CuepointMetadata getMetadata() {
 		return metadata;
+	}
+	
+	
+	
+	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	@Override
 	public String toString() {

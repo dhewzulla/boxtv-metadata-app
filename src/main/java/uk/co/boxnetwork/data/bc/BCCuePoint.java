@@ -12,7 +12,7 @@ public class BCCuePoint {
 	  public BCCuePoint(){
 		  
 	  }
-	  public BCCuePoint(uk.co.boxnetwork.data.CuePoint cuepoint){
+	  public BCCuePoint(uk.co.boxnetwork.data.CuePoint cuepoint, String numberOfBraks){
 		  this.name=cuepoint.getName();
 		  this.type=cuepoint.getType();
 		  this.time=cuepoint.getTime();
@@ -20,6 +20,10 @@ public class BCCuePoint {
 		  if(cuepoint.getMetadata()!=null && cuepoint.getMetadata().getNumberOfAds()!=null){			  
 				this.metadata="{\"numberOfAds\":"+cuepoint.getMetadata().getNumberOfAds()+"}";				
 		  }
+		  else if(numberOfBraks!=null && numberOfBraks.trim().length()>0){
+			  this.metadata="{\"numberOfAds\":"+cuepoint.getMetadata().getNumberOfAds()+"}";
+		  }
+		  
 		  		  
 	  }
 	public String getId() {

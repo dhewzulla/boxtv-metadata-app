@@ -65,6 +65,26 @@ public class BoxMedataRepository {
     	    seriesGroup.setCreatedAt(lastModifiedAt);
    			entityManager.persist(seriesGroup);
        }
+       @Transactional
+       public void persistCuePoint(CuePoint cuepoint, Episode episode){
+    	  if(cuepoint.getId()!=null){
+    		  entityManager.merge(cuepoint);
+    		  return;
+    	  }
+    	  cuepoint.setEpisode(episode);
+    	  episode.addCuePoint(cuepoint);
+    	  entityManager.persist(cuepoint);
+    	  persist(episode);
+    	  markMetadataChanged(episode);
+       }
+       @Transactional
+       public void removeCuePoint(Long cueid){
+    	   CuePoint cuepoint=findCuePoint(cueid);
+    	   markMetadataChanged(cuepoint.getEpisode());
+    	   entityManager.remove(cuepoint);
+    	   
+       }
+       
        
        public void persist(Episode episode){
     	   Date lastModifiedAt=new Date();
@@ -574,6 +594,9 @@ public class BoxMedataRepository {
 	   public Episode findEpisodeById(Long id){
 		   return entityManager.find(Episode.class, id);		   
 	   }
+	   public CuePoint findCuePoint(Long id){
+		   return entityManager.find(CuePoint.class, id);		   
+	   }
 	  
 	   public List<Episode> findAllEpisodes(){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);
@@ -723,5 +746,20 @@ public class BoxMedataRepository {
 		   		epstatus.setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
 		   	}		   
        }
+	   @Transactional
+	   public void updateCue(uk.co.boxnetwork.data.CuePoint cuePoint){
+		   CuePoint cue=findCuePoint(cuePoint.getId());
+		   cuePoint.update(cue);
+		   persist(cue);
+		   markMetadataChanged(cue.getEpisode());
+	   }
+	   public void markMetadataChanged(Episode episode){
+		   EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+		   if(episodeStatus.getMetadataStatus()==MetadataStatus.PUBLISHED){
+			   episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+			   persistEpisodeStatus(episodeStatus);
+		   }
+	   }
+	   
 	   
 }

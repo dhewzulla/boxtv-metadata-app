@@ -123,25 +123,24 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 	}
 	
 	 protected Object processGET(MuleMessage message, String outputEncoding){
-			
-		return new ErrorMessage("The Method GET not supported");
+		 return returnError("The Method GET not supported",message);
 	}
 	 protected Object processPOST(MuleMessage message, String outputEncoding){
-		
-		return new ErrorMessage("The Method POST not supported");			 
+		 return returnError("The Method POST not supported",message);					 
 	}	
 	protected Object processPUT(MuleMessage message, String outputEncoding) throws Exception{
-	   return new ErrorMessage("The Method PUT not supported");					 
+	   		
+	   return returnError("The Method PUT not supported",message);
 	}
-	protected Object processDELETE(MuleMessage message, String outputEncoding){	
-		return new ErrorMessage("The Method DELETE not supported");			 
+	protected Object processDELETE(MuleMessage message, String outputEncoding){			
+		return returnError("The Method DELETE not supported",message);
 	}
 	protected Object processOPTIONS(MuleMessage message, String outputEncoding){			
 	   return message.getPayload();
 	   
 	}
-	protected Object processDefault(MuleMessage message, String outputEncoding, String method){	   
-		return new ErrorMessage("The Method "+method+" not supported");			 
+	protected Object processDefault(MuleMessage message, String outputEncoding, String method){	   					
+		return returnError("The Method "+method+" not supported",message);
 	}
    
    public void addCORS(MuleMessage message, String outputEncoding){

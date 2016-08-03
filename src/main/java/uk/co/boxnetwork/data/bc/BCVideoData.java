@@ -29,6 +29,7 @@ public class BCVideoData {
 		  private String created_at;
 		  private BCCuePoint[] cue_points;		  
 		  private BCCustomFields custom_fields;
+		  private String delivery_type;
 		  private String description;
 		  private String digital_master_id;
 		  private Integer duration;
@@ -113,7 +114,7 @@ public class BCVideoData {
 					Collections.sort(cuepoints);
 				    this.cue_points=new BCCuePoint[cuepoints.size()];
 				    for(int i=0;i<cuepoints.size();i++){
-				    	this.cue_points[i]=new BCCuePoint(cuepoints.get(i));				    	
+				    	this.cue_points[i]=new BCCuePoint(cuepoints.get(i),episode.getNumberOfAdsPerBreak());				    	
 				    }
 				}
 		 }
@@ -368,6 +369,14 @@ public class BCVideoData {
 
 		public void setComplete(Boolean complete) {
 			this.complete = complete;
+		}
+
+		public String getDelivery_type() {
+			return delivery_type;
+		}
+
+		public void setDelivery_type(String delivery_type) {
+			this.delivery_type = delivery_type;
 		}
 		
 		 
