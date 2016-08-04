@@ -1,4 +1,4 @@
-muleapp=boxtv-metadata-app-1.0.0-SNAPSHOT.zip
+muleapp=boxtv-metadata-app-1.0.1.zip
 
 cd ~/box-config
 git add . --all
@@ -14,5 +14,5 @@ git push origin master
 cd -
 ssh davran@userver 'cd ~/bcs3uploader && git pull origin'
 
-
+echo "deploying version $muleapp" 
 scp target/$muleapp davran@userver:bdocker/bmule/opt/mule/apps/
