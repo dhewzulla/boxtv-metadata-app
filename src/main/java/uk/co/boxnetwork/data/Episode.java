@@ -11,7 +11,7 @@ import java.util.Set;
 
 
 import uk.co.boxnetwork.model.AdSuport;
-import uk.co.boxnetwork.model.AvailabilityWindow;
+
 import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.EpisodeStatus;
@@ -109,7 +109,7 @@ public class Episode {
 	
 	
 	private List<CuePoint> cuePoints=new ArrayList<CuePoint>();
-	private Set<AvailabilityWindow> availabilities;
+	private List<AvailabilityWindow> availabilities=new ArrayList<AvailabilityWindow>();
 	
 	private Double durationScheduled;
 	
@@ -334,7 +334,9 @@ public Episode(){
 			}
 		}
 		if(episode.getAvailabilities()!=null){
-			
+			for(uk.co.boxnetwork.model.AvailabilityWindow availabilityWindow:episode.getAvailabilities()){
+				this.addAvailability(new AvailabilityWindow(availabilityWindow));
+			}
 		}
 		if(scheduleEvents!=null){
 			for(uk.co.boxnetwork.model.ScheduleEvent evt:scheduleEvents){
@@ -635,12 +637,14 @@ public void setGeoAllowedCountries(String geoAllowedCountries) {
 }
 
 
-public Set<AvailabilityWindow> getAvailabilities() {
+
+
+public List<AvailabilityWindow> getAvailabilities() {
 	return availabilities;
 }
 
 
-public void setAvailabilities(Set<AvailabilityWindow> availabilities) {
+public void setAvailabilities(List<AvailabilityWindow> availabilities) {
 	this.availabilities = availabilities;
 }
 
@@ -654,6 +658,8 @@ public void setNumberOfAdsPerBreak(String numberOfAdsPerBreak) {
 	this.numberOfAdsPerBreak = numberOfAdsPerBreak;
 }
 
-
+public void addAvailability(AvailabilityWindow availabilityWindow){
+	this.availabilities.add(availabilityWindow);
+}
 	
 }

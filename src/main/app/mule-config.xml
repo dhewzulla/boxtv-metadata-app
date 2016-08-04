@@ -139,6 +139,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.SeriesGroupTransformer" name="seriesGroupService" doc:name="SeriesGroupService"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.TagsTransformer" name="tagsService" doc:name="Tags Services"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.CueTransformer" name="cueTransformer" doc:name="Cue Transformer"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.AvailabilityTransformer" name="availabilityTransformer" doc:name="Availability Transformer"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
    

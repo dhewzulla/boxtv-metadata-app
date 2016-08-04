@@ -326,7 +326,7 @@ public class BCVideoData {
 			if(availabilityWindows!=null && availabilityWindows.size()>0){
 					if(availabilityWindows.size()==1){
 						availabilityWindow=availabilityWindows.iterator().next();
-						schedule =new BCSchedule(availabilityWindow.getStart(),availabilityWindow.getEnd());
+						schedule =new BCSchedule(new Date(availabilityWindow.getStart()),new Date(availabilityWindow.getEnd()));
 						return;
 					}
 					else{
@@ -335,13 +335,13 @@ public class BCVideoData {
 						
 						for(int i=0;i<sortedAvailabilityWindows.size();i++){
 							availabilityWindow=sortedAvailabilityWindows.get(i);
-							if(today.before(availabilityWindow.getEnd())){																
-								schedule =new BCSchedule(availabilityWindow.getStart(),availabilityWindow.getEnd());
+							if(today.before(new Date(availabilityWindow.getEnd()))){																
+								schedule =new BCSchedule(new Date(availabilityWindow.getStart()),new Date(availabilityWindow.getEnd()));
 								return;									
 																
 							}							
 						}
-						schedule =new BCSchedule(availabilityWindow.getStart(),availabilityWindow.getEnd());
+						schedule =new BCSchedule(new Date(availabilityWindow.getStart()),new Date(availabilityWindow.getEnd()));
 						return;								
 					}							
 			}

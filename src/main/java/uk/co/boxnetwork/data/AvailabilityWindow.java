@@ -8,9 +8,12 @@ public class AvailabilityWindow {
 	
     private Long id;
  
-	private Date start;
-	private Date end;
-
+	private Long start;
+	private Long end;
+	
+	public AvailabilityWindow(){
+	
+	}
 public AvailabilityWindow(uk.co.boxnetwork.model.AvailabilityWindow availability){
 	
 	this.id=availability.getId();
@@ -20,7 +23,7 @@ public AvailabilityWindow(uk.co.boxnetwork.model.AvailabilityWindow availability
 }
 public void update(uk.co.boxnetwork.model.AvailabilityWindow availability){
 	availability.setStart(this.start);
-	availability.setEnd(end);
+	availability.setEnd(this.end);
 
 	
 }
@@ -30,17 +33,24 @@ public void update(uk.co.boxnetwork.model.AvailabilityWindow availability){
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Date getStart() {
+	public Long getStart() {
 		return start;
 	}
-	public void setStart(Date start) {
+	public void setStart(Long start) {
 		this.start = start;
 	}
-	public Date getEnd() {
+	public Long getEnd() {
 		return end;
 	}
-	public void setEnd(Date end) {
+	public void setEnd(Long end) {
 		this.end = end;
 	}
-    
+    public boolean valid(){
+    	if(start==null || end==null)
+    		return false;
+    	if(start<=0 || end<=0){
+    		return false;
+    	}
+    	return true;
+    }
 }

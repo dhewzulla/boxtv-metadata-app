@@ -17,26 +17,14 @@ public class AvailabilityWindow implements Comparable<AvailabilityWindow>{
 	@GeneratedValue
     private Long id;
  
-	private Date start;
-	private Date end;
+	private Long start;
+	private Long end;
 
 	@ManyToOne
     @JoinColumn(name="episode_id") 
     private Episode episode;
 
- public Date getStart() {
-	return start;
- }
- public void setStart(Date start) {
-	this.start = start;
- }
- public Date getEnd() {
-	return end;
- }
- public void setEnd(Date end) {
-	this.end = end;
- }
-public Long getId() {
+ public Long getId() {
 	return id;
 }
 public void setId(Long id) {
@@ -50,7 +38,19 @@ public void setEpisode(Episode episode) {
 }
 @Override
 public int compareTo(AvailabilityWindow o) {
-	return (int)(this.getStart().getTime()-o.getStart().getTime());
+	return (int)(this.getStart()-o.getStart());
+}
+public Long getStart() {
+	return start;
+}
+public void setStart(Long start) {
+	this.start = start;
+}
+public Long getEnd() {
+	return end;
+}
+public void setEnd(Long end) {
+	this.end = end;
 }
  
 	

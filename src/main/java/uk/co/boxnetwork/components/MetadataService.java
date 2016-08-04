@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.s3.VideoFilesLocation;
+import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
@@ -71,7 +72,11 @@ public class MetadataService {
 	private  List<uk.co.boxnetwork.data.Episode>  toData(List<Episode> eposides){
 		List<uk.co.boxnetwork.data.Episode> ret=new ArrayList<uk.co.boxnetwork.data.Episode>();
 		for(Episode episode:eposides){
-			ret.add(new uk.co.boxnetwork.data.Episode(episode,null));
+			uk.co.boxnetwork.data.Episode dep=new uk.co.boxnetwork.data.Episode(episode,null);
+			dep.setCuePoints(null);
+			dep.setComplianceInformations(null);
+			dep.setAvailabilities(null);
+			ret.add(dep);
 		}
 		
 		return ret;
@@ -117,6 +122,15 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		return new uk.co.boxnetwork.data.CuePoint(cuepoint);
 		
 	}
+	public uk.co.boxnetwork.data.AvailabilityWindow getAvailabilityWindowId(Long id){
+		AvailabilityWindow availabilityWindow=boxMetadataRepository.findAvailabilityWindowId(id);
+		if(availabilityWindow==null){
+			return null;			
+		}
+		return new uk.co.boxnetwork.data.AvailabilityWindow(availabilityWindow);
+		
+	}
+	
 	public void statusUpdateOnEpisodeUpdated(Episode existingEpisode, String oldIngestSource, String oldIngstProfile){
 		EpisodeStatus episodeStatus=existingEpisode.getEpisodeStatus();
 		MetadataStatus metadataStatus=GenericUtilities.calculateMetadataStatus(existingEpisode);
@@ -797,6 +811,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	  boxMetadataRepository.persistCuePoint(cue,episode);
 	  cuePoint.setId(cue.getId());
   }
+  public void createNewAvailability(Long episodeid, uk.co.boxnetwork.data.AvailabilityWindow availabilityWindow){
+	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
+	  AvailabilityWindow avwindow=new AvailabilityWindow();
+	  availabilityWindow.update(avwindow);
+	  boxMetadataRepository.persistAvailabilityWindow(avwindow,episode);
+	  availabilityWindow.setId(avwindow.getId());
+  }
   
   public void updateCuepoint(Long episodeid,Long cueid, uk.co.boxnetwork.data.CuePoint cuePoint){
 	  CuePoint cue=boxMetadataRepository.findCuePoint(cueid);
@@ -810,6 +831,18 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	  boxMetadataRepository.updateCue(cuePoint);	  
 	  
   }
+  public void updateAvailabilityWindow(Long episodeid,Long availabilitywindowid, uk.co.boxnetwork.data.AvailabilityWindow availabilitywindow){
+	  AvailabilityWindow avwindow=boxMetadataRepository.findAvailabilityWindowId(availabilitywindowid);
+	  if(!avwindow.getId().equals(availabilitywindowid)){
+		  throw new RuntimeException("Not permitted to update not matching availability availabilitywindowid=["+availabilitywindowid+"]avwindow=["+avwindow);  
+	  }
+	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
+	  if(!episode.getId().equals(episodeid)){
+		  throw new RuntimeException("Not permitted to update not matching availabilitywindow episodeid=["+episodeid+"]");
+	  }
+	  boxMetadataRepository.updateAvailabilityWindow(availabilitywindow);	  
+	  
+  }
   public uk.co.boxnetwork.data.CuePoint deleteCuepoint(Long episodeid, Long cueid){	  	  
 	  CuePoint cue=boxMetadataRepository.findCuePoint(cueid);
 	  if(cue.getEpisode().getId().equals(episodeid)){
@@ -818,6 +851,17 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	  }
 	  else{		  	
 		  throw new RuntimeException("Not permitted to delete not matching cue cueid=["+cueid+"]episodeid=["+episodeid);		  
+	  }
+	  
+  }
+  public uk.co.boxnetwork.data.AvailabilityWindow deleteAvailabilityWindow(Long episodeid, Long avid){	  	  
+	  AvailabilityWindow availabilityWindow=boxMetadataRepository.findAvailabilityWindowId(avid);
+	  if(availabilityWindow.getEpisode().getId().equals(episodeid)){
+		  boxMetadataRepository.removeAvailabilityWindow(avid);		  
+		  return new uk.co.boxnetwork.data.AvailabilityWindow(availabilityWindow);
+	  }
+	  else{		  	
+		  throw new RuntimeException("Not permitted to delete not matching availability avid=["+avid+"]episodeid=["+episodeid);		  
 	  }
 	  
   }

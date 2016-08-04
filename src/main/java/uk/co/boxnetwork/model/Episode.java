@@ -390,6 +390,9 @@ public class Episode {
    public void addCuePoint(CuePoint cuepoint){
 	   this.cuePoints.add(cuepoint);
    }
+   public void addAvailabilityWindow(AvailabilityWindow av){
+	   this.availabilities.add(av);
+   }
    public void rempveCuePoint(CuePoint cuepoint){
 	   this.cuePoints.remove(cuepoint);
    }

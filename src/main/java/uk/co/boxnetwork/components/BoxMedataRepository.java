@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.bc.BCVideoSource;
+import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.BoxUser;
 import uk.co.boxnetwork.model.CertificationCategory;
@@ -77,11 +78,31 @@ public class BoxMedataRepository {
     	  persist(episode);
     	  markMetadataChanged(episode);
        }
+       
+       @Transactional
+       public void persistAvailabilityWindow(AvailabilityWindow availabilityWindow, Episode episode){
+    	  if(availabilityWindow.getId()!=null){
+    		  entityManager.merge(availabilityWindow);
+    		  return;
+    	  }
+    	  availabilityWindow.setEpisode(episode);
+    	  episode.addAvailabilityWindow(availabilityWindow);
+    	  entityManager.persist(availabilityWindow);
+    	  persist(episode);
+    	  markMetadataChanged(episode);
+       }
        @Transactional
        public void removeCuePoint(Long cueid){
     	   CuePoint cuepoint=findCuePoint(cueid);
     	   markMetadataChanged(cuepoint.getEpisode());
     	   entityManager.remove(cuepoint);
+    	   
+       }
+       @Transactional
+       public void removeAvailabilityWindow(Long avid){
+    	   AvailabilityWindow avwindow=findAvailabilityWindowId(avid);
+    	   markMetadataChanged(avwindow.getEpisode());
+    	   entityManager.remove(avwindow);
     	   
        }
        
@@ -597,6 +618,9 @@ public class BoxMedataRepository {
 	   public CuePoint findCuePoint(Long id){
 		   return entityManager.find(CuePoint.class, id);		   
 	   }
+	   public AvailabilityWindow findAvailabilityWindowId(Long id){
+		   return entityManager.find(AvailabilityWindow.class, id);
+	   }
 	  
 	   public List<Episode> findAllEpisodes(){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);
@@ -752,6 +776,13 @@ public class BoxMedataRepository {
 		   cuePoint.update(cue);
 		   persist(cue);
 		   markMetadataChanged(cue.getEpisode());
+	   }
+	   @Transactional
+	   public void updateAvailabilityWindow(uk.co.boxnetwork.data.AvailabilityWindow availabilityWindow){
+		   AvailabilityWindow avWindow=findAvailabilityWindowId(availabilityWindow.getId());
+		   availabilityWindow.update(avWindow);
+		   entityManager.merge(avWindow);		   
+		   markMetadataChanged(avWindow.getEpisode());
 	   }
 	   public void markMetadataChanged(Episode episode){
 		   EpisodeStatus episodeStatus=episode.getEpisodeStatus();
