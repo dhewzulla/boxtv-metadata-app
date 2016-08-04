@@ -9,7 +9,9 @@
 	<name>Mule boxtv-metadata-app Application</name>
 
     
-
+	<scm>            
+        <connection>scm:ssh://git@github.com:dhewzulla/boxtv-metadata-app.git</connection>
+    </scm>
     <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -74,6 +76,34 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			 <plugin>
+            <groupId>external.atlassian.jgitflow</groupId>
+            <artifactId>jgitflow-maven-plugin</artifactId>
+            <version>1.0-m4.3</version>
+              <configuration>
+                 <!--     
+    				<enableSshAgent>true</enableSshAgent>
+    				 -->
+    				<autoVersionSubmodules>true</autoVersionSubmodules> 
+    				<pushFeatures>true</pushFeatures>    
+    				<pushReleases>true</pushReleases>    
+    				<pushHotfixes>true</pushHotfixes>
+    				    		     
+    				 
+    				<noDeploy>true</noDeploy>
+    				    		
+                    <flowInitContext>      
+                       <developBranchName>develop</developBranchName>
+                       <versionTagPrefix>release-</versionTagPrefix>
+                       <masterBranchName>master</masterBranchName>
+                    </flowInitContext>
+             </configuration>
+        </plugin>
+			
+			
+			
+			
 		</plugins>
 	</build>
 	<!-- Mule Dependencies -->
