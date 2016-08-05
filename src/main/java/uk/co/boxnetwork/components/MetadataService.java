@@ -2,6 +2,7 @@ package uk.co.boxnetwork.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -656,8 +657,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 	}
 		
-	public List<uk.co.boxnetwork.data.ScheduleEvent> getAllScheduleEvent(){
-		List<ScheduleEvent> schedules= boxMetadataRepository.findAllScheduleEvent();
+	public List<uk.co.boxnetwork.data.ScheduleEvent> getAllScheduleEventFrom(Date fromDate){
+		List<ScheduleEvent> schedules= boxMetadataRepository.findScheduleEventsFrom(fromDate);
+	
 		List<uk.co.boxnetwork.data.ScheduleEvent> ret=new ArrayList<uk.co.boxnetwork.data.ScheduleEvent>();
 		for(ScheduleEvent evt:schedules){
 			ret.add(new uk.co.boxnetwork.data.ScheduleEvent(evt));			
