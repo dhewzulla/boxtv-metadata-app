@@ -396,11 +396,14 @@ public class Episode {
    public void rempveCuePoint(CuePoint cuepoint){
 	   this.cuePoints.remove(cuepoint);
    }
+   
 
    public void clearCuePoints(){
 	   this.cuePoints.clear();
    }
-
+   public void clearAvailabilityWindows(){
+	   this.availabilities.clear();
+   }
 public Set<CuePoint> getCuePoints() {
 	return cuePoints;
 }
