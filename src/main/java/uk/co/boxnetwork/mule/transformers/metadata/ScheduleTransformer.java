@@ -1,5 +1,6 @@
 package uk.co.boxnetwork.mule.transformers.metadata;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.mule.api.MuleMessage;
@@ -8,6 +9,8 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
 
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.model.Episode;
@@ -25,7 +28,10 @@ public class ScheduleTransformer extends BoxRestTransformer{
 		String schduleid=MuleRestUtil.getPathPath(message);
 		
 		if(schduleid==null){			
-			return metadataService.getAllScheduleEvent();			
+			Calendar calendar=Calendar.getInstance();
+			calendar.add(Calendar.DATE, -30);
+			
+			return metadataService.getAllScheduleEventFrom(calendar.getTime());			
 		}
 		else{
 			Long id=Long.valueOf(schduleid);

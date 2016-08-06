@@ -2,6 +2,7 @@ package uk.co.boxnetwork.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -60,16 +61,15 @@ public class MetadataService {
 		return ret;		
 	}
 	
-	public List<uk.co.boxnetwork.data.Episode> getAllEpisodes(){
-		
-		return toData(boxMetadataRepository.findAllEpisodes());
+	public List<uk.co.boxnetwork.data.Episode> getAllEpisodes(int beginIndex, int recordLimit){		
+		return toDataEpisodes(boxMetadataRepository.findAllEpisodes(beginIndex,recordLimit));
 	}
 	public List<uk.co.boxnetwork.data.Episode> findEpisodes(String search){
 		List<Episode> eposides=boxMetadataRepository.findEpisodes(search);
 		logger.info("For search:"+search+" found matching:"+eposides.size());
-		return toData(eposides);
+		return toDataEpisodes(eposides);
 	}
-	private  List<uk.co.boxnetwork.data.Episode>  toData(List<Episode> eposides){
+	private  List<uk.co.boxnetwork.data.Episode>  toDataEpisodes(List<Episode> eposides){
 		List<uk.co.boxnetwork.data.Episode> ret=new ArrayList<uk.co.boxnetwork.data.Episode>();
 		for(Episode episode:eposides){
 			uk.co.boxnetwork.data.Episode dep=new uk.co.boxnetwork.data.Episode(episode,null);
@@ -81,9 +81,19 @@ public class MetadataService {
 		
 		return ret;
 	}
+	private  List<uk.co.boxnetwork.data.Series>  toDataSeries(List<Series> series){
+		List<uk.co.boxnetwork.data.Series> ret=new ArrayList<uk.co.boxnetwork.data.Series>();
+		for(Series s:series){
+			uk.co.boxnetwork.data.Series dep=new uk.co.boxnetwork.data.Series(s);			
+			ret.add(dep);
+		}		
+		return ret;
+	}
+	 
 	
-public List<Series> getAllSeries(){		
-		 return boxMetadataRepository.findAllSeries();
+	
+public List<uk.co.boxnetwork.data.Series> getAllSeries(){		
+		 return toDataSeries(boxMetadataRepository.findAllSeries());
 	}
 public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	Series series=boxMetadataRepository.findSeriesById(id);
@@ -91,13 +101,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		return null;
 	}
 	List<Episode> episodes=boxMetadataRepository.findEpisodesBySeries(series);
-	uk.co.boxnetwork.data.Series ret=new uk.co.boxnetwork.data.Series(series);
-	for(Episode episode:episodes){
-		episode.setSeries(null);
-		episode.setComplianceInformations(null);
-		episode.setCuePoints(null);
+	List<uk.co.boxnetwork.data.Episode> eps=toDataEpisodes(episodes);
+	for(uk.co.boxnetwork.data.Episode ep:eps){
+		ep.setScheduleEvents(null);
+		ep.setSeries(null);
 	}
-	ret.setEpisodes(episodes);		
+	uk.co.boxnetwork.data.Series ret=new uk.co.boxnetwork.data.Series(series);
+	ret.setEpisodes(eps);		
 	return ret;		
 }
 
@@ -656,8 +666,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 	}
 		
-	public List<uk.co.boxnetwork.data.ScheduleEvent> getAllScheduleEvent(){
-		List<ScheduleEvent> schedules= boxMetadataRepository.findAllScheduleEvent();
+	public List<uk.co.boxnetwork.data.ScheduleEvent> getAllScheduleEventFrom(Date fromDate){
+		List<ScheduleEvent> schedules= boxMetadataRepository.findScheduleEventsFrom(fromDate);
+	
 		List<uk.co.boxnetwork.data.ScheduleEvent> ret=new ArrayList<uk.co.boxnetwork.data.ScheduleEvent>();
 		for(ScheduleEvent evt:schedules){
 			ret.add(new uk.co.boxnetwork.data.ScheduleEvent(evt));			
