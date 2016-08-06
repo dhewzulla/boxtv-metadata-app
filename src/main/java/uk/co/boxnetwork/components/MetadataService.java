@@ -364,6 +364,12 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 					existingSeriesGroup=existingSeries.getSeriesGroup();
 				}
 		}	
+		if(existingSeries==null && episode.getSeries()!=null && episode.getSeries().getId()!=null){
+			existingSeries=boxMetadataRepository.findSeriesById(episode.getSeries().getId());
+			if(existingEpisode!=null){
+				existingSeriesGroup=existingSeries.getSeriesGroup();
+			}			
+		}
 	    if(existingSeries==null && (!GenericUtilities.isNotValidCrid(contractNumber))){
 		     List<Series> matchSeries=boxMetadataRepository.findSeriesByContractNumber(contractNumber);
 		     if(matchSeries.size()==0){

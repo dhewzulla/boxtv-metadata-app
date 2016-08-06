@@ -18,4 +18,4 @@ echo "deploying version $muleapp"
 
 ssh davran@userver 'rm ~/bdocker/bmule/opt/mule/apps/$muleappname*.txt' 
 
-scp target/$muleappname*.zip davran@userver:bdocker/bmule/opt/mule/apps/
+scp target/$muleappname*-SNAPSHOT.zip davran@userver:bdocker/bmule/opt/mule/apps/
