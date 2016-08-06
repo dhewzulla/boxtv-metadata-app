@@ -118,6 +118,15 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          	  
          </spring:bean>
          
+         <spring:bean id="appConfiguration" class="uk.co.boxnetwork.data.AppConfig">
+         	  
+         	  <spring:property name="episodeRecordLimit" value="${episode.record.limit}"/>
+         	  
+         </spring:bean>
+         
+         
+         
+         
          <spring:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
          
          <ss:authentication-manager alias="authenticationManager">
@@ -166,9 +175,13 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.security.BoxUsersTransformer" name="boxUsersTransformer" doc:name="BoxUsersTransformer"/>
    
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.LoadAppInformationTransformer" name="loadAppInfoTransformer" doc:name="LoadConfig"/>
+   
    
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.DoNothingTransformer" name="doNothingTransformer" doc:name="DoNothingTransformer"/>
+   
+   
      
    
    

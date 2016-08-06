@@ -627,8 +627,10 @@ public class BoxMedataRepository {
 		   return entityManager.find(AvailabilityWindow.class, id);
 	   }
 	  
-	   public List<Episode> findAllEpisodes(){
+	   public List<Episode> findAllEpisodes(int beginIndex, int recordLimit){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);
+		   query.setFirstResult(beginIndex);
+		   query.setMaxResults(recordLimit);
 		   return query.getResultList();
 	   }
 	   public List<Episode> findEpisodes(String search){

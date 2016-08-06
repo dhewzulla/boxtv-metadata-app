@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import uk.co.boxnetwork.components.BCVideoService;
 import uk.co.boxnetwork.components.MetadataMaintainanceService;
 import uk.co.boxnetwork.components.MetadataService;
+import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.model.Episode;
@@ -32,6 +33,8 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		@Autowired
 		MetadataMaintainanceService metadataMaintainanceService;
 		
+		@Autowired
+		AppConfig appConfig;
 		
 		
 		@Override
@@ -48,9 +51,22 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		private  Object getAllEpisodes(MuleMessage message, String outputEncoding){
 			
 			ParameterMap queryparams=message.getInboundProperty("http.query.params");
-			if(queryparams==null || queryparams.get("search") ==null || queryparams.get("search").length()==0){				
-					return metadataService.getAllEpisodes();
-					
+			
+			if(queryparams==null || queryparams.get("search") ==null || queryparams.get("search").length()==0){
+				     
+				    int recordLimit=appConfig.getEpisodeRecordLimit();
+				    int beginIndex=0;
+				    int counter=0;				    
+				    if(queryparams!=null && queryparams.get("start")!=null){
+				    	try{
+				    		beginIndex=Integer.valueOf(queryparams.get("start"));
+				    	}
+				    	catch(Exception e){
+				    		logger.error(e+ " while convering the fromIndex value:"+queryparams.get("start"),e);
+				    	}
+				    }
+				    
+					return metadataService.getAllEpisodes(beginIndex,recordLimit);					
 			}
 			String search=queryparams.get("search");
 			if(search.indexOf("%")==-1){

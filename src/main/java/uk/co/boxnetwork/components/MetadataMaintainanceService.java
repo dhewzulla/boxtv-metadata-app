@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
@@ -47,17 +48,37 @@ public class MetadataMaintainanceService {
 	@Autowired
 	MetadataService metataService;
 	
+	@Autowired
+	AppConfig appConfig;
+	
+	
 	private static final Logger logger=LoggerFactory.getLogger(MetadataMaintainanceService.class);
+	
 	
 	@Transactional
 	public void fixTxChannel(){
 		logger.info("fixing the channel......");
-		List<Episode> episodes=repository.findAllEpisodes();
-		
-		for(Episode episode:episodes){
-			if(fixTxChannel(episode)){													  
-				repository.persist(episode);
-			}			
+		int beginIndex=0;
+		int rcordLimit=appConfig.getEpisodeRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
+		}
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				if(episodes.size()==0){
+					break;
+				}
+				for(Episode episode:episodes){
+					if(fixTxChannel(episode)){													  
+						repository.persist(episode);
+					}			
+				}
+				if(episodes.size()<rcordLimit){
+					break;
+				}
+				else{
+					beginIndex+=rcordLimit;
+				}
 		}
 	}
 	public boolean fixTxChannel(Episode episode){
@@ -80,14 +101,31 @@ public class MetadataMaintainanceService {
 	@Transactional
     public void fixEpisodeStatusIfEmpty(){
     	logger.info("fixing the episode status......");
-		List<Episode> episodes=repository.findAllEpisodes();		
-		for(Episode episode:episodes){
-			if(episode.getEpisodeStatus()==null){													  
-				fixEpisodeStatusIfEmpty(episode);
-				repository.persist(episode);
-			}			
+    	int beginIndex=0;
+		int rcordLimit=appConfig.getEpisodeRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
 		}
-		logger.info("Completed the fixing the episode status");
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				if(episodes.size()==0){
+					break;
+				}		
+							
+					for(Episode episode:episodes){
+							if(episode.getEpisodeStatus()==null){													  
+								fixEpisodeStatusIfEmpty(episode);
+								repository.persist(episode);
+							}							
+					}
+					if(episodes.size()<rcordLimit){
+						break;
+					}
+					else{
+						beginIndex+=rcordLimit;
+					}
+		}
+					logger.info("Completed the fixing the episode status");
     }
 	@Transactional
     public void deleteAllTasls(){
@@ -141,9 +179,25 @@ public class MetadataMaintainanceService {
     @Transactional     
     public void replaceIngestProfiles(String oldIngestProfile,String newIngestProfile){
     	logger.info("repacing the episode ingestProfile:oldIngestProfile="+oldIngestProfile+" newIngestProfile="+newIngestProfile);
-		List<Episode> episodes=repository.findAllEpisodes();		
-		for(Episode episode:episodes){
-			replaceIngestProfiles(episode,oldIngestProfile,newIngestProfile);												  					
+    	int beginIndex=0;
+		int rcordLimit=appConfig.getEpisodeRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
+		}
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				if(episodes.size()==0){
+					break;
+				}								
+				for(Episode episode:episodes){
+					replaceIngestProfiles(episode,oldIngestProfile,newIngestProfile);												  					
+				}
+				if(episodes.size()<rcordLimit){
+					break;					
+				}
+				else{
+					beginIndex+=rcordLimit;
+				}
 		}
 		logger.info("Completed the ingestprofile changes");
     }
@@ -201,10 +255,25 @@ public class MetadataMaintainanceService {
     }
 
     public void updateAllPublishedStatys(){
-    	List<Episode> episodes=repository.findAllEpisodes();
-		
-		for(Episode episode:episodes){
-			updatePublishedStatus(episode);  
+    	int beginIndex=0;
+		int rcordLimit=appConfig.getEpisodeRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
+		}
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				if(episodes.size()==0){
+					break;
+				}			
+				for(Episode episode:episodes){
+					updatePublishedStatus(episode);  
+				}
+				if(episodes.size()<rcordLimit){
+					break;
+				}
+				else{
+					beginIndex+=rcordLimit;
+				}
 		}
     }
     private void updatePublishedStatus(Episode episode){

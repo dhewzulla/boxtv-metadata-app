@@ -12,7 +12,7 @@ public class Series {
 	private SeriesGroup seriesGroup;
 	private Date lastModifiedAt;
 	private Date createdAt;
-	private List<uk.co.boxnetwork.model.Episode> episodes;
+	private List<uk.co.boxnetwork.data.Episode> episodes;
 	private String synopsis;
 	
 	
@@ -84,12 +84,7 @@ public class Series {
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
-	public List<uk.co.boxnetwork.model.Episode> getEpisodes() {
-		return episodes;
-	}
-	public void setEpisodes(List<uk.co.boxnetwork.model.Episode> episodes) {
-		this.episodes = episodes;
-	}
+	
 	public SeriesGroup getSeriesGroup() {
 		return seriesGroup;
 	}
@@ -101,6 +96,12 @@ public class Series {
 	}
 	public void setSynopsis(String synopsis) {
 		this.synopsis = synopsis;
+	}
+	public List<uk.co.boxnetwork.data.Episode> getEpisodes() {
+		return episodes;
+	}
+	public void setEpisodes(List<uk.co.boxnetwork.data.Episode> episodes) {
+		this.episodes = episodes;
 	}
 	
 	

@@ -37,8 +37,7 @@ public class SeriesTransformer  extends BoxRestTransformer{
 		}
 	}
 	private Object getAllSeries(MuleMessage message, String outputEncoding){
-			List<Series> series=metadataService.getAllSeries();
-				return series;
+			return metadataService.getAllSeries();				
 	}
     private Object getAnSeries(String seriesid, MuleMessage message, String outputEncoding){
 	  		Long id=Long.valueOf(seriesid);
