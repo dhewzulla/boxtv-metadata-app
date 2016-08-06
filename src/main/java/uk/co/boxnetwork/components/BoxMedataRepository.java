@@ -197,30 +197,39 @@ public class BoxMedataRepository {
     	   
        }
        
+      
+       
        @Transactional
-       public void removeScheduleEvents(List<ScheduleEvent> eventsToDelete){
-    	   if(eventsToDelete==null || eventsToDelete.size()==0){
-    		   return;
+       public void removeEpisode(Long episodeid){
+    	   Episode episode=entityManager.find(Episode.class, episodeid);
+    	   logger.info("The episode is going to be deleted:"+episodeid+":"+episode);
+    	   List<ScheduleEvent> eventsToDelete=findScheduleEventByEpisode(episode);
+    	   
+    	   if(eventsToDelete!=null && eventsToDelete.size()>0){
+    		   logger.info("removing the schedules:"+eventsToDelete.size());
+    		   for(ScheduleEvent evt:eventsToDelete){
+    			   ScheduleEvent event=entityManager.find(ScheduleEvent.class, evt.getId());
+    			   entityManager.remove(event);    			   
+    		   }
     	   }
-    	   for(ScheduleEvent evt:eventsToDelete){
-    		   ScheduleEvent event=entityManager.find(ScheduleEvent.class, evt.getId());
-    		   removeScheduleEvent(event);
+    	   if(episode.getCuePoints()!=null && episode.getCuePoints().size()>0){
+    		   logger.info("removing the cues:"+episode.getCuePoints().size());
+	    	   for(CuePoint cp:episode.getCuePoints()){
+	    		   entityManager.remove(cp);		    		   
+	    	   }
+	    	   episode.clearCuePoints();
+    	   }    	   
+    	   if(episode.getAvailabilities()!=null && episode.getAvailabilities().size()>0){
+    		   logger.info("Removing the vailability:"+episode.getAvailabilities());
+    		   for(AvailabilityWindow avail: episode.getAvailabilities()){
+    			   entityManager.remove(avail);
+    		   }
+    		   episode.clearCuePoints();
     	   }
-       }
-       @Transactional
-       public void removeCuePoints(Set<CuePoint> cuepoints){
-    	   if(cuepoints==null || cuepoints.size()==0){
-    		   return;
+    	   entityManager.remove(episode);    	   
+    	   if(episode.getEpisodeStatus()!=null){
+    		   entityManager.remove(episode.getEpisodeStatus());
     	   }
-    	   for(CuePoint cp:cuepoints){
-    		   CuePoint cuepoint=entityManager.find(CuePoint.class, cp.getId());
-    		   remove(cuepoint);
-    	   }
-       }
-       @Transactional
-       public void removeEpisode(Episode episode){
-    	   Episode ep=entityManager.find(Episode.class, episode.getId());
-    	   entityManager.remove(ep);
        }
        
        public void persisMediaTag(MediaTag mediaTag){

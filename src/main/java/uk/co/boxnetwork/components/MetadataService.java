@@ -346,7 +346,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		String programmeId=GenericUtilities.getProgrammeNumber(episode);
 		logger.info("contractNumber:"+contractNumber+" programmeId=["+programmeId+"]");
 		Series existingSeries=null;
-		SeriesGroup existingEeriesGroup=null;	
+		SeriesGroup existingSeriesGroup=null;	
 		Episode existingEpisode=null;		
 		
 		List<Episode> matchedEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(programmeId);		
@@ -361,7 +361,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				existingEpisode=matchedEpisodes.get(0);
 				existingSeries=existingEpisode.getSeries();
 				if(existingSeries!=null){
-					existingEeriesGroup=existingSeries.getSeriesGroup();
+					existingSeriesGroup=existingSeries.getSeriesGroup();
 				}
 		}	
 	    if(existingSeries==null && (!GenericUtilities.isNotValidCrid(contractNumber))){
@@ -374,23 +374,23 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		     }
 		     else{
 		    	 	existingSeries=matchSeries.get(0);		    	 	
-		    	 	existingEeriesGroup=existingSeries.getSeriesGroup();
+		    	 	existingSeriesGroup=existingSeries.getSeriesGroup();
 		     }
 	    }   
-		if(existingEeriesGroup==null && episode.getSeries() !=null && episode.getSeries().getSeriesGroup() !=null && (!GenericUtilities.isNotValidTitle(episode.getSeries().getSeriesGroup().getTitle()))){
+		if(existingSeriesGroup==null && episode.getSeries() !=null && episode.getSeries().getSeriesGroup() !=null && (!GenericUtilities.isNotValidTitle(episode.getSeries().getSeriesGroup().getTitle()))){
 			List<SeriesGroup> matchedSeriesGroups=boxMetadataRepository.findSeriesGroupByTitle(episode.getSeries().getSeriesGroup().getTitle());
 			if(matchedSeriesGroups.size()>0){
-				existingEeriesGroup=matchedSeriesGroups.get(0);
+				existingSeriesGroup=matchedSeriesGroups.get(0);
 			}
 			else{
-					existingEeriesGroup=new SeriesGroup();
-					episode.getSeries().getSeriesGroup().update(existingEeriesGroup);
-					boxMetadataRepository.persisSeriesGroup(existingEeriesGroup);
-					logger.info("created a nw series group:"+existingEeriesGroup);
+					existingSeriesGroup=new SeriesGroup();
+					episode.getSeries().getSeriesGroup().update(existingSeriesGroup);
+					boxMetadataRepository.persisSeriesGroup(existingSeriesGroup);
+					logger.info("created a nw series group:"+existingSeriesGroup);
 			}
 		}
-		else if(existingEeriesGroup==null){
-			existingEeriesGroup=boxMetadataRepository.retrieveDefaultSeriesGroup();
+		else if(existingSeriesGroup==null){
+			existingSeriesGroup=boxMetadataRepository.retrieveDefaultSeriesGroup();
 		}
 		
 		if(existingSeries==null && episode.getSeries()!=null && GenericUtilities.isNotValidTitle(episode.getSeries().getName())){
@@ -399,7 +399,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			if(GenericUtilities.isNotValidCrid(existingSeries.getContractNumber())){
 				existingSeries.setContractNumber(contractNumber);
 			}									
-			existingSeries.setSeriesGroup(existingEeriesGroup);
+			existingSeries.setSeriesGroup(existingSeriesGroup);
 			boxMetadataRepository.persisSeries(existingSeries);
 		}
 		if(existingEpisode==null){
@@ -710,22 +710,8 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
    }
    
    
-   public void deleteEpisodeById(Long episodeid){
-	   Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
-	   if(episode==null){
-		   logger.info("No epsiode to delete episodeid="+episodeid);
-		   return;
-	   }
-	   logger.info("The episode is going to be deleted:"+episode.getId()+":"+episode);
-	   List<ScheduleEvent> eventsToDelete=boxMetadataRepository.findScheduleEventByEpisode(episode);
-	   logger.info("The number of schedule events to be deleted:"+eventsToDelete.size());
-	   boxMetadataRepository.removeScheduleEvents(eventsToDelete);
-	   boxMetadataRepository.removeCuePoints(episode.getCuePoints());	   
-	   boxMetadataRepository.removeEpisode(episode);
-	   if(episode.getEpisodeStatus()!=null){
-		   	boxMetadataRepository.remove(episode.getEpisodeStatus());
-	   }
-	   
+   public void deleteEpisodeById(Long episodeid){	   
+		 boxMetadataRepository.removeEpisode(episodeid);
    }
    
    public void deleteSeriesGroupById(Long seriesgroupid){
