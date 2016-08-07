@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.AppConfig;
+import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
@@ -58,13 +59,15 @@ public class MetadataMaintainanceService {
 	@Transactional
 	public void fixTxChannel(){
 		logger.info("fixing the channel......");
-		int beginIndex=0;
-		int rcordLimit=appConfig.getEpisodeRecordLimit();
+		
+		int rcordLimit=appConfig.getRecordLimit();
 		if(rcordLimit<1){
 			rcordLimit=Integer.MAX_VALUE;
 		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
+		
 		while(true){
-				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
 				if(episodes.size()==0){
 					break;
 				}
@@ -73,11 +76,11 @@ public class MetadataMaintainanceService {
 						repository.persist(episode);
 					}			
 				}
-				if(episodes.size()<rcordLimit){
+				if(searchParam.isEnd(episodes.size())){
 					break;
 				}
 				else{
-					beginIndex+=rcordLimit;
+					searchParam.nextBatch();
 				}
 		}
 	}
@@ -101,13 +104,14 @@ public class MetadataMaintainanceService {
 	@Transactional
     public void fixEpisodeStatusIfEmpty(){
     	logger.info("fixing the episode status......");
-    	int beginIndex=0;
-		int rcordLimit=appConfig.getEpisodeRecordLimit();
+    	
+		int rcordLimit=appConfig.getRecordLimit();
 		if(rcordLimit<1){
 			rcordLimit=Integer.MAX_VALUE;
 		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
 		while(true){
-				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
 				if(episodes.size()==0){
 					break;
 				}		
@@ -118,11 +122,11 @@ public class MetadataMaintainanceService {
 								repository.persist(episode);
 							}							
 					}
-					if(episodes.size()<rcordLimit){
+					if(searchParam.isEnd(episodes.size())){
 						break;
 					}
 					else{
-						beginIndex+=rcordLimit;
+						searchParam.nextBatch();
 					}
 		}
 					logger.info("Completed the fixing the episode status");
@@ -179,24 +183,25 @@ public class MetadataMaintainanceService {
     @Transactional     
     public void replaceIngestProfiles(String oldIngestProfile,String newIngestProfile){
     	logger.info("repacing the episode ingestProfile:oldIngestProfile="+oldIngestProfile+" newIngestProfile="+newIngestProfile);
-    	int beginIndex=0;
-		int rcordLimit=appConfig.getEpisodeRecordLimit();
+    	
+		int rcordLimit=appConfig.getRecordLimit();
 		if(rcordLimit<1){
 			rcordLimit=Integer.MAX_VALUE;
 		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
 		while(true){
-				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
 				if(episodes.size()==0){
 					break;
 				}								
 				for(Episode episode:episodes){
 					replaceIngestProfiles(episode,oldIngestProfile,newIngestProfile);												  					
 				}
-				if(episodes.size()<rcordLimit){
-					break;					
+				if(searchParam.isEnd(episodes.size())){
+					break;
 				}
 				else{
-					beginIndex+=rcordLimit;
+					searchParam.nextBatch();
 				}
 		}
 		logger.info("Completed the ingestprofile changes");
@@ -216,16 +221,28 @@ public class MetadataMaintainanceService {
     
     
     public void removeOrphantSeriesGroup(){
-    	List<SeriesGroup> seriesGroups=repository.findAllSeriesGroup();
-    	List<SeriesGroup> orphanned=new ArrayList<SeriesGroup>();
-    	
-    	for(SeriesGroup sg:seriesGroups){
-    		List<Series> series=repository.findSeriesBySeriesGroup(sg);
-    		if(series.size()==0){
-    			orphanned.add(sg);
-    		}
+    	SearchParam searchParam=new SearchParam(null, 0, appConfig.getRecordLimit());
+    	while(true){
+		    	List<SeriesGroup> seriesGroups=repository.findAllSeriesGroup(searchParam);
+		    	if(seriesGroups.size()==0){
+					break;
+				}
+		    	List<SeriesGroup> orphanned=new ArrayList<SeriesGroup>();
+		    	
+		    	for(SeriesGroup sg:seriesGroups){
+		    		List<Series> series=repository.findSeriesBySeriesGroup(sg);
+		    		if(series.size()==0){
+		    			orphanned.add(sg);
+		    		}
+		    	}
+		    	repository.removeSeriesGroup(orphanned);
+		    	if(searchParam.isEnd(seriesGroups.size())){
+					break;
+				}
+				else{
+					searchParam.nextBatch();
+				}
     	}
-    	repository.removeSeriesGroup(orphanned);    	
     }
     
     
@@ -255,24 +272,25 @@ public class MetadataMaintainanceService {
     }
 
     public void updateAllPublishedStatys(){
-    	int beginIndex=0;
-		int rcordLimit=appConfig.getEpisodeRecordLimit();
+    	
+		int rcordLimit=appConfig.getRecordLimit();
 		if(rcordLimit<1){
 			rcordLimit=Integer.MAX_VALUE;
 		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
 		while(true){
-				List<Episode> episodes=repository.findAllEpisodes(beginIndex,rcordLimit);
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
 				if(episodes.size()==0){
 					break;
 				}			
 				for(Episode episode:episodes){
 					updatePublishedStatus(episode);  
 				}
-				if(episodes.size()<rcordLimit){
+				if(searchParam.isEnd(episodes.size())){
 					break;
 				}
 				else{
-					beginIndex+=rcordLimit;
+					searchParam.nextBatch();
 				}
 		}
     }

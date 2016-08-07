@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import uk.co.boxnetwork.components.MetadataService;
+import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.ErrorMessage;
+import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.SeriesGroup;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
@@ -21,6 +23,9 @@ import uk.co.boxnetwork.util.GenericUtilities;
 public class SeriesGroupTransformer extends BoxRestTransformer{
 	@Autowired
 	MetadataService metadataService;
+	
+	@Autowired
+	AppConfig appConfig;
 	
 	
 			
@@ -36,7 +41,8 @@ public class SeriesGroupTransformer extends BoxRestTransformer{
 		}
 	}
 	private Object getAllSeriesGroups(MuleMessage message, String outputEncoding){
-			return metadataService.getAllSeriesGroups();			
+			SearchParam searchParam=new SearchParam(message,appConfig);
+			return metadataService.getAllSeriesGroups(searchParam);			
 	}
     private Object getAnSeriesGroup(String seriesgroupdid, MuleMessage message, String outputEncoding){
 	  		Long id=Long.valueOf(seriesgroupdid);
