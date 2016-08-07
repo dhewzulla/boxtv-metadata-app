@@ -30,7 +30,16 @@ public class BCIngestNotificationTransformer extends BoxRestTransformer{
 							objectMapper.setSerializationInclusion(Include.NON_NULL);
 							String notificationInJson = (String)message.getPayloadAsString();
 							logger.info("Received bc notification:"+notificationInJson);
+							if(notificationInJson.indexOf("entity=ASSET")!=-1){
+								logger.info("Trying to correct the json format:"+notificationInJson);
+								notificationInJson=notificationInJson.replaceAll("\\{", "{\"");
+								notificationInJson=notificationInJson.replaceAll("\\}", "\"}");
+								notificationInJson=notificationInJson.replaceAll("\\=", "\":\"");
+								notificationInJson=notificationInJson.replaceAll("\\, ", "\", \"");
+								logger.info("corrected to:"+notificationInJson);								
+							}
 							BCNotification bcNotification = objectMapper.readValue(notificationInJson, BCNotification.class);
+							bcNotification.setId(null);
 							bcVideoService.persist(bcNotification);
 							medataService.notifyTranscode(bcNotification);							
 							return bcNotification;

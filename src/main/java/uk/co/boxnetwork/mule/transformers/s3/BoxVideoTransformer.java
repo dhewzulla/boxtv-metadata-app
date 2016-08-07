@@ -1,11 +1,10 @@
 package uk.co.boxnetwork.mule.transformers.s3;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,8 +14,9 @@ import org.mule.api.MuleMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StreamUtils;
 
+
 import uk.co.boxnetwork.components.S3BucketService;
-import uk.co.boxnetwork.data.s3.FileItem;
+
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 
 public class BoxVideoTransformer extends BoxRestTransformer{
@@ -40,16 +40,32 @@ public class BoxVideoTransformer extends BoxRestTransformer{
 		for(String attachementname:attachementnames){
 			logger.info("reciving::::"+attachementname);
 			DataHandler dataHandler=message.getInboundAttachment(attachementname);
-			
+			String filepath="/data/"+attachementname;
 			InputStream in;
+			OutputStream out=null;
 			try {
 				in = dataHandler.getInputStream();
-				OutputStream out=new FileOutputStream("/data/uploaded.mp4");
+				out=new FileOutputStream(filepath);
 				StreamUtils.copy(in, out);
-				out.close();				
+				out.close();
+				return s3uckerService.uploadFile(filepath, attachementname);
+				
 			} catch (IOException e) {
 				logger.error(e+ " whilte recevimg the upload",e);
 			}
+			finally{
+				try{
+					if(out!=null){
+						out.close();
+					}					
+				}
+				catch(Exception e){
+					logger.error(e+ " whilte close",e);
+				}
+				File file=new File(filepath);
+				file.delete();
+			}
+		
 			
 			break;
 		}

@@ -41,7 +41,13 @@ public class BCNotification {
     @Column(name="error_message")
     private String errorMessage;
     
-	
+    @Column(name="error")
+    private String error;
+    
+    @Column(name="referenceId")
+    private String referenceId;
+    
+    
 	public Long getId() {
 		return id;
 	}
@@ -129,6 +135,23 @@ public class BCNotification {
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
+
+	public String getReferenceId() {
+		return referenceId;
+	}
+
+	public void setReferenceId(String referenceId) {
+		this.referenceId = referenceId;
+	}
+	
   
 }
 

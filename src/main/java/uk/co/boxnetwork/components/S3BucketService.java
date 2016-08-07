@@ -1,5 +1,6 @@
 package uk.co.boxnetwork.components;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 
@@ -82,6 +84,17 @@ public class S3BucketService {
 		logger.info("******number of s3 file for prefix=["+prefix+"]:"+videoFilesLocations.getFiles().size());
 		
 		return videoFilesLocations;
+	}
+	public VideoFilesLocation uploadFile(String filepath, String destFilename){
+		VideoFilesLocation videoFileLocation=listFilesInVideoBucket(destFilename);
+		if(videoFileLocation.getFiles().size()>0){
+			throw new RuntimeException("The file already exist on the s3 buccket:"+videoFileLocation.getFiles().get(0));
+		}
+		AmazonS3 s3Client=getAmazonS3();
+		File file=new File(filepath);
+		s3Client.putObject(new PutObjectRequest(s3Configuration.getVideoBucket(), destFilename, file));
+		videoFileLocation.addFilename(destFilename);
+		return videoFileLocation;		
 	}
 	public VideoFileList listVideoFileItem(String prefix){
 		VideoFilesLocation videoFileLocation=listFilesInVideoBucket(prefix);
