@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.s3.VideoFilesLocation;
 import uk.co.boxnetwork.model.AvailabilityWindow;
@@ -38,9 +39,9 @@ public class MetadataService {
 	@Autowired
 	BCVideoService videoService;
 	
-	public List<uk.co.boxnetwork.data.SeriesGroup> getAllSeriesGroups(){
+	public List<uk.co.boxnetwork.data.SeriesGroup> getAllSeriesGroups(SearchParam searchParam){
 		List<uk.co.boxnetwork.data.SeriesGroup> seriesgrps=new ArrayList<uk.co.boxnetwork.data.SeriesGroup>();
-		List<SeriesGroup> seriesgroups=boxMetadataRepository.findAllSeriesGroup();
+		List<SeriesGroup> seriesgroups=boxMetadataRepository.findAllSeriesGroup(searchParam);
 		for(SeriesGroup seriesgroup:seriesgroups){
 			seriesgrps.add(new uk.co.boxnetwork.data.SeriesGroup(seriesgroup));	
 		}
@@ -61,14 +62,16 @@ public class MetadataService {
 		return ret;		
 	}
 	
-	public List<uk.co.boxnetwork.data.Episode> getAllEpisodes(int beginIndex, int recordLimit){		
-		return toDataEpisodes(boxMetadataRepository.findAllEpisodes(beginIndex,recordLimit));
+	public List<uk.co.boxnetwork.data.Episode> getAllEpisodes(SearchParam searchParam){		
+		return toDataEpisodes(boxMetadataRepository.findAllEpisodes(searchParam));
 	}
+	/*
 	public List<uk.co.boxnetwork.data.Episode> findEpisodes(String search){
 		List<Episode> eposides=boxMetadataRepository.findEpisodes(search);
 		logger.info("For search:"+search+" found matching:"+eposides.size());
 		return toDataEpisodes(eposides);
 	}
+	*/
 	private  List<uk.co.boxnetwork.data.Episode>  toDataEpisodes(List<Episode> eposides){
 		List<uk.co.boxnetwork.data.Episode> ret=new ArrayList<uk.co.boxnetwork.data.Episode>();
 		for(Episode episode:eposides){
@@ -92,8 +95,8 @@ public class MetadataService {
 	 
 	
 	
-public List<uk.co.boxnetwork.data.Series> getAllSeries(){		
-		 return toDataSeries(boxMetadataRepository.findAllSeries());
+public List<uk.co.boxnetwork.data.Series> getAllSeries(SearchParam searchParam){		
+		 return toDataSeries(boxMetadataRepository.findAllSeries(searchParam));
 	}
 public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	Series series=boxMetadataRepository.findSeriesById(id);
@@ -148,7 +151,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			episodeStatus.setMetadataStatus(metadataStatus);
 		}
 		else{
-			episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+			if(GenericUtilities.isNotAValidId(existingEpisode.getBrightcoveId())){
+				episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
+			}
+			else{
+				episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
+			}
+			
 		}
 		VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(existingEpisode,oldIngestSource,oldIngstProfile);
 		if(videoStatus!=null){
@@ -237,7 +246,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		if(metadataStatus!=null){
 			episodeStatus.setMetadataStatus(metadataStatus);
 		}
-		else{
+		else{			
 			episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
 		}
 		VideoStatus videoStatus=GenericUtilities.calculateVideoStatus(episode);
@@ -424,11 +433,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		else{	
 			   logger.info("Upating the existing episode");
 			    existingEpisode.setSeries(existingSeries);
-				episode.updateWhenReceivedByMaterialId(existingEpisode);
-				statusUpde(existingEpisode);
+				episode.updateWhenReceivedByMaterialId(existingEpisode);				
 				boxMetadataRepository.saveTags(episode.getTags());
-				existingEpisode.getEpisodeStatus().setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
-				boxMetadataRepository.persistEpisodeStatus(existingEpisode.getEpisodeStatus());
+				statusUpde(existingEpisode);
 				boxMetadataRepository.persist(existingEpisode);
 		}
 		replaceCuePoints(existingEpisode,episode.getCuePoints());		

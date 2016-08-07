@@ -120,7 +120,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          
          <spring:bean id="appConfiguration" class="uk.co.boxnetwork.data.AppConfig">
          	  
-         	  <spring:property name="episodeRecordLimit" value="${episode.record.limit}"/>
+         	  <spring:property name="recordLimit" value="${record.limit}"/>
          	  
          </spring:bean>
          

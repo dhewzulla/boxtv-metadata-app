@@ -5,6 +5,7 @@ import java.util.List;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.http.internal.ParameterMap;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import uk.co.boxnetwork.components.MetadataService;
+import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.ErrorMessage;
+import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
@@ -24,7 +27,11 @@ public class SeriesTransformer  extends BoxRestTransformer{
 	
 	@Autowired
 	MetadataService metadataService;
-			
+	
+	@Autowired
+	AppConfig appConfig;
+	
+	
 	@Override
 	protected  Object processGET(MuleMessage message, String outputEncoding){
 			
@@ -37,7 +44,9 @@ public class SeriesTransformer  extends BoxRestTransformer{
 		}
 	}
 	private Object getAllSeries(MuleMessage message, String outputEncoding){
-			return metadataService.getAllSeries();				
+		SearchParam searchParam=new SearchParam(message,appConfig);					    
+		return metadataService.getAllSeries(searchParam);					
+						
 	}
     private Object getAnSeries(String seriesid, MuleMessage message, String outputEncoding){
 	  		Long id=Long.valueOf(seriesid);
@@ -94,7 +103,7 @@ public class SeriesTransformer  extends BoxRestTransformer{
 			   uk.co.boxnetwork.data.Series series = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Series.class);
 			   if(GenericUtilities.isNotValidTitle(series.getName())){
 				   return returnError("Series title is not valid",message);				  
-			   }			   				   
+			   }				   
 			   uk.co.boxnetwork.data.Series sr=metadataService.createNewSeries(series);
 			   return sr;
 			   

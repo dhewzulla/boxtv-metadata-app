@@ -1,25 +1,21 @@
 package uk.co.boxnetwork.mule.transformers.metadata;
 
-import java.util.List;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+
 import org.mule.module.http.internal.ParameterMap;
-import org.mule.transformer.AbstractMessageTransformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import uk.co.boxnetwork.components.BCVideoService;
+
 import uk.co.boxnetwork.components.MetadataMaintainanceService;
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.ErrorMessage;
-import uk.co.boxnetwork.data.bc.BCVideoData;
-import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
@@ -49,30 +45,9 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		}
 		
 		private  Object getAllEpisodes(MuleMessage message, String outputEncoding){
-			
-			ParameterMap queryparams=message.getInboundProperty("http.query.params");
-			
-			if(queryparams==null || queryparams.get("search") ==null || queryparams.get("search").length()==0){
-				     
-				    int recordLimit=appConfig.getEpisodeRecordLimit();
-				    int beginIndex=0;
-				    int counter=0;				    
-				    if(queryparams!=null && queryparams.get("start")!=null){
-				    	try{
-				    		beginIndex=Integer.valueOf(queryparams.get("start"));
-				    	}
-				    	catch(Exception e){
-				    		logger.error(e+ " while convering the fromIndex value:"+queryparams.get("start"),e);
-				    	}
-				    }
-				    
-					return metadataService.getAllEpisodes(beginIndex,recordLimit);					
-			}
-			String search=queryparams.get("search");
-			if(search.indexOf("%")==-1){
-				search="%"+search+"%";				
-			}
-			return metadataService.findEpisodes(search);		    
+			SearchParam searchParam=new SearchParam(message,appConfig);
+		    return metadataService.getAllEpisodes(searchParam);		    			
+					    
 		}
 		
          private Object getAnEpisode(String episodeid, MuleMessage message, String outputEncoding){

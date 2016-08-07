@@ -1,14 +1,16 @@
 package uk.co.boxnetwork.data;
 
 public class AppConfig {
- private int episodeRecordLimit;
+ private int recordLimit;
 
-public int getEpisodeRecordLimit() {
-	return episodeRecordLimit;
+public int getRecordLimit() {
+	return recordLimit;
 }
 
-public void setEpisodeRecordLimit(int episodeRecordLimit) {
-	this.episodeRecordLimit = episodeRecordLimit;
+public void setRecordLimit(int recordLimit) {
+	this.recordLimit = recordLimit;
 }
+
+
  
 }

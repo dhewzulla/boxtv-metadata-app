@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.BCNotification;
@@ -575,8 +576,10 @@ public class BoxMedataRepository {
 	   public SeriesGroup findSeriesGroupById(Long id){
 		   return entityManager.find(SeriesGroup.class, id);		   
 	   }
-	   public List<Series> findAllSeries(){
-		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s", Series.class);
+	   public List<Series> findAllSeries(SearchParam searchParam){
+		   String queryString=searchParam.selectQuery("SELECT s FROM series s", "SELECT s FROM series s where s.name LIKE :search OR s.contractNumber LIKE :search");		   
+		   TypedQuery<Series> query=entityManager.createQuery(queryString, Series.class);
+		   searchParam.config(query);		   		   
 		   return query.getResultList();
 	   }
 	   
@@ -597,8 +600,10 @@ public class BoxMedataRepository {
 		   return defaultSeriesGroup;
 		   
 	   }
-	   public List<SeriesGroup> findAllSeriesGroup(){		   
-		   TypedQuery<SeriesGroup> query=entityManager.createQuery("SELECT p FROM series_group p order by p.title", SeriesGroup.class);
+	   public List<SeriesGroup> findAllSeriesGroup(SearchParam searchParam){
+		   String queryString=searchParam.selectQuery("SELECT p FROM series_group p order by p.title", "SELECT p FROM series_group p where p.title LIKE :search order by p.title ");		   
+		   TypedQuery<SeriesGroup> query=entityManager.createQuery(queryString, SeriesGroup.class);
+		   searchParam.config(query);		   		   
 		   return query.getResultList();
 	   }
 	   public List<Episode> findEpisodesByName(String name){
@@ -636,15 +641,11 @@ public class BoxMedataRepository {
 		   return entityManager.find(AvailabilityWindow.class, id);
 	   }
 	  
-	   public List<Episode> findAllEpisodes(int beginIndex, int recordLimit){
-		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e", Episode.class);
-		   query.setFirstResult(beginIndex);
-		   query.setMaxResults(recordLimit);
-		   return query.getResultList();
-	   }
-	   public List<Episode> findEpisodes(String search){
-		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title LIKE :search OR e.materialId LIKE :search OR e.series.name LIKE :search", Episode.class);
-		   return query.setParameter("search",search).getResultList();
+	   public List<Episode> findAllEpisodes(SearchParam searchParam){
+		   String queryString=searchParam.selectQuery("SELECT e FROM episode e", "SELECT e FROM episode e where e.title LIKE :search OR e.materialId LIKE :search OR e.series.name LIKE :search");		   
+		   TypedQuery<Episode> query=entityManager.createQuery(queryString, Episode.class);
+		   searchParam.config(query);		   		   
+		   return query.getResultList();		   
 	   }
 	   public List<Episode> findEpisodesByMatId(String matid){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.materialId LIKE :matid", Episode.class);
@@ -802,7 +803,13 @@ public class BoxMedataRepository {
 	   }
 	   public void markMetadataChanged(Episode episode){
 		   EpisodeStatus episodeStatus=episode.getEpisodeStatus();
-		   if(episodeStatus.getMetadataStatus()==MetadataStatus.PUBLISHED){
+		   if(GenericUtilities.isNotAValidId(episode.getBrightcoveId())){
+			   if(episodeStatus.getMetadataStatus()!=MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER){
+				   episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
+				   persistEpisodeStatus(episodeStatus);
+			   }			   
+		   }
+		   else if(episodeStatus.getMetadataStatus()==MetadataStatus.PUBLISHED){
 			   episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_PUBLISH_CHANGES);
 			   persistEpisodeStatus(episodeStatus);
 		   }
