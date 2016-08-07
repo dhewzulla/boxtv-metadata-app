@@ -25,5 +25,9 @@ public class VideoFilesLocation {
 		return files.get(0).getFile();			
 		
 	} 
-  
+  public void addFilename(String filename){
+	  FileItem fileItem=new FileItem();
+	  fileItem.setFile(filename);
+	  this.files.add(fileItem);
+  }
 }

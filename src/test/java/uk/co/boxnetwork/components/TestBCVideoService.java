@@ -18,9 +18,18 @@ public class TestBCVideoService {
 	public void jsonToBCVideoDataShouldReturnBCVideoData() throws IOException{
 		InputStream ins=LoadResourceAsInputStream.class.getClassLoader().getResourceAsStream("data/bc/bc-video.json");
 		String jsonText=IOUtils.toString(ins);
-		System.out.println(jsonText);
+		//System.out.println(jsonText);
 		BCVideoService videoService=new BCVideoService();
 		BCVideoData videoData=videoService.jsonToBCVideoData(jsonText);
 		assertEquals("drm ", "True", videoData.getCustom_fields().getDrm());
+	}
+	@Test
+	public void testConvertInvalidJson(){
+		String message="{id=5074307031001, entity=ASSET, status=SUCCESS, error=null, action=CREATE, referenceId=}";
+		message=message.replaceAll("\\{", "{\"");
+		message=message.replaceAll("\\}", "\"}");
+		message=message.replaceAll("\\=", "\":\"");
+		message=message.replaceAll("\\, ", "\", \"");
+		System.out.println("result:"+message);
 	}
 }
