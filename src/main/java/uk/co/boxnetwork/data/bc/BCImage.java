@@ -1,10 +1,22 @@
 package uk.co.boxnetwork.data.bc;
 
-public class BCImage{
+import uk.co.boxnetwork.data.AppConfig;
+import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.util.GenericUtilities;
+
+public class BCImage{	
 	private String asset_id;
 	private Boolean remote;
 	private String src;
 	private BCImageSource[] sources;
+	
+	public BCImage(){
+		
+	}
+	public BCImage(String imagename,Episode episode, AppConfig appConfig, int width, int height){
+		src=GenericUtilities.getImageWithSize(appConfig, imagename, width, height);
+	}
+	
 	public String getAsset_id() {
 		return asset_id;
 	}

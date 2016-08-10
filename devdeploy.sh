@@ -3,7 +3,7 @@ version=1.0.1.zip
 cd ~/box-config
 git add . --all
 git commit -m "developing"
-git push origin master
+git push origin develop
 cd -
 ssh davran@www.davran.co.uk 'cd ~/box-config && git pull origin'
 
