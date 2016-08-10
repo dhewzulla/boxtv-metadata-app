@@ -78,7 +78,13 @@ public class EpisodeTransformer extends BoxRestTransformer{
 					episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
 		   }
 		   metadataService.update(id,episode);
-		   return metadataService.publishMetadatatoBCByEpisodeId(id);		   
+		   if(appConfig.getBrightcoveStatus()){
+			   return metadataService.publishMetadatatoBCByEpisodeId(id);
+		   }
+		   else{
+			   logger.info("Skipping the auto publish to brightcove");
+			   return episode;
+		   }
 		}  
          
          
@@ -102,7 +108,14 @@ public class EpisodeTransformer extends BoxRestTransformer{
 					   episode=metadataService.updateEpisodeById(episode);	
 				   }
 				   if(episode.getEpisodeStatus()!=null && episode.getEpisodeStatus().getMetadataStatus()==MetadataStatus.NEEDS_TO_PUBLISH_CHANGES){
-					   return metadataService.publishMetadatatoBCByEpisodeId(episode.getId());
+					   if(appConfig.getBrightcoveStatus()){
+						   return metadataService.publishMetadatatoBCByEpisodeId(episode.getId());   
+					   }
+					   else{
+						   logger.info("Skipping the auto publish to brightcove");
+						   return episode;
+					   }
+					   
 				   }
 				   else{
 					   return episode;

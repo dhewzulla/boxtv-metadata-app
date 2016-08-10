@@ -210,7 +210,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		if(GenericUtilities.isNotValidCrid(existingEpisode.getImageURL())){
 			String fname=retrieveEpisodeImageFromS3(existingEpisode);
 			if(fname!=null){
-				existingEpisode.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+				existingEpisode.setImageURL(fname);				
 			}
 		}		
 		boxMetadataRepository.persist(existingEpisode);		
@@ -225,7 +225,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		if(GenericUtilities.isNotValidCrid(existingSeriesGroup.getImageURL())){
 			String fname=retrieveSeriesGroupImageFromS3(existingSeriesGroup);
 			if(fname!=null){
-				existingSeriesGroup.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+				existingSeriesGroup.setImageURL(fname);				
 			}
 		}
 		
@@ -505,7 +505,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			String fname=retrieveSeriesGroupImageFromS3(existingSeriesGroup);
 			if(fname!=null){
 				if(GenericUtilities.isNotValidCrid(existingSeriesGroup.getImageURL())){
-					existingSeriesGroup.setImageURL(s3BucketService.getMasterImageFullURL(fname));
+					existingSeriesGroup.setImageURL(fname);
 					boxMetadataRepository.mergeSeriesGroup(existingSeriesGroup);
 				}
 			}
@@ -526,7 +526,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			if(GenericUtilities.isNotValidCrid(existingEpisode.getImageURL())){
 				String fname=retrieveEpisodeImageFromS3(existingEpisode);
 				if(fname!=null){
-					existingEpisode.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+					existingEpisode.setImageURL(fname);				
 				}
 			}			
 			boxMetadataRepository.persist(existingEpisode);
@@ -565,7 +565,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		if(GenericUtilities.isNotValidCrid(existingSeries.getImageURL())){
 			String fname=retrieveSeriesImageFromS3(existingSeries);
 			if(fname!=null){
-				existingSeries.setImageURL(s3BucketService.getMasterImageFullURL(fname));
+				existingSeries.setImageURL(fname);
 				boxMetadataRepository.mergeSeries(existingSeries);
 			}
 		}
@@ -695,7 +695,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			if(GenericUtilities.isNotValidCrid(newSeriesGroup.getImageURL())){
 				String fname=retrieveSeriesGroupImageFromS3(newSeriesGroup);
 				if(fname!=null){
-					newSeriesGroup.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+					newSeriesGroup.setImageURL(fname);				
 				}
 			}
 			boxMetadataRepository.persisSeriesGroup(newSeriesGroup);
@@ -1036,47 +1036,47 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   }
   
   
-  private boolean matchImageToEpisodes(List<Episode> matchedEpisodes,String fullImageURL){
+  private boolean matchImageToEpisodes(List<Episode> matchedEpisodes,String imagefile){
 	  if(matchedEpisodes==null||matchedEpisodes.size()==0){
 		  return false;
 	  }	 
 	   for(Episode episode:matchedEpisodes){					  					  
 			  if(GenericUtilities.isNotValidCrid(episode.getImageURL())){
-				  logger.info("setting imageURL for episode:"+episode.getId()+":"+fullImageURL);
-				  boxMetadataRepository.setEpisodeImage(episode.getId(), fullImageURL);
+				  logger.info("setting imageURL for episode:"+episode.getId()+":"+imagefile+":"+imagefile);
+				  boxMetadataRepository.setEpisodeImage(episode.getId(), imagefile);
 			  }
 			  else{
-				  logger.info("imageURL is already set for episode:"+episode.getId()+":"+fullImageURL);						  
+				  logger.info("imageURL is already set for episode:"+episode.getId()+":"+imagefile+":"+imagefile);						  
 			  }
 	   }				  
 	  return true;
   }
-  private boolean matchImageToSeries(List<Series> matchedSeries,String fullImageURL){
+  private boolean matchImageToSeries(List<Series> matchedSeries,String ImageName){
 	  if(matchedSeries==null || matchedSeries.size()==0){
 		  return false;
 	  }
 	  for(Series series:matchedSeries){					  					  
 			  if(GenericUtilities.isNotValidCrid(series.getImageURL())){
-				  logger.info("setting imageURL for series:"+series.getId()+":"+fullImageURL);
-				  boxMetadataRepository.setSeriesImage(series.getId(), fullImageURL);
+				  logger.info("setting imageURL for series:"+series.getId()+":"+ImageName);
+				  boxMetadataRepository.setSeriesImage(series.getId(), ImageName);
 			  }
 			  else{
-				  logger.info("imageURL is already set for series:"+series.getId()+":"+fullImageURL);						  
+				  logger.info("imageURL is already set for series:"+series.getId()+":"+ImageName);						  
 			  }		  
 	   }				  
 		  return true;
   }
-private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,String fullImageURL){
+private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,String imagefile){
 	if(matchedSeriesGroup==null || matchedSeriesGroup.size()==0){
 		  return false;
 	  }	  
 	 for(SeriesGroup seriesgroup:matchedSeriesGroup){
 			  if(GenericUtilities.isNotValidCrid(seriesgroup.getImageURL())){
-				  logger.info("setting imageURL for series group:"+seriesgroup.getId()+":"+fullImageURL);
-				  boxMetadataRepository.setSeriesGroupImage(seriesgroup.getId(), fullImageURL);
+				  logger.info("setting imageURL for series group:"+seriesgroup.getId()+":"+imagefile);
+				  boxMetadataRepository.setSeriesGroupImage(seriesgroup.getId(), imagefile);
 			  }
 			  else{
-				  logger.info("imageURL is already for series group:"+seriesgroup.getId()+":"+fullImageURL);
+				  logger.info("imageURL is already for series group:"+seriesgroup.getId()+":"+imagefile);
 			  }
 		  }
 	 return true;
@@ -1101,20 +1101,20 @@ private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,Str
 		  return;
 	  }
 	  
-	  String fullImageURL=s3BucketService.getMasterImageFullURL(imagefile);	        
+	  	        
 	  if(parts.length==1){		  			  
 		      List<Series> matchedSeries=boxMetadataRepository.findSeriesByContractNumber(parts[0]);
-			  if(matchImageToSeries(matchedSeries,fullImageURL)){
+			  if(matchImageToSeries(matchedSeries,imagefile)){
 				  logger.info("matched contractnumber for the series");				  
 			  }	
 			  List<SeriesGroup> matchedSeriesGroup=boxMetadataRepository.findSeriesGroupByTitle(GenericUtilities.fromWebsafeTitle(parts[0]));
-			  if(matchImageToSeriesGroup(matchedSeriesGroup,fullImageURL)){
+			  if(matchImageToSeriesGroup(matchedSeriesGroup,imagefile)){
 				  logger.info("matched series group with title");				
 			  }	
 			  return;
 	  }
 	  List<Episode> matchedEpisodes=boxMetadataRepository.findEpisodesByMatId(GenericUtilities.partsToMatId(parts,0));
-	  if(matchImageToEpisodes(matchedEpisodes,fullImageURL)){
+	  if(matchImageToEpisodes(matchedEpisodes, imagefile)){
 		  logger.info("matched material id");
 		  return;
 	  }	
@@ -1123,21 +1123,21 @@ private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,Str
       
 	  List<Series> matchedSeries=boxMetadataRepository.findSeriesByNameAndContractNumber(matchTitle,matid);
 	 
-	   if(matchImageToSeries(matchedSeries, fullImageURL)){
+	   if(matchImageToSeries(matchedSeries, imagefile)){
 		  logger.info("matched series by name and contract number");
 		  return;	
 	   }
 	  
 	  matchedEpisodes=boxMetadataRepository.findEpisodesByTitleAndProgramId(matchTitle,matid);
 	  
-      if(matchImageToEpisodes(matchedEpisodes, fullImageURL)){
+      if(matchImageToEpisodes(matchedEpisodes, imagefile)){
 			  logger.info("matched episodes for title and programmeid");
 			  return;
 	  }
       
       if(parts.length>2){
     	  matchedEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(matid);
-    	  matchImageToEpisodes(matchedEpisodes, fullImageURL);
+    	  matchImageToEpisodes(matchedEpisodes, imagefile);
       }      
   }
 }

@@ -11,7 +11,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-
+import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
@@ -77,7 +77,7 @@ public class BCVideoData {
 			 }
 		 }
 		 
-		 public BCVideoData(Episode episode,List<ScheduleEvent> schedules){			 	
+		 public BCVideoData(Episode episode,List<ScheduleEvent> schedules,AppConfig appConfig){			 	
 			 this.name=episode.getTitle();		
 			 if(episode.getTags()!=null){
 				 this.tags=episode.getTags().split(",");
@@ -96,10 +96,27 @@ public class BCVideoData {
 			populateCuePoints(episode);
 			if(episode.getGeoAllowedCountries()!=null && episode.getGeoAllowedCountries().trim().length()>0){
 				geo=new BCGeo(episode);				
-			}			
+			}	
+//			String imagename=calculateImageURL(episode);
+//			if(imagename!=null){
+//				images=new BCImages(imagename,episode,appConfig);
+//				
+//				
+//			}
 			calculateSchedule(episode, schedules);
 			
 			
+		 }
+		 public String calculateImageURL(Episode episode){
+			 String imagename=episode.getImageURL();
+			 if(imagename==null && episode.getSeries()!=null){
+				 imagename=episode.getSeries().getImageURL();
+			 }
+			 if(imagename==null && episode.getSeries()!=null && episode.getSeries().getSeriesGroup()!=null){
+				 imagename=episode.getSeries().getSeriesGroup().getImageURL();
+			 }
+			 return imagename;
+			 
 		 }
 		 public void populateCuePoints(Episode episode){
 			 if(episode.getCuePoints()==null|| episode.getCuePoints().size()==0){
@@ -317,6 +334,7 @@ public class BCVideoData {
 			  if(bcVideo.getReference_id()!=null){
 				  this.reference_id=bcVideo.getReference_id();
 			  }
+			 
 		}
 		public void calculateSchedule(Episode episode,List<ScheduleEvent> schedules){
 			Set<AvailabilityWindow> availabilityWindows=episode.getAvailabilities();			

@@ -120,10 +120,10 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          	  
          </spring:bean>
          
-         <spring:bean id="appConfiguration" class="uk.co.boxnetwork.data.AppConfig">
-         	  
+         <spring:bean id="appConfiguration" class="uk.co.boxnetwork.data.AppConfig">         	  
          	  <spring:property name="recordLimit" value="${record.limit}"/>
-         	  
+         	  <spring:property name="imagetemplateurl" value="${image.templateurl}"/>
+         	  <spring:property name="brightcoveStatus" value="${brightcove.status}"/>         	  
          </spring:bean>
          
          

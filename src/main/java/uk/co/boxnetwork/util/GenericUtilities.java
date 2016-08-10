@@ -15,8 +15,7 @@ import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
+import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.VideoStatus;
@@ -381,6 +380,21 @@ public class GenericUtilities {
 		calendar.set(Calendar.DAY_OF_MONTH, 31);
 		return calendar.getTime();
   }
-
+	public static String getImageWithSize(AppConfig config, String imagename, int width, int height){
+		String basename=imagename;
+		String ext="";
+		int ib=imagename.indexOf(".");
+						
+		if(ib!=-1){
+			 basename=imagename.substring(0,ib);
+			 ext=imagename.substring(ib+1);
+		}
+		String template=config.getImagetemplateurl();
+		String imgURL=template.replace("{image_name}",basename);
+		imgURL=imgURL.replace("{width}", String.valueOf(width));
+		imgURL=imgURL.replace("{height}", String.valueOf(height));
+		imgURL=imgURL.replace("{ext}", ext);
+		return imgURL;
+	}
 }
 

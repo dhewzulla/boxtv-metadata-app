@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.FileIngestRequest;
 import uk.co.boxnetwork.data.bc.BCAccessToken;
 import uk.co.boxnetwork.data.bc.BCConfiguration;
@@ -48,6 +49,11 @@ public class BCVideoService {
 	private static final Logger logger=LoggerFactory.getLogger(BCVideoService.class);
 	@Autowired
     private BCConfiguration configuration;
+	
+	
+	@Autowired
+	private AppConfig appConfig;
+	
 	
 	@Autowired
 	private BCAccessTokenService bcAccessToenService;
@@ -388,7 +394,7 @@ public class BCVideoService {
 		  }
 		  
 		  List<ScheduleEvent> schedules=metadataRepository.findScheduleEventByEpisode(episode);
-		  BCVideoData newbcVideoData=new BCVideoData(episode,schedules);
+		  BCVideoData newbcVideoData=new BCVideoData(episode,schedules,appConfig);
 		  
 		  if(episode.getBrightcoveId()==null){			 
 			  newbcVideoData.setName(newbcVideoData.getName());			  
