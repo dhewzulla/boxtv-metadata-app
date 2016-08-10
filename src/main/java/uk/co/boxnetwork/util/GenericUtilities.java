@@ -213,7 +213,7 @@ public class GenericUtilities {
 	  
   }
   
-  public static String materialIdToFileName(String materialID){
+  public static String materialIdToVideoFileName(String materialID){
 	  String matParts[]=materialID.split("/");
 		 StringBuilder filenameBuilder=new StringBuilder();
 		 filenameBuilder.append("V");
@@ -231,7 +231,7 @@ public class GenericUtilities {
   public static String fileNameToMaterialID(String filename){
 	  if(filename.startsWith("V_") || filename.startsWith("v_")){
 		  String fpath=filename.substring(2);
-		  int ie=filename.indexOf(".");
+		  int ie=fpath.indexOf(".");
 		  if(ie!=-1){
 			  fpath=fpath.substring(0,ie);
 		  }
@@ -328,4 +328,46 @@ public class GenericUtilities {
 		}
 		return null;		
 	}
+  public static String toWebsafeTitle(String title){
+	  if(title==null||title.length()==0){
+		  return title;
+	  }
+	  return   title.replaceAll("[&\\/\\\\#,\\ +()$~%.'\":*?<>{}]","-");	  	  
+  }
+  public static String fromWebsafeTitle(String websafeTitle){
+	  if(websafeTitle==null||websafeTitle.length()==0){
+		  return websafeTitle;
+	  }	  
+	  return websafeTitle.replace("-", "_");	  
+  }
+  public static String partsToMatId(String [] parts, int first){
+	  if(first>=parts.length){
+		  return null;
+	  }
+	  StringBuilder builder=new StringBuilder();
+	  builder.append(parts[first]);	  
+	  for(int i=first+1;i<parts.length;i++){
+		  builder.append("/");
+		  builder.append(parts[i]);
+	  }
+	  return builder.toString();
+  }
+  public static String materialIdToImageFileName(String materialId){
+	  if(materialId==null){
+		  return null;
+	  }
+	  else{
+		  return materialId.replace("/", "_");		  
+	  }
+  }
+  public static String fixChannel(String channelName){
+	  if("Box Hits (SmashHits)".equals(channelName)){		  
+		  return "Box Hits";
+	  }
+	  else if("Box Upfront (Heat)".equals(channelName)){
+		  return "Box Upfront";
+	  }
+	 return channelName;
+  }
 }
+

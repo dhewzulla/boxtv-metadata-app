@@ -15,6 +15,11 @@ public class BCCustomFields {
   private String episodenumber;
   private String drm;
   private String excludeddevices;
+  private String sponsorship;
+  private String artist;
+  private String productplacement;
+  
+  
   
   
   
@@ -24,7 +29,13 @@ public class BCCustomFields {
   }
   public BCCustomFields(Episode episode){
 	  if(episode.getSeries()!=null){
-		  this.seriestitle= episode.getSeries().getName();		  
+		  this.seriestitle= episode.getSeries().getName();	
+		  if(episode.getSeries().getSeriesNumber()!=null){
+			  seriesnumber=String.valueOf(episode.getSeries().getSeriesNumber());
+			  if(seriesnumber.length()==1){
+				  seriesnumber="0"+seriesnumber;
+			  }
+		  }
 	  }
 	  if(episode.getCertType()!=null){
 		  certificationtype=episode.getCertType().getBcName();
@@ -33,6 +44,7 @@ public class BCCustomFields {
 		  programmetitle= episode.getSeries().getSeriesGroup().getTitle();
 		  programmesynopsis=episode.getSeries().getSeriesGroup().getSynopsis();
 	  }
+	
 	  warningtext=episode.getWarningText();	  		 
 	  if(episode.getNumber()!=null){
 		  episodenumber=String.valueOf(episode.getNumber());
@@ -48,6 +60,12 @@ public class BCCustomFields {
 	  }
 	  if(episode.getExcludeddevices()!=null){
 		  excludeddevices=episode.getExcludeddevices();				 
+	  }
+	  if(episode.getIngestProfile()!=null && episode.getIngestProfile().endsWith("-DRM-profile")){
+		  drm="True";
+	  }
+	  else{
+		  drm="False";		  
 	  }
 	  
   }
@@ -116,6 +134,24 @@ public String getExcludeddevices() {
 }
 public void setExcludeddevices(String excludeddevices) {
 	this.excludeddevices = excludeddevices;
+}
+public String getSponsorship() {
+	return sponsorship;
+}
+public void setSponsorship(String sponsorship) {
+	this.sponsorship = sponsorship;
+}
+public String getArtist() {
+	return artist;
+}
+public void setArtist(String artist) {
+	this.artist = artist;
+}
+public String getProductplacement() {
+	return productplacement;
+}
+public void setProductplacement(String productplacement) {
+	this.productplacement = productplacement;
 }
 
  

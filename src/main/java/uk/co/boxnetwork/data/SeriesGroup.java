@@ -14,17 +14,21 @@ public class SeriesGroup {
 	private Date lastModifiedAt;
 	private Date createdAt;
 	private List<Series> series=new ArrayList<Series>();
+	private String imageURL;
 	
 	public SeriesGroup(uk.co.boxnetwork.model.SeriesGroup prg){
-		id=prg.getId();
-		title=prg.getTitle();
-		synopsis=prg.getSynopsis();		
-		lastModifiedAt=prg.getLastModifiedAt();
-		createdAt=prg.getCreatedAt();
+		this.id=prg.getId();
+		this.title=prg.getTitle();
+		this.synopsis=prg.getSynopsis();		
+		this.lastModifiedAt=prg.getLastModifiedAt();
+		this.createdAt=prg.getCreatedAt();
+		this.imageURL=prg.getImageURL();
+				
 	}
 	public void update(uk.co.boxnetwork.model.SeriesGroup seriesgroup){
 		seriesgroup.setTitle(this.title);
 		seriesgroup.setSynopsis(this.synopsis);
+		seriesgroup.setImageURL(this.imageURL);
 	}
 	public SeriesGroup(){
 		
@@ -70,5 +74,12 @@ public class SeriesGroup {
 	   this.series.add(series);
 	   
    }
+	public String getImageURL() {
+		return imageURL;
+	}
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+   
 	
 }

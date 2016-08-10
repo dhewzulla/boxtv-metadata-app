@@ -56,5 +56,22 @@ http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/cu
     </flow>
     
     
+    <flow name="box-master-image-service">
+        <http:listener config-ref="http_metadata_inbound_listener" path="${boxtv_metadata_app.images.master.path}" doc:name="HTTP"/>
+        <choice doc:name="Choice">
+	         <when expression="#[message.inboundProperties['http.method'] == 'OPTIONS']">
+	         	<transformer ref="doNothingTransformer"/>         	
+	  		 </when>
+	    	<otherwise>
+	        	<http:basic-security-filter realm="mule-realm"/>
+	        	<transformer ref="boxMasterImageTransfoer" doc:name="Box Video"/>
+	        	    	
+	        </otherwise>
+	    </choice>
+        
+        
+                                 		
+    </flow>
+    
     
 </mule>

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.validator.jtype.Generic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoData;
-import uk.co.boxnetwork.data.s3.VideoFilesLocation;
+import uk.co.boxnetwork.data.s3.MediaFilesLocation;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.CuePoint;
@@ -198,12 +199,26 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		boxMetadataRepository.saveTags(episode.getTags());
 		logger.info("After upating the episode:"+existingEpisode);
 		checkS3ToUpdateVidoStatus(existingEpisode);
+		if(GenericUtilities.isNotValidCrid(existingEpisode.getImageURL())){
+			String fname=retrieveEpisodeImageFromS3(existingEpisode);
+			if(fname!=null){
+				existingEpisode.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+			}
+		}		
 		boxMetadataRepository.persist(existingEpisode);		
 	}
 	
 	public void update(long id, uk.co.boxnetwork.data.SeriesGroup seriesGroup){
 		SeriesGroup existingSeriesGroup=boxMetadataRepository.findSeriesGroupById(id);		
 		seriesGroup.update(existingSeriesGroup);
+		if(GenericUtilities.isNotValidCrid(existingSeriesGroup.getImageURL())){
+			String fname=retrieveSeriesGroupImageFromS3(existingSeriesGroup);
+			if(fname!=null){
+				existingSeriesGroup.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+			}
+		}
+		
+
 		boxMetadataRepository.mergeSeriesGroup(existingSeriesGroup);
 		
 		List<SeriesGroup> matchedSeriesGroups=boxMetadataRepository.findSeriesGroupByTitle(seriesGroup.getTitle());
@@ -289,6 +304,61 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		}
 	}
 	
+	public String retrieveSeriesGroupImageFromS3(SeriesGroup seriesGroup){
+		if(seriesGroup==null){			
+			return null;			
+		}
+		if(GenericUtilities.isNotValidTitle(seriesGroup.getTitle())){
+			logger.info("Series group does not have valid title");
+			return null;
+		}
+		String websafeTitle=GenericUtilities.toWebsafeTitle(seriesGroup.getTitle());
+		MediaFilesLocation matchedImages=s3BucketService.listMasterImagesInImagesBucket(websafeTitle);
+		logger.info("matching the file name in the image s3 bucket:websafeTitle=["+websafeTitle+"]matchedImages:"+matchedImages.getFiles().size());
+		return matchedImages.retrieveMatchBasefilename(websafeTitle);		
+	}
+	public String retrieveSeriesImageFromS3(Series series){
+		if(series==null){
+			return null;
+		}		
+		if(GenericUtilities.isNotValidContractNumber(series.getContractNumber())){
+			return null;			
+		}				
+		MediaFilesLocation matchedImages=s3BucketService.listMasterImagesInImagesBucket(series.getContractNumber());
+		String matchfilename=matchedImages.retrieveMatchBasefilename(series.getContractNumber());
+		if(matchfilename!=null){
+			return matchfilename;
+		}
+		if(GenericUtilities.isNotValidTitle(series.getName())){
+			return null;
+		}
+		String websafetitle=GenericUtilities.toWebsafeTitle(series.getName());	
+		matchedImages=s3BucketService.listMasterImagesInImagesBucket(websafetitle+"_"+series.getContractNumber());
+		return matchedImages.retrieveMatchBasefilename(websafetitle+"_"+series.getContractNumber());
+	}
+	public String retrieveEpisodeImageFromS3(Episode episode){
+		if(episode==null){
+			return null;
+		}	
+		String matchedfile=null;
+		if(!GenericUtilities.isNotValidCrid(episode.getMaterialId())){
+			String matid=GenericUtilities.materialIdToImageFileName(episode.getMaterialId());			
+			MediaFilesLocation matchedEpisodeImages=s3BucketService.listMasterImagesInImagesBucket(matid);
+			matchedfile=matchedEpisodeImages.retrieveMatchBasefilename(matid);
+			if(matchedfile!=null){
+				return matchedfile;
+			}
+		}
+		if(GenericUtilities.isNotValidContractNumber(episode.getCtrPrg()) || GenericUtilities.isNotValidTitle(episode.getTitle()) ){				
+			return null;
+		}		
+		String websafeTitle=GenericUtilities.toWebsafeTitle(episode.getTitle());
+		String matid=GenericUtilities.materialIdToImageFileName(episode.getMaterialId());		
+		MediaFilesLocation matchedEpisodeImages=s3BucketService.listMasterImagesInImagesBucket(websafeTitle+"_"+matid);				
+		return matchedEpisodeImages.retrieveMatchBasefilename(websafeTitle+"_"+matid);
+	}
+	
+	
 	@Transactional
 	public uk.co.boxnetwork.data.Episode updateEpisodeById(uk.co.boxnetwork.data.Episode episode){
 		Episode episodeInDB=boxMetadataRepository.findEpisodeById(episode.getId());
@@ -371,6 +441,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				existingSeries=existingEpisode.getSeries();
 				if(existingSeries!=null){
 					existingSeriesGroup=existingSeries.getSeriesGroup();
+					
 				}
 		}	
 		if(existingSeries==null && episode.getSeries()!=null && episode.getSeries().getId()!=null){
@@ -417,6 +488,17 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			existingSeries.setSeriesGroup(existingSeriesGroup);
 			boxMetadataRepository.persisSeries(existingSeries);
 		}
+		if(GenericUtilities.isNotValidCrid(existingSeriesGroup.getImageURL())){
+			String fname=retrieveSeriesGroupImageFromS3(existingSeriesGroup);
+			if(fname!=null){
+				if(GenericUtilities.isNotValidCrid(existingSeriesGroup.getImageURL())){
+					existingSeriesGroup.setImageURL(s3BucketService.getMasterImageFullURL(fname));
+					boxMetadataRepository.mergeSeriesGroup(existingSeriesGroup);
+				}
+			}
+		}
+		checks3ToSetSeriesImage(existingSeries);
+		
 		if(existingEpisode==null){
 			logger.info("creating a new episode");
 			existingEpisode=new Episode();			
@@ -428,6 +510,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			boxMetadataRepository.persistEpisodeStatus(episodeStatus);
 			existingEpisode.setEpisodeStatus(episodeStatus);
 			boxMetadataRepository.saveTags(episode.getTags());
+			if(GenericUtilities.isNotValidCrid(existingEpisode.getImageURL())){
+				String fname=retrieveEpisodeImageFromS3(existingEpisode);
+				if(fname!=null){
+					existingEpisode.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+				}
+			}
+			
 			boxMetadataRepository.persist(existingEpisode);
 		}		
 		else{	
@@ -436,6 +525,12 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				episode.updateWhenReceivedByMaterialId(existingEpisode);				
 				boxMetadataRepository.saveTags(episode.getTags());
 				statusUpde(existingEpisode);
+				if(GenericUtilities.isNotValidCrid(existingEpisode.getImageURL())){
+					String fname=retrieveEpisodeImageFromS3(existingEpisode);
+					if(fname!=null){
+						existingEpisode.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+					}
+				}
 				boxMetadataRepository.persist(existingEpisode);
 		}
 		replaceCuePoints(existingEpisode,episode.getCuePoints());		
@@ -449,7 +544,18 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	@Transactional
 	public uk.co.boxnetwork.data.Series createNewSeries(uk.co.boxnetwork.data.Series series){
 		Series ser=createOrUpdateSeries(series, series.getContractNumber());
+		checks3ToSetSeriesImage(ser);
 		return new uk.co.boxnetwork.data.Series(ser);
+	}
+	
+	private void checks3ToSetSeriesImage(Series existingSeries){
+		if(GenericUtilities.isNotValidCrid(existingSeries.getImageURL())){
+			String fname=retrieveSeriesImageFromS3(existingSeries);
+			if(fname!=null){
+				existingSeries.setImageURL(s3BucketService.getMasterImageFullURL(fname));
+				boxMetadataRepository.mergeSeries(existingSeries);
+			}
+		}
 	}
 	public Series createOrUpdateSeries(uk.co.boxnetwork.data.Series series, String contractNumber){
 		if(series==null){
@@ -470,6 +576,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 						series.setContractNumber(contractNumber);
 					}
 					existingSeries.setSeriesGroup(sg);
+					
 					boxMetadataRepository.persisSeries(existingSeries);
 					return existingSeries;
 				}
@@ -571,7 +678,13 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		List<SeriesGroup> seriesGroups=boxMetadataRepository.findSeriesGroupByTitle(seriesGroup.getTitle());
 		if(seriesGroups.size()==0){
 			SeriesGroup newSeriesGroup=new SeriesGroup();
-			seriesGroup.update(newSeriesGroup);			
+			seriesGroup.update(newSeriesGroup);	
+			if(GenericUtilities.isNotValidCrid(newSeriesGroup.getImageURL())){
+				String fname=retrieveSeriesGroupImageFromS3(newSeriesGroup);
+				if(fname!=null){
+					newSeriesGroup.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
+				}
+			}
 			boxMetadataRepository.persisSeriesGroup(newSeriesGroup);
 			return new uk.co.boxnetwork.data.SeriesGroup(newSeriesGroup);
 		}
@@ -671,6 +784,8 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	public void update(long id, uk.co.boxnetwork.data.Series series){
 		Series existingSeries=boxMetadataRepository.findSeriesById(id);
 		series.update(existingSeries);
+		checks3ToSetSeriesImage(existingSeries);
+		
 		boxMetadataRepository.update(existingSeries);
 		if(existingSeries.getSeriesGroup()==null){
 			existingSeries.setSeriesGroup(boxMetadataRepository.retrieveDefaultSeriesGroup());
@@ -740,7 +855,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		 if(fileNameFilter==null){
 			 return;
 		 }
-		 VideoFilesLocation matchedfiles=s3BucketService.listFilesInVideoBucket(fileNameFilter);
+		 MediaFilesLocation matchedfiles=s3BucketService.listFilesInVideoBucket(fileNameFilter);
 		 String ingestFile=matchedfiles.highestVersion();
 		 if(ingestFile!=null){
 			 episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
@@ -874,5 +989,111 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		  throw new RuntimeException("Not permitted to delete not matching availability avid=["+avid+"]episodeid=["+episodeid);		  
 	  }
 	  
+  }
+  
+  
+  private boolean matchImageToEpisodes(List<Episode> matchedEpisodes,String fullImageURL){
+	  if(matchedEpisodes==null||matchedEpisodes.size()==0){
+		  return false;
+	  }	 
+	   for(Episode episode:matchedEpisodes){					  					  
+			  if(GenericUtilities.isNotValidCrid(episode.getImageURL())){
+				  logger.info("setting imageURL for episode:"+episode.getId()+":"+fullImageURL);
+				  boxMetadataRepository.setEpisodeImage(episode.getId(), fullImageURL);
+			  }
+			  else{
+				  logger.info("imageURL is already set for episode:"+episode.getId()+":"+fullImageURL);						  
+			  }
+	   }				  
+	  return true;
+  }
+  private boolean matchImageToSeries(List<Series> matchedSeries,String fullImageURL){
+	  if(matchedSeries==null || matchedSeries.size()==0){
+		  return false;
+	  }
+	  for(Series series:matchedSeries){					  					  
+			  if(GenericUtilities.isNotValidCrid(series.getImageURL())){
+				  logger.info("setting imageURL for series:"+series.getId()+":"+fullImageURL);
+				  boxMetadataRepository.setSeriesImage(series.getId(), fullImageURL);
+			  }
+			  else{
+				  logger.info("imageURL is already set for series:"+series.getId()+":"+fullImageURL);						  
+			  }		  
+	   }				  
+		  return true;
+  }
+private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,String fullImageURL){
+	if(matchedSeriesGroup==null || matchedSeriesGroup.size()==0){
+		  return false;
+	  }	  
+	 for(SeriesGroup seriesgroup:matchedSeriesGroup){
+			  if(GenericUtilities.isNotValidCrid(seriesgroup.getImageURL())){
+				  logger.info("setting imageURL for series group:"+seriesgroup.getId()+":"+fullImageURL);
+				  boxMetadataRepository.setSeriesGroupImage(seriesgroup.getId(), fullImageURL);
+			  }
+			  else{
+				  logger.info("imageURL is already for series group:"+seriesgroup.getId()+":"+fullImageURL);
+			  }
+		  }
+	 return true;
+	}
+  
+  public void notifyMasterImageUploaded(String imagefile){
+	  logger.info("processing mater image notification:"+imagefile);
+	  if(imagefile.length()==0){
+		  logger.info("ingoring:"+imagefile);
+		  return;
+	  }	 
+	  int ie=imagefile.indexOf(".");
+	  if(ie<=0){
+		  logger.info("ignoring the  file:"+imagefile);
+		  return;
+	  }
+	  
+	  String parts[]=imagefile.substring(0,ie).split("_");
+	  
+	  if(parts.length==0 || parts[0].length()==0){
+		  logger.error("the part of the image is _");
+		  return;
+	  }
+	  
+	  String fullImageURL=s3BucketService.getMasterImageFullURL(imagefile);	        
+	  if(parts.length==1){		  			  
+		      List<Series> matchedSeries=boxMetadataRepository.findSeriesByContractNumber(parts[0]);
+			  if(matchImageToSeries(matchedSeries,fullImageURL)){
+				  logger.info("matched contractnumber for the series");				  
+			  }	
+			  List<SeriesGroup> matchedSeriesGroup=boxMetadataRepository.findSeriesGroupByTitle(GenericUtilities.fromWebsafeTitle(parts[0]));
+			  if(matchImageToSeriesGroup(matchedSeriesGroup,fullImageURL)){
+				  logger.info("matched series group with title");				
+			  }	
+			  return;
+	  }
+	  List<Episode> matchedEpisodes=boxMetadataRepository.findEpisodesByMatId(GenericUtilities.partsToMatId(parts,0));
+	  if(matchImageToEpisodes(matchedEpisodes,fullImageURL)){
+		  logger.info("matched material id");
+		  return;
+	  }	
+	  String matchTitle=GenericUtilities.fromWebsafeTitle(parts[0]);
+	  String matid=GenericUtilities.partsToMatId(parts, 1);	  
+      
+	  List<Series> matchedSeries=boxMetadataRepository.findSeriesByNameAndContractNumber(matchTitle,matid);
+	 
+	   if(matchImageToSeries(matchedSeries, fullImageURL)){
+		  logger.info("matched series by name and contract number");
+		  return;	
+	   }
+	  
+	  matchedEpisodes=boxMetadataRepository.findEpisodesByTitleAndProgramId(matchTitle,matid);
+	  
+      if(matchImageToEpisodes(matchedEpisodes, fullImageURL)){
+			  logger.info("matched episodes for title and programmeid");
+			  return;
+	  }
+      
+      if(parts.length>2){
+    	  matchedEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(matid);
+    	  matchImageToEpisodes(matchedEpisodes, fullImageURL);
+      }      
   }
 }

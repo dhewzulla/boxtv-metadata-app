@@ -14,31 +14,29 @@ import org.mule.api.MuleMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StreamUtils;
 
-
 import uk.co.boxnetwork.components.S3BucketService;
-
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 
-public class BoxVideoTransformer extends BoxRestTransformer{
+public class BoxMasterImageTransformer extends BoxRestTransformer{
 	
 	@Autowired
 	private S3BucketService s3uckerService;
 	
 	
 	protected Object processGET(MuleMessage message, String outputEncoding){
-		logger.info("boxvideo.get request is received");
+		logger.info("boximage.get request is received");
 		Map<String, String> queryprarams=message.getInboundProperty("http.query.params");
 		String prefix=null;
 		if(queryprarams!=null && queryprarams.get("prefix")!=null){
 			prefix=queryprarams.get("prefix").trim();			
 		}
-		return s3uckerService.listVideoFileItem(prefix);		
+		return s3uckerService.listMasterImageItem(prefix);		
 	}
 	protected Object processPOST(MuleMessage message, String outputEncoding){
 		Set<String> attachementnames=message.getInboundAttachmentNames();
 				
 		for(String attachementname:attachementnames){
-			logger.info("reciving::::"+attachementname);
+			logger.info("receiving::::"+attachementname+" for images");
 			DataHandler dataHandler=message.getInboundAttachment(attachementname);
 			String filepath="/data/"+attachementname;
 			InputStream in;
@@ -48,7 +46,7 @@ public class BoxVideoTransformer extends BoxRestTransformer{
 				out=new FileOutputStream(filepath);
 				StreamUtils.copy(in, out);
 				out.close();
-				Object obj= s3uckerService.uploadVideoFile(filepath, attachementname);
+				Object obj=s3uckerService.uploadMasterImageFile(filepath, attachementname);
 				File fp=new File(filepath);
 				fp.delete();
 				return obj;
@@ -75,6 +73,6 @@ public class BoxVideoTransformer extends BoxRestTransformer{
 		logger.info("*******Completed***");
 		return message.getPayload();		
 	}
-	
+		
 	
 }

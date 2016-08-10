@@ -122,6 +122,7 @@ public class Episode {
 	 
 	 private String geoAllowedCountries;
 	 
+	 private String imageURL;
 	 
 	public Long getId() {
 		return id;
@@ -324,6 +325,7 @@ public Episode(){
 		this.txChannel=episode.getTxChannel();
 		this.episodeStatus=episode.getEpisodeStatus();
 		this.excludeddevices=episode.getExcludeddevices();
+		this.imageURL=episode.getImageURL();
 		
 		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
@@ -358,6 +360,7 @@ public Episode(){
 		episode.setDurationScheduled(this.durationScheduled);
 		episode.setShowType(this.showType);
 		episode.setPrAuk(this.prAuk);
+		episode.setImageURL(this.imageURL);
 		if("".equals(this.certType)){
 			this.certType=null;
 		}
@@ -462,6 +465,10 @@ public Episode(){
 		}
 		if(this.geoAllowedCountries!=null){
 			episode.setGeoAllowedCountries(geoAllowedCountries);
+			changed=true;
+		}
+		if(this.imageURL!=null){
+			episode.setImageURL(this.imageURL);
 			changed=true;
 		}
 		return changed;
@@ -661,5 +668,16 @@ public void setNumberOfAdsPerBreak(String numberOfAdsPerBreak) {
 public void addAvailability(AvailabilityWindow availabilityWindow){
 	this.availabilities.add(availabilityWindow);
 }
+
+
+public String getImageURL() {
+	return imageURL;
+}
+
+
+public void setImageURL(String imageURL) {
+	this.imageURL = imageURL;
+}
+
 	
 }
