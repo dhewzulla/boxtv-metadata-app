@@ -2,6 +2,7 @@ package uk.co.boxnetwork.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -119,6 +120,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	public uk.co.boxnetwork.data.Episode getEpisodeById(Long id){
 		Episode episode=boxMetadataRepository.findEpisodeById(id);
 		if(episode==null){
+			logger.warn("not found episode:"+id);
 			return null;
 		}
 		List<ScheduleEvent> scheduleEvents=boxMetadataRepository.findScheduleEventByEpisode(episode);
@@ -131,6 +133,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	public uk.co.boxnetwork.data.CuePoint getCuePointById(Long id){
 		CuePoint cuepoint=boxMetadataRepository.findCuePoint(id);
 		if(cuepoint==null){
+			logger.warn("not found cue:"+id);
 			return null;			
 		}
 		return new uk.co.boxnetwork.data.CuePoint(cuepoint);
@@ -139,6 +142,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	public uk.co.boxnetwork.data.AvailabilityWindow getAvailabilityWindowId(Long id){
 		AvailabilityWindow availabilityWindow=boxMetadataRepository.findAvailabilityWindowId(id);
 		if(availabilityWindow==null){
+			logger.warn("not found availability:"+id);
 			return null;			
 		}
 		return new uk.co.boxnetwork.data.AvailabilityWindow(availabilityWindow);
@@ -189,6 +193,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	@Transactional
 	public void update(long id, uk.co.boxnetwork.data.Episode episode){
 		Episode existingEpisode=boxMetadataRepository.findEpisodeById(id);
+		if(existingEpisode==null){
+			logger.warn("not found episode:"+id);
+			return;
+		}
 		String oldIngestSource=existingEpisode.getIngestSource();
 		String oldIngestProfile=existingEpisode.getIngestProfile();
 		logger.info("Before upating the episode:"+existingEpisode);
@@ -210,6 +218,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	
 	public void update(long id, uk.co.boxnetwork.data.SeriesGroup seriesGroup){
 		SeriesGroup existingSeriesGroup=boxMetadataRepository.findSeriesGroupById(id);		
+		if(existingSeriesGroup==null){
+			return;
+		}
 		seriesGroup.update(existingSeriesGroup);
 		if(GenericUtilities.isNotValidCrid(existingSeriesGroup.getImageURL())){
 			String fname=retrieveSeriesGroupImageFromS3(existingSeriesGroup);
@@ -228,8 +239,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 		List<SeriesGroup> recordsToDelete=new ArrayList<SeriesGroup>();
 		for(SeriesGroup sg:matchedSeriesGroups){
-			if(!sg.getId().equals(targetSeriesGroup.getId())){
-				recordsToDelete.add(sg);
+			if(sg.getId()!=null){
+				if(!sg.getId().equals(targetSeriesGroup.getId())){
+					recordsToDelete.add(sg);
+				}
 			}
 		}
 		if(recordsToDelete.size()==0){
@@ -363,7 +376,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	public uk.co.boxnetwork.data.Episode updateEpisodeById(uk.co.boxnetwork.data.Episode episode){
 		Episode episodeInDB=boxMetadataRepository.findEpisodeById(episode.getId());
 		if(episodeInDB==null){
-			logger.info("not found");
+			logger.info("not found episode");
 			return null;
 		}
 		if(episode.updateWhenReceivedByMaterialId(episodeInDB)){
@@ -515,9 +528,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				if(fname!=null){
 					existingEpisode.setImageURL(s3BucketService.getMasterImageFullURL(fname));				
 				}
-			}
-			
+			}			
 			boxMetadataRepository.persist(existingEpisode);
+			boxMetadataRepository.replaceAvailabilityWindow(existingEpisode.getId(), Calendar.getInstance().getTime(),GenericUtilities.nextYearDate());
 		}		
 		else{	
 			   logger.info("Upating the existing episode");
@@ -783,6 +796,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	@Transactional
 	public void update(long id, uk.co.boxnetwork.data.Series series){
 		Series existingSeries=boxMetadataRepository.findSeriesById(id);
+		if(existingSeries==null){
+			return;
+		}
 		series.update(existingSeries);
 		checks3ToSetSeriesImage(existingSeries);
 		
@@ -900,7 +916,11 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	  }
   }
   public  uk.co.boxnetwork.data.Episode publishMetadatatoBCByEpisodeId(Long id){
-	  Episode uptoDateEpisode=boxMetadataRepository.findEpisodeById(id);	  
+	  Episode uptoDateEpisode=boxMetadataRepository.findEpisodeById(id);	
+	  if(uptoDateEpisode==null){
+		  logger.warn("not found episode:"+id);
+		  return null;
+	  }
 	  if(!GenericUtilities.isNotValidCrid(uptoDateEpisode.getBrightcoveId())){		  		  
 			  BCVideoData videoData=videoService.publishEpisodeToBrightcove(id);
 			  logger.info("The changes is pushed to the bc:"+videoData);
@@ -910,6 +930,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   }
   public  uk.co.boxnetwork.data.Series publishMetadatatoBCBySeriesId(Long id){
 	  Series series=boxMetadataRepository.findSeriesById(id);
+	  if(series==null){
+		  logger.warn("not found series:"+id);
+		  return null;
+	  }
 	  List<Episode> episodes=boxMetadataRepository.findEpisodesBySeries(series);
 	  logger.info("Publishing all the episodes in this series");
 	  for(Episode ep:episodes){
@@ -931,6 +955,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   
   public void createNewCuepoint(Long episodeid, uk.co.boxnetwork.data.CuePoint cuePoint){
 	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
+	  if(episode==null){
+		  logger.warn("not found episode:"+episodeid);
+		  return;
+	  }
 	  CuePoint cue=new CuePoint();
 	  cuePoint.update(cue);
 	  boxMetadataRepository.persistCuePoint(cue,episode);
@@ -938,6 +966,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   }
   public void createNewAvailability(Long episodeid, uk.co.boxnetwork.data.AvailabilityWindow availabilityWindow){
 	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
+	  if(episode==null){
+		  logger.warn("not found episode:"+episodeid);
+		  return;
+	  }
 	  AvailabilityWindow avwindow=new AvailabilityWindow();
 	  availabilityWindow.update(avwindow);
 	  boxMetadataRepository.persistAvailabilityWindow(avwindow,episode);
@@ -946,31 +978,40 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   
   public void updateCuepoint(Long episodeid,Long cueid, uk.co.boxnetwork.data.CuePoint cuePoint){
 	  CuePoint cue=boxMetadataRepository.findCuePoint(cueid);
-	  if(!cue.getId().equals(cueid)){
-		  throw new RuntimeException("Not permitted to update not matching cue cueid=["+cueid+"]cuePoint=["+cuePoint);  
+	  if(cue.getId()!=null){
+		  if(!cue.getId().equals(cueid)){
+			  throw new RuntimeException("Not permitted to update not matching cue cueid=["+cueid+"]cuePoint=["+cuePoint);  
+		  }
 	  }
 	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
-	  if(!episode.getId().equals(episodeid)){
-		  throw new RuntimeException("Not permitted to update not matching cue episodeid=["+episodeid+"]");
+	  if(episode.getId()!=null){
+		  if(!episode.getId().equals(episodeid)){
+			  throw new RuntimeException("Not permitted to update not matching cue episodeid=["+episodeid+"]");
+		  }
 	  }
 	  boxMetadataRepository.updateCue(cuePoint);	  
 	  
   }
   public void updateAvailabilityWindow(Long episodeid,Long availabilitywindowid, uk.co.boxnetwork.data.AvailabilityWindow availabilitywindow){
 	  AvailabilityWindow avwindow=boxMetadataRepository.findAvailabilityWindowId(availabilitywindowid);
-	  if(!avwindow.getId().equals(availabilitywindowid)){
-		  throw new RuntimeException("Not permitted to update not matching availability availabilitywindowid=["+availabilitywindowid+"]avwindow=["+avwindow);  
+	  if(avwindow.getId()!=null){
+		  if(!avwindow.getId().equals(availabilitywindowid)){
+			  throw new RuntimeException("Not permitted to update not matching availability availabilitywindowid=["+availabilitywindowid+"]avwindow=["+avwindow);  
+		  }
 	  }
 	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
-	  if(!episode.getId().equals(episodeid)){
-		  throw new RuntimeException("Not permitted to update not matching availabilitywindow episodeid=["+episodeid+"]");
+	  if(episode.getId()!=null){
+		  if(!episode.getId().equals(episodeid)){
+			  throw new RuntimeException("Not permitted to update not matching availabilitywindow episodeid=["+episodeid+"]");
+		  }
 	  }
 	  boxMetadataRepository.updateAvailabilityWindow(availabilitywindow);	  
 	  
   }
   public uk.co.boxnetwork.data.CuePoint deleteCuepoint(Long episodeid, Long cueid){	  	  
 	  CuePoint cue=boxMetadataRepository.findCuePoint(cueid);
-	  if(cue.getEpisode().getId().equals(episodeid)){
+	  
+	  if(cue.getEpisode().getId()!=null && cue.getEpisode().getId().equals(episodeid)){
 		  boxMetadataRepository.removeCuePoint(cueid);		  
 		  return new uk.co.boxnetwork.data.CuePoint(cue);
 	  }
@@ -981,7 +1022,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   }
   public uk.co.boxnetwork.data.AvailabilityWindow deleteAvailabilityWindow(Long episodeid, Long avid){	  	  
 	  AvailabilityWindow availabilityWindow=boxMetadataRepository.findAvailabilityWindowId(avid);
-	  if(availabilityWindow.getEpisode().getId().equals(episodeid)){
+	  if(availabilityWindow==null){
+		  return null;
+	  }
+	  if(availabilityWindow.getEpisode().getId()!=null && availabilityWindow.getEpisode().getId().equals(episodeid)){
 		  boxMetadataRepository.removeAvailabilityWindow(avid);		  
 		  return new uk.co.boxnetwork.data.AvailabilityWindow(availabilityWindow);
 	  }

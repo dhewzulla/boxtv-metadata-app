@@ -1,6 +1,7 @@
 package uk.co.boxnetwork.components;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
+import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.MetadataStatus;
@@ -83,6 +85,38 @@ public class MetadataMaintainanceService {
 					searchParam.nextBatch();
 				}
 		}
+	}
+	
+	
+	public void setAvailableWindowForAll(Date from, Date to){
+logger.info("adding the default availability window......");
+		
+		int rcordLimit=appConfig.getRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
+		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
+		
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
+				if(episodes.size()==0){
+					break;
+				}
+				for(Episode episode:episodes){
+					setAvailableWindow(episode, from,to);													  
+				}
+				if(searchParam.isEnd(episodes.size())){
+					break;
+				}
+				else{
+					searchParam.nextBatch();
+				}
+		}
+	}
+	public void setAvailableWindow(Episode episode,Date from, Date to){
+		repository.replaceAvailabilityWindow(episode.getId(), from, to);
+		
+		
 	}
 	public boolean fixTxChannel(Episode episode){
 		if("Box Hits (SmashHits)".equals(episode.getTxChannel())){		  			  
