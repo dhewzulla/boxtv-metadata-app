@@ -90,7 +90,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          	   <spring:property name="imageBucket" value="${s3.images.bucket}"/>
          	   <spring:property name="imageMasterFolder" value="${s3.images.master.folder}"/>
          	   <spring:property name="imagePublicFolder" value="${s3.images.public.folder}"/>
-         	   
+         	   <spring:property name="convertImage" value="${convertImage.status}"/>
          </spring:bean>
          
          <spring:bean id="bcConfiguration"  class="uk.co.boxnetwork.data.bc.BCConfiguration">
@@ -179,6 +179,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.security.BoxUsersTransformer" name="boxUsersTransformer" doc:name="BoxUsersTransformer"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.LoadAppInformationTransformer" name="loadAppInfoTransformer" doc:name="LoadConfig"/>
+   
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.tasks.CommandExecutionTransformer" name="commandExecutionTransformer" doc:name="CommandExecutionTransformer"/>
    
    
    

@@ -32,7 +32,7 @@ private MetadataMaintainanceService metadataMaintainanceService;
 		//metadataMaintainanceService.removeOrphantSeriesGroup();
 		//metadataMaintainanceService.updateAllPublishedStatys();
 		
-		metadataMaintainanceService.setAvailableWindowForAll(Calendar.getInstance().getTime(),GenericUtilities.nextYearDate());
+		//metadataMaintainanceService.setAvailableWindowForAll(Calendar.getInstance().getTime(),GenericUtilities.nextYearDate());
 		//metadataMaintainanceService.autoPublishChangesToBrightcove();
 		return message.getPayload();
 	}

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.SearchParam;
+import uk.co.boxnetwork.data.app.MediaCommand;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
@@ -339,4 +340,51 @@ logger.info("adding the default availability window......");
     private void updatePublishedStatus(Episode episode){
     	metataService.updatePublishedStatus(episode);
     }
+    
+    public  MediaCommand processCommand(MediaCommand mediaCommand){
+    	if("publish-all-changes".equals(mediaCommand.getCommand())){
+    		
+    		pushAllChangesToBrightcove();    		
+    	}
+    	else{
+    		logger.info("ignore the command");
+    	}
+    	return mediaCommand;
+     }
+    
+    
+    public void pushAllChangesToBrightcove(){
+    	
+logger.info("pushing all changes to brightcove......");
+		
+		int rcordLimit=appConfig.getRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
+		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
+		
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
+				if(episodes.size()==0){
+					break;
+				}
+				for(Episode episode:episodes){
+					pushChangesToBrightcove(episode);												  
+				}
+				if(searchParam.isEnd(episodes.size())){
+					break;
+				}
+				else{
+					searchParam.nextBatch();
+				}
+		}
+    }
+    
+    void pushChangesToBrightcove(Episode episode){
+    	if(episode.getEpisodeStatus().getMetadataStatus()==MetadataStatus.NEEDS_TO_PUBLISH_CHANGES){
+    		metataService.publishMetadatatoBCByEpisodeId(episode.getId());
+    	}
+    	
+    }
+    
 }

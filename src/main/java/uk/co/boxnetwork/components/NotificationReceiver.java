@@ -115,7 +115,18 @@ public class NotificationReceiver {
 	private void onImageBucketUpload(String file){
 		logger.info("Uploaded to the image bucket"+ file);
 		if(file.startsWith(s3Configuration.getImageMasterFolder())){
-			commandService.convertFromMasterImage(file);
+			if(s3Configuration.getConvertImage()!=null && s3Configuration.getConvertImage().equals("False")){
+				
+				logger.info("**** not converting imagges");
+			}
+			else{							
+			    try{
+			    		commandService.convertFromMasterImage(file);
+			    }
+			    catch(Throwable e){
+					logger.error(e+" while setting the image in the metadata on notification"+file,e );
+				}
+			}
 			try{
 				String imageFile=file.substring(s3Configuration.getImageMasterFolder().length()+1);
 				metadataService.notifyMasterImageUploaded(imageFile);
