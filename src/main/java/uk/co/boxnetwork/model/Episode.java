@@ -150,7 +150,9 @@ public class Episode {
 	@Column(name="geo_allowed_countries")
 	private String geoAllowedCountries;
 	
-
+    
+	@Column(name="image_url")
+	private String imageURL;
 	
 	
 	public EpisodeStatus getEpisodeStatus() {
@@ -383,9 +385,10 @@ public class Episode {
 			 if(materialID.length()==0){
 				 return null;
 			 }
-			 return GenericUtilities.materialIdToFileName(materialID);
+			 return GenericUtilities.materialIdToVideoFileName(materialID);
 	}
-
+  
+  
 		
    public void addCuePoint(CuePoint cuepoint){
 	   this.cuePoints.add(cuepoint);
@@ -496,6 +499,14 @@ public void setPrAuk(String prAuk) {
 
 	public void setNumberOfAdsPerBreak(String numberOfAdsPerBreak) {
 		this.numberOfAdsPerBreak = numberOfAdsPerBreak;
+	}
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
 	}
 
 	

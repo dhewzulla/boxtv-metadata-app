@@ -6,6 +6,7 @@ public class S3Configuration {
 	private String imageBucket;
     private String imageMasterFolder;
     private String imagePublicFolder;
+    private String s3imagesURL;
     
 	
 	
@@ -21,6 +22,7 @@ public class S3Configuration {
 	public String getImageMasterFolder() {
 		return imageMasterFolder;
 	}
+	
 
 	public void setImageMasterFolder(String imageMasterFolder) {
 		this.imageMasterFolder = imageMasterFolder;
@@ -48,6 +50,14 @@ public class S3Configuration {
 
 	public void setImageBucket(String imageBucket) {
 		this.imageBucket = imageBucket;
+	}
+
+	public String getS3imagesURL() {
+		return s3imagesURL;
+	}
+
+	public void setS3imagesURL(String s3imagesURL) {
+		this.s3imagesURL = s3imagesURL;
 	}
 
 		

@@ -85,19 +85,27 @@ public class MetadataMaintainanceService {
 		}
 	}
 	public boolean fixTxChannel(Episode episode){
-		if("Box Upfront".equals(episode.getTxChannel())){
-			episode.setTxChannel("Box Upfront (Heat)");
-			return true;
+		if("Box Hits (SmashHits)".equals(episode.getTxChannel())){		  			  
+			  episode.setTxChannel("Box Hits");
+			  return true;
 		}
+		else if("Box Upfront (Heat)".equals(episode.getTxChannel())){			  
+			  episode.setTxChannel("Box Upfront");
+			  return true;
+		 }		
 		else
 			return false;
 	}
 	
 	public boolean fixTxChannel(uk.co.boxnetwork.data.Episode episode){
-		if("Box Upfront".equals(episode.getTxChannel())){
-			episode.setTxChannel("Box Upfront (Heat)");
-			return true;
+		if("Box Hits (SmashHits)".equals(episode.getTxChannel())){		  			  
+			  episode.setTxChannel("Box Hits");
+			  return true;
 		}
+		else if("Box Upfront (Heat)".equals(episode.getTxChannel())){			  
+			  episode.setTxChannel("Box Upfront");
+			  return true;
+		 }		
 		else
 			return false;
 	}

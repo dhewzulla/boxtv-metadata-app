@@ -25,6 +25,9 @@ public class SeriesGroup {
 	@Column(name="created_at")
 	private Date createdAt;
 
+	@Column(name="image_url")
+	private String imageURL;
+	
 
 	public Long getId() {
 		return id;
@@ -73,6 +76,16 @@ public class SeriesGroup {
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
+	}
+
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
 	}
 	
 

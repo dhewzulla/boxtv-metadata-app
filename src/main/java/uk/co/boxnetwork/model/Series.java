@@ -48,6 +48,12 @@ public class Series {
 	
 	private String synopsis;
 	
+	@Column(name="series_number")
+	private Integer seriesNumber;
+	
+	@Column(name="image_url")
+	private String imageURL;
+	
 	public Long getId() {
 		return id;
 	}
@@ -144,6 +150,22 @@ public class Series {
 
 	public void setSynopsis(String synopsis) {
 		this.synopsis = synopsis;
+	}
+
+	public Integer getSeriesNumber() {
+		return seriesNumber;
+	}
+
+	public void setSeriesNumber(Integer seriesNumber) {
+		this.seriesNumber = seriesNumber;
+	}
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
 	}
 	
 

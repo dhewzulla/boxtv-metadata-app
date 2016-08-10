@@ -21,7 +21,7 @@ private MetadataMaintainanceService metadataMaintainanceService;
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		logger.info("Application initialization");
-		//metadataMaintainanceService.fixTxChannel();
+		metadataMaintainanceService.fixTxChannel();
 		//metadataMaintainanceService.deleteAllTasls();
 		//metadataMaintainanceService.fixEpisodeStatusIfEmpty();
 		//metadataMaintainanceService.replaceIngestProfiles("high-resolution","box-plus-network-1080p-profile");

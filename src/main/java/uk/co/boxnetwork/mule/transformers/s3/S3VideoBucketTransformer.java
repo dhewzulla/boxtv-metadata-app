@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.boxnetwork.components.S3BucketService;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.s3.FileItem;
-import uk.co.boxnetwork.data.s3.VideoFilesLocation;
+import uk.co.boxnetwork.data.s3.MediaFilesLocation;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 
 public class S3VideoBucketTransformer extends BoxRestTransformer{
@@ -41,7 +41,7 @@ public class S3VideoBucketTransformer extends BoxRestTransformer{
 	}
 	protected Object processGET(MuleMessage message, String outputEncoding){
 		logger.info("s3 list request is received");
-		VideoFilesLocation files=s3uckerService.listFilesInVideoBucket(null);
+		MediaFilesLocation files=s3uckerService.listFilesInVideoBucket(null);
 		return 	filter(message, outputEncoding,files.getFiles());
 	
 	}

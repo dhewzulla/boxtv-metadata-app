@@ -28,7 +28,7 @@ import uk.co.boxnetwork.data.s3.FileItem;
 import uk.co.boxnetwork.data.s3.S3Configuration;
 import uk.co.boxnetwork.data.s3.VideoFileItem;
 import uk.co.boxnetwork.data.s3.VideoFileList;
-import uk.co.boxnetwork.data.s3.VideoFilesLocation;
+import uk.co.boxnetwork.data.s3.MediaFilesLocation;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -77,18 +77,39 @@ public class S3BucketService {
         }
         return ret;
 	}
-	public VideoFilesLocation listFilesInVideoBucket(String prefix){
-		VideoFilesLocation videoFilesLocations=new VideoFilesLocation();
+	public MediaFilesLocation listFilesInVideoBucket(String prefix){
+		MediaFilesLocation videoFilesLocations=new MediaFilesLocation();
 		videoFilesLocations.setBaseUrl(s3Configuration.getS3videoURL());
 		videoFilesLocations.setFiles(listFiles(s3Configuration.getVideoBucket(),prefix));
 		logger.info("******number of s3 file for prefix=["+prefix+"]:"+videoFilesLocations.getFiles().size());
 		
 		return videoFilesLocations;
 	}
-	public VideoFilesLocation uploadFile(String filepath, String destFilename){
-		VideoFilesLocation videoFileLocation=listFilesInVideoBucket(destFilename);
+	public MediaFilesLocation listMasterImagesInImagesBucket(String prefix){
+		MediaFilesLocation videoFilesLocations=new MediaFilesLocation();
+		videoFilesLocations.setBaseUrl(s3Configuration.getS3imagesURL());
+		String path=s3Configuration.getImageMasterFolder();
+		if(prefix!=null){
+			path=path+"/"+prefix;
+		}
+		List<FileItem>  files=listFiles(s3Configuration.getImageBucket(),path);
+		videoFilesLocations.setFiles(files);
+		if(files.size()>0){			
+			for(FileItem item:files){
+				if(item.getFile().length() > ( s3Configuration.getImageMasterFolder().length()+1) ){
+					item.setFile(item.getFile().substring(s3Configuration.getImageMasterFolder().length()+1));
+				}				
+			}
+			
+		}
+		logger.info("******number of s3 file for prefix=["+prefix+"]:"+videoFilesLocations.getFiles().size());		
+		return videoFilesLocations;
+	}
+	
+	public MediaFilesLocation uploadVideoFile(String filepath, String destFilename){
+		MediaFilesLocation videoFileLocation=listFilesInVideoBucket(destFilename);
 		if(videoFileLocation.getFiles().size()>0){
-			throw new RuntimeException("The file already exist on the s3 buccket:"+videoFileLocation.getFiles().get(0));
+			throw new RuntimeException("The file already exist on the video buccket:"+videoFileLocation.getFiles().get(0));
 		}
 		AmazonS3 s3Client=getAmazonS3();
 		File file=new File(filepath);
@@ -96,8 +117,20 @@ public class S3BucketService {
 		videoFileLocation.addFilename(destFilename);
 		return videoFileLocation;		
 	}
+	public MediaFilesLocation uploadMasterImageFile(String filepath, String destFilename){
+		MediaFilesLocation imageFileLocation=listMasterImagesInImagesBucket(destFilename);
+		if(imageFileLocation.getFiles().size()>0){
+			throw new RuntimeException("The file already exist on the image buccket:"+imageFileLocation.getFiles().get(0));
+		}
+		AmazonS3 s3Client=getAmazonS3();
+		File file=new File(filepath);
+		
+		s3Client.putObject(new PutObjectRequest(s3Configuration.getImageBucket(), s3Configuration.getImageMasterFolder()+"/"+destFilename, file));
+		imageFileLocation.addFilename(destFilename);
+		return imageFileLocation;		
+	}
 	public VideoFileList listVideoFileItem(String prefix){
-		VideoFilesLocation videoFileLocation=listFilesInVideoBucket(prefix);
+		MediaFilesLocation videoFileLocation=listFilesInVideoBucket(prefix);
 		List<VideoFileItem> videos=new ArrayList<VideoFileItem>();
 		
 		
@@ -123,9 +156,18 @@ public class S3BucketService {
 		return videoFileList;
 	}
 	
+	public MediaFilesLocation listMasterImageItem(String prefix){		
+		return listMasterImagesInImagesBucket(prefix);		
+	}
+	
 	public String getFullVideoURL(String fileName){
 		return s3Configuration.getS3videoURL()+"/"+fileName;
 	}
+	public String getMasterImageFullURL(String fileName){
+		return s3Configuration.getS3imagesURL()+"/"+s3Configuration.getImageMasterFolder()+"/"+fileName;		
+	}
+	
+	
 	public String generatedPresignedURL(String url, int expiredInSeconds){
 		if(url==null){
 			return null;

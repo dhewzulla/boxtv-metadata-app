@@ -3,6 +3,8 @@ package uk.co.boxnetwork.data;
 import java.util.Date;
 import java.util.List;
 
+
+
 public class Series {
     private Long id;
 	private String assetId;
@@ -13,7 +15,12 @@ public class Series {
 	private Date lastModifiedAt;
 	private Date createdAt;
 	private List<uk.co.boxnetwork.data.Episode> episodes;
-	private String synopsis;
+	private String synopsis;	
+	private String imageURL;
+	private Integer seriesNumber;
+	
+	
+	
 	
 	
 	public Series(uk.co.boxnetwork.model.Series series) {
@@ -29,6 +36,8 @@ public class Series {
 		this.lastModifiedAt=series.getLastModifiedAt();
 		this.createdAt=series.getCreatedAt();
 		this.synopsis=series.getSynopsis();		
+		this.imageURL=series.getImageURL();
+		this.seriesNumber=series.getSeriesNumber();
 	}
 	public void update(uk.co.boxnetwork.model.Series series){		
 		series.setAssetId(this.assetId);
@@ -36,6 +45,8 @@ public class Series {
 		series.setName(this.name);
 		series.setContractNumber(this.contractNumber);	
 		series.setSynopsis(this.synopsis);
+		series.setImageURL(this.imageURL);
+		series.setSeriesNumber(this.seriesNumber);
 	}
 	public Series(){
 		
@@ -102,6 +113,18 @@ public class Series {
 	}
 	public void setEpisodes(List<uk.co.boxnetwork.data.Episode> episodes) {
 		this.episodes = episodes;
+	}
+	public String getImageURL() {
+		return imageURL;
+	}
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+	public Integer getSeriesNumber() {
+		return seriesNumber;
+	}
+	public void setSeriesNumber(Integer seriesNumber) {
+		this.seriesNumber = seriesNumber;
 	}
 	
 	

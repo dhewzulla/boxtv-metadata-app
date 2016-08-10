@@ -588,6 +588,12 @@ public class BoxMedataRepository {
 		   TypedQuery<SeriesGroup> query=entityManager.createQuery("SELECT p FROM series_group p where p.title=:title", SeriesGroup.class);
 		   return query.setParameter("title",title).getResultList();
 	   }
+	   
+	   public List<SeriesGroup> findSeriesGroupByMatchingTitle(String title){
+		   title=title.trim();		   
+		   TypedQuery<SeriesGroup> query=entityManager.createQuery("SELECT p FROM series_group p where p.title like :title", SeriesGroup.class);
+		   return query.setParameter("title",title).getResultList();
+	   }
 	   public SeriesGroup retrieveDefaultSeriesGroup(){
 		   String defaultSeriesGroupTitle="Default Series Group";
 		   List<SeriesGroup> matchedSeriesGroups=findSeriesGroupByTitle(defaultSeriesGroupTitle);
@@ -656,6 +662,11 @@ public class BoxMedataRepository {
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.ctrPrg=:ctrPrg", Episode.class);
 		   return query.setParameter("ctrPrg",ctrPrg).getResultList();
 	   }
+	   public List<Episode> findEpisodesByTitleAndProgramId(String title,String ctrPrg){
+		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title like :title and e.ctrPrg=:ctrPrg", Episode.class);
+		   query.setParameter("title",title);
+		   return query.getResultList();
+	   }
 	   public List<Episode> findEpisodesByPrimaryId(String primaryId){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.primaryId=:primaryId", Episode.class);
 		   return query.setParameter("primaryId",primaryId).getResultList();
@@ -671,6 +682,12 @@ public class BoxMedataRepository {
 	   public List<Series> findSeriesByName(String name){
 		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s where s.name=:name", Series.class);
 		   return query.setParameter("name",name).getResultList();
+	   }
+	   public List<Series> findSeriesByNameAndContractNumber(String name, String contractNumber){
+		   TypedQuery<Series> query=entityManager.createQuery("SELECT s FROM series s where s.name like :name and s.contractNumber=:contractNumber", Series.class);
+		   query.setParameter("name",name);
+		   query.setParameter("contractNumber",contractNumber);
+		   return query.getResultList();
 	   }
 	   public List<ComplianceInformation> findComplianceInformationById(String id){
 		   TypedQuery<ComplianceInformation> query=entityManager.createQuery("SELECT c FROM compliance_information c where c.id=:id", ComplianceInformation.class);
@@ -815,5 +832,24 @@ public class BoxMedataRepository {
 		   }
 	   }
 	   
+	   @Transactional
+	   public void setEpisodeImage(Long id, String imageURL){
+		   Episode episode=findEpisodeById(id);
+		   episode.setImageURL(imageURL);
+		   markMetadataChanged(episode);
+		   persist(episode);
+	   }
+	   @Transactional
+	   public void setSeriesImage(Long id, String imageURL){
+		   Series series=findSeriesById(id);
+		   series.setImageURL(imageURL);		   
+		   persisSeries(series);
+	   }
+	   @Transactional
+	   public void setSeriesGroupImage(Long id, String imageURL){
+		   SeriesGroup seriesgroup=findSeriesGroupById(id);
+		   seriesgroup.setImageURL(imageURL);		   
+		   persisSeriesGroup(seriesgroup);
+	   }
 	   
 }

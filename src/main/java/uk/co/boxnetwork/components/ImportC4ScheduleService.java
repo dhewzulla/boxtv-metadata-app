@@ -27,7 +27,7 @@ import uk.co.boxnetwork.data.C4Metadata;
 import uk.co.boxnetwork.data.ImportScheduleRequest;
 import uk.co.boxnetwork.data.bc.BCAccessToken;
 import uk.co.boxnetwork.data.s3.FileItem;
-import uk.co.boxnetwork.data.s3.VideoFilesLocation;
+import uk.co.boxnetwork.data.s3.MediaFilesLocation;
 import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;

@@ -116,6 +116,13 @@ public class NotificationReceiver {
 		logger.info("Uploaded to the image bucket"+ file);
 		if(file.startsWith(s3Configuration.getImageMasterFolder())){
 			commandService.convertFromMasterImage(file);
+			try{
+				String imageFile=file.substring(s3Configuration.getImageMasterFolder().length()+1);
+				metadataService.notifyMasterImageUploaded(imageFile);
+			}
+			catch(Throwable e){
+				logger.error(e+" while setting the image in the metadata on notification"+file,e );
+			}
 		}
 	}
    private void onVideoBucketUpload(String file){
