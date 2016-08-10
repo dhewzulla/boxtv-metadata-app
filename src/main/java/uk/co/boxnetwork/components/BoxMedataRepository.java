@@ -831,6 +831,24 @@ public class BoxMedataRepository {
 			   persistEpisodeStatus(episodeStatus);
 		   }
 	   }
+	   @Transactional
+	   public void replaceAvailabilityWindow(Long episodeid, Date from, Date to){
+		   Episode episode=findEpisodeById(episodeid);
+		   if(episode.getAvailabilities()!=null && episode.getAvailabilities().size()>0){
+				for(AvailabilityWindow availability:episode.getAvailabilities()){
+					entityManager.remove(availability);
+				}
+				episode.clearAvailabilityWindows();
+			}
+			AvailabilityWindow availabilityWindow=new AvailabilityWindow();
+			availabilityWindow.setStart(from.getTime());
+			availabilityWindow.setEnd(to.getTime());
+			availabilityWindow.setEpisode(episode);
+			entityManager.persist(availabilityWindow);
+			episode.addAvailabilityWindow(availabilityWindow);
+			markMetadataChanged(episode);
+			persist(episode);
+	   }
 	   
 	   @Transactional
 	   public void setEpisodeImage(Long id, String imageURL){

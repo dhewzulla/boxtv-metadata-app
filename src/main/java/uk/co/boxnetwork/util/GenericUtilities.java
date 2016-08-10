@@ -6,12 +6,16 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+
 
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.MetadataStatus;
@@ -369,5 +373,14 @@ public class GenericUtilities {
 	  }
 	 return channelName;
   }
+
+  public static Date nextYearDate(){
+	    Calendar calendar=Calendar.getInstance();		
+		calendar.set(Calendar.YEAR, 2017);
+		calendar.set(Calendar.MONTH, 11);
+		calendar.set(Calendar.DAY_OF_MONTH, 31);
+		return calendar.getTime();
+  }
+
 }
 

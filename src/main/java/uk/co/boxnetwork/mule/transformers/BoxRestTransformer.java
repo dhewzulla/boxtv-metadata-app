@@ -154,7 +154,7 @@ public class BoxRestTransformer  extends AbstractMessageTransformer{
 		}
 	    message.setOutboundProperty("Access-Control-Allow-Origin", origin);
 	    message.setOutboundProperty("Access-Control-Max-Age", "600");
-	    message.setOutboundProperty("Access-Control-Allow-Methods","GET,POST, PUT, PATCH, OPTIONS");
+	    message.setOutboundProperty("Access-Control-Allow-Methods","GET,POST, DELETE,PUT, PATCH, OPTIONS");
 	    message.setOutboundProperty("Access-Control-Allow-Headers","X-Requested-With, Content-Type, Accept,apikey,accept, authorization");
    }
 }

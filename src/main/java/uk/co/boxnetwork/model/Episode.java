@@ -1,7 +1,7 @@
 package uk.co.boxnetwork.model;
 
 import java.util.Date;
-
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -394,6 +394,9 @@ public class Episode {
 	   this.cuePoints.add(cuepoint);
    }
    public void addAvailabilityWindow(AvailabilityWindow av){
+	   if(this.availabilities==null){
+		   this.availabilities=new HashSet<AvailabilityWindow>();
+	   }
 	   this.availabilities.add(av);
    }
    public void rempveCuePoint(CuePoint cuepoint){

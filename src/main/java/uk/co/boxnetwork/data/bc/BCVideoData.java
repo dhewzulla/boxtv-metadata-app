@@ -96,10 +96,9 @@ public class BCVideoData {
 			populateCuePoints(episode);
 			if(episode.getGeoAllowedCountries()!=null && episode.getGeoAllowedCountries().trim().length()>0){
 				geo=new BCGeo(episode);				
-			}
-			if(schedules!=null && schedules.size()>0){
-				calculateSchedule(episode, schedules);
-			}
+			}			
+			calculateSchedule(episode, schedules);
+			
 			
 		 }
 		 public void populateCuePoints(Episode episode){
