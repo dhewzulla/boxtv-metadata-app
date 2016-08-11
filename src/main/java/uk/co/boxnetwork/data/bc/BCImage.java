@@ -1,21 +1,20 @@
 package uk.co.boxnetwork.data.bc;
 
-import uk.co.boxnetwork.data.AppConfig;
-import uk.co.boxnetwork.model.Episode;
-import uk.co.boxnetwork.util.GenericUtilities;
 
 public class BCImage{	
 	private String asset_id;
 	private Boolean remote;
 	private String src;
 	private BCImageSource[] sources;
+	private String referenceId;
+	private String displayName;
+	private String type;
+	private String remoteUrl;
 	
 	public BCImage(){
 		
 	}
-	public BCImage(String imagename,Episode episode, AppConfig appConfig, int width, int height){
-		src=GenericUtilities.getImageWithSize(appConfig, imagename, width, height);
-	}
+	
 	
 	public String getAsset_id() {
 		return asset_id;
@@ -40,6 +39,34 @@ public class BCImage{
 	}
 	public void setSources(BCImageSource[] sources) {
 		this.sources = sources;
+	}
+	public String getReferenceId() {
+		return referenceId;
+	}
+	public void setReferenceId(String referenceId) {
+		this.referenceId = referenceId;
+	}
+	public String getDisplayName() {
+		return displayName;
+	}
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+
+
+	public String getRemoteUrl() {
+		return remoteUrl;
+	}
+
+
+	public void setRemoteUrl(String remoteUrl) {
+		this.remoteUrl = remoteUrl;
 	}
 	
 	
