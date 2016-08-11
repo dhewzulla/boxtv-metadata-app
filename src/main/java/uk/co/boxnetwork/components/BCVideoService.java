@@ -21,14 +21,16 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.FileIngestRequest;
+import uk.co.boxnetwork.data.bc.AddImageRequest;
 import uk.co.boxnetwork.data.bc.BCAccessToken;
 import uk.co.boxnetwork.data.bc.BCConfiguration;
 import uk.co.boxnetwork.data.bc.BCVideoData;
@@ -272,7 +274,59 @@ public class BCVideoService {
 				
 			}
 	}
+	public String sendMediaRequest(String requestInJson){
+		RestTemplate rest=new RestTemplate();							
+			logger.info("sending media api request to bc:"+requestInJson);
+			MultiValueMap<String, Object> parts = 
+			          new LinkedMultiValueMap<String, Object>();			
+			parts.add("JSONRPC",requestInJson);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+			HttpEntity<MultiValueMap<String, Object>> requestEntity =
+			          new HttpEntity<MultiValueMap<String, Object>>(parts, headers);
+			ResponseEntity<String> responseEntity =
+					rest.exchange(configuration.getMediaapiurl(), 
+			                  HttpMethod.POST, requestEntity, String.class);
+			HttpStatus statusCode=responseEntity.getStatusCode();	    
+		    
+		    logger.info(":::::::::statuscode:"+statusCode);
+		    String responseBody= responseEntity.getBody();
+		    logger.info("add media api response received:"+responseBody);
+		    return responseBody;
+	}
+	public String sendImageRequest(AddImageRequest imageRequest){			
+		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();			
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
+		String requestInJson=null;
+		try {
+			requestInJson = objectMapper.writeValueAsString(imageRequest);
+			return sendMediaRequest(requestInJson);
+		} catch (Exception e) {
+			logger.error("error when sending the image request"+e+" when sending:"+requestInJson,e);
+			throw new RuntimeException(e+" while sending image request",e);
+		}
+	}
 	
+	
+	public void uploadImages(Episode episode){
+	try{	
+				AddImageRequest imageRequest=AddImageRequest.createAddTVideoStillImageRequest(configuration, appConfig,episode);				
+				if(imageRequest==null){
+					logger.info("There is no image set in episode");
+					return;
+				}
+				sendImageRequest(imageRequest);
+				imageRequest=AddImageRequest.createAddTThumbnailImageRequest(configuration, appConfig, episode);
+				if(imageRequest==null){
+					logger.info("There is no image set in episode");
+					return;
+				}
+				sendImageRequest(imageRequest);
+	    }
+		catch(Throwable e){
+			logger.error("Uploading the image is not successfull:"+e,e);
+		}
+	}
 	public BcIngestResponse ingestVideo(BCVideoIngestRequest ingestRequest, String videoid){
 		BCAccessToken accessToken=bcAccessToenService.getAccessToken();
 		RestTemplate rest=new RestTemplate();
@@ -405,6 +459,7 @@ public class BCVideoService {
 			  episode.setBrightcoveId(createdVideo.getId());
 			  statusPublishedToBrightCove(episode,createdVideo);
 			  metadataRepository.persist(episode);
+			  uploadImages(episode);
 			  return createdVideo;
 		  }
 		  else{
@@ -442,6 +497,9 @@ public class BCVideoService {
 				  BCVideoData updatedVideo=jsonToBCVideoData(reponse);
 				  logger.info("updatedVideo video:"+updatedVideo);
 				  statusPublishedToBrightCove(episode,updatedVideo);
+				  
+				  uploadImages(episode);
+				  
 				  return updatedVideo;
 			  }
 			  else{

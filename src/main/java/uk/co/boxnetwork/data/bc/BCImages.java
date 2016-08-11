@@ -9,10 +9,7 @@ public class BCImages {
 	public BCImages(){
 		
 	}
-    public BCImages(String imagename,Episode episode, AppConfig appConfig){
-    	thumbnail=new BCImage(imagename,episode,appConfig, 320,180);
-    	poster=new BCImage(imagename,episode,appConfig, 1920,1080);
-	}
+    
 	public BCImage getThumbnail() {
 		return thumbnail;
 	}

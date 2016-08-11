@@ -97,27 +97,11 @@ public class BCVideoData {
 			if(episode.getGeoAllowedCountries()!=null && episode.getGeoAllowedCountries().trim().length()>0){
 				geo=new BCGeo(episode);				
 			}	
-//			String imagename=calculateImageURL(episode);
-//			if(imagename!=null){
-//				images=new BCImages(imagename,episode,appConfig);
-//				
-//				
-//			}
 			calculateSchedule(episode, schedules);
 			
 			
 		 }
-		 public String calculateImageURL(Episode episode){
-			 String imagename=episode.getImageURL();
-			 if(imagename==null && episode.getSeries()!=null){
-				 imagename=episode.getSeries().getImageURL();
-			 }
-			 if(imagename==null && episode.getSeries()!=null && episode.getSeries().getSeriesGroup()!=null){
-				 imagename=episode.getSeries().getSeriesGroup().getImageURL();
-			 }
-			 return imagename;
-			 
-		 }
+		 
 		 public void populateCuePoints(Episode episode){
 			 if(episode.getCuePoints()==null|| episode.getCuePoints().size()==0){
 				 return;

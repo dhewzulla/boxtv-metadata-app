@@ -6,10 +6,11 @@ public class BCConfiguration {
 	private String oauthurl;
 	private String cmsurl;
 	private String ingesturl;
-	
+	private String mediaapiurl;	
 	private String accountId;
 	private String clientId;
 	private String clientSecret;
+	private String apiToken;
 	
 	private String defaltIngestProfile;
 	private String ingestCallback;
@@ -134,6 +135,18 @@ public class BCConfiguration {
 		String base64Creds = new String(base64CredsBytes);
 		return base64Creds;
 		
+	}
+	public String getApiToken() {
+		return apiToken;
+	}
+	public void setApiToken(String apiToken) {
+		this.apiToken = apiToken;
+	}
+	public String getMediaapiurl() {
+		return mediaapiurl;
+	}
+	public void setMediaapiurl(String mediaapiurl) {
+		this.mediaapiurl = mediaapiurl;
 	}
 	
   

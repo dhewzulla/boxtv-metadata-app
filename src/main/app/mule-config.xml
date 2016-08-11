@@ -97,11 +97,17 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                             <spring:property name="oauthurl" value="${brightcove.oauth.url}"/>
                             <spring:property name="cmsurl" value="${brightcove.cms.url}"/>
                             <spring:property name="ingesturl" value="${brightcove.ingest.url}"/>
+                            
+                            <spring:property name="mediaapiurl" value="${brightcove.mediaapi.url}"/>
+                            
                             <spring:property name="accountId" value="${brightcove.account_id}"/>
-                            <spring:property name="clientId" value="${brightcove.client_id}"/>
-                            <spring:property name="clientSecret" value="${brightcove.client_secret}"/>                            
+                            <spring:property name="clientId" value="${brightcove.client_id}"/>                            
+                            <spring:property name="clientSecret" value="${brightcove.client_secret}"/>
+                            <spring:property name="apiToken" value="${brightcove.api_token}"/>                            
                              <spring:property name="defaltIngestProfile" value="${brightcove.ingest.profile}"/>
                              <spring:property name="ingestCallback" value="${brightcove.ingest.callback}"/>
+                             
+                                                          
          </spring:bean>
          <spring:bean id="c4ScheduleConfiguration"  class="uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration">
                             <spring:property name="url" value="${c4.schedule.get.url}"/>
