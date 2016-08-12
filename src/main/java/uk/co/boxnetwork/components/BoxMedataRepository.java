@@ -1,6 +1,6 @@
 package uk.co.boxnetwork.components;
 
-import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -9,8 +9,6 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.jasypt.util.password.StrongPasswordEncryptor;
-import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.SearchParam;
-import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.BoxUser;
@@ -238,6 +235,7 @@ public class BoxMedataRepository {
     	   mediaTag.setCreatedAt(lastModifiedAt);    	   
 		   entityManager.persist(mediaTag);
        }
+       
        public void persist(ComplianceInformation compliance){
     	   entityManager.persist(compliance);
        }
@@ -761,6 +759,18 @@ public class BoxMedataRepository {
 			   ret[i]=tags.get(i).getName();
 		   }
 		   return ret;		   
+	   }
+	   @Transactional
+	   public MediaTag removeTag(String tag){
+		   TypedQuery<MediaTag> query=entityManager.createQuery("SELECT t FROM tag t where t.name=:name", MediaTag.class);
+		   query.setParameter("name",tag);
+		   List<MediaTag> tags=query.getResultList();
+		   MediaTag ret=null;
+		   for(MediaTag t:tags){
+			   ret=t;
+			   entityManager.remove(t);
+		   }
+		   return ret;
 	   }
 	   
 	        
