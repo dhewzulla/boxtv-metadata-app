@@ -665,6 +665,7 @@ public class BoxMedataRepository {
 	   public List<Episode> findEpisodesByTitleAndProgramId(String title,String ctrPrg){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.title like :title and e.ctrPrg=:ctrPrg", Episode.class);
 		   query.setParameter("title",title);
+		   query.setParameter("ctrPrg",ctrPrg);
 		   return query.getResultList();
 	   }
 	   public List<Episode> findEpisodesByPrimaryId(String primaryId){
