@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import uk.co.boxnetwork.model.ProgrammeContentType;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 public class SeriesGroup {
 	private Long id;	
@@ -15,6 +16,7 @@ public class SeriesGroup {
 	private Date createdAt;
 	private List<Series> series=new ArrayList<Series>();
 	private String imageURL;
+	private String[] tags;
 	
 	public SeriesGroup(uk.co.boxnetwork.model.SeriesGroup prg){
 		this.id=prg.getId();
@@ -23,12 +25,13 @@ public class SeriesGroup {
 		this.lastModifiedAt=prg.getLastModifiedAt();
 		this.createdAt=prg.getCreatedAt();
 		this.imageURL=prg.getImageURL();
-				
+		this.tags=GenericUtilities.commandDelimitedToArray(prg.getTags());		
 	}
 	public void update(uk.co.boxnetwork.model.SeriesGroup seriesgroup){
 		seriesgroup.setTitle(this.title);
 		seriesgroup.setSynopsis(this.synopsis);
 		seriesgroup.setImageURL(this.imageURL);
+		seriesgroup.setTags(GenericUtilities.arrayToCommaSeparated(this.tags));
 	}
 	public SeriesGroup(){
 		
@@ -79,6 +82,12 @@ public class SeriesGroup {
 	}
 	public void setImageURL(String imageURL) {
 		this.imageURL = imageURL;
+	}
+	public String[] getTags() {
+		return tags;
+	}
+	public void setTags(String[] tags) {
+		this.tags = tags;
 	}
    
 	

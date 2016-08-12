@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -77,11 +78,43 @@ public class BCVideoData {
 			 }
 		 }
 		 
-		 public BCVideoData(Episode episode,List<ScheduleEvent> schedules,AppConfig appConfig){			 	
-			 this.name=episode.getTitle();		
+		 
+		 private void populateTags(Episode episode){
 			 if(episode.getTags()!=null){
 				 this.tags=episode.getTags().split(",");
 			 }
+			 if(episode.getSeries()!=null && episode.getSeries().getTags()!=null){
+				 if(this.tags==null){
+					 this.tags=episode.getSeries().getTags().split(",");
+				 }
+				 else{
+					 String tgs[]=episode.getSeries().getTags().split(",");
+					 
+					 Set<String> temp = new HashSet<String>(Arrays.asList(this.tags));
+					 for(String t:tgs){
+						 temp.add(t);
+					 }					 
+					 this.tags= temp.toArray(new String[temp.size()]);					 
+				 }				 
+			 }
+			 if(episode.getSeries()!=null && episode.getSeries().getSeriesGroup()!=null && episode.getSeries().getSeriesGroup().getTags()!=null){
+				 if(this.tags==null){
+					 this.tags=episode.getSeries().getSeriesGroup().getTags().split(",");
+				 }
+				 else{
+					 String tgs[]=episode.getSeries().getSeriesGroup().getTags().split(",");					 
+					 Set<String> temp = new HashSet<String>(Arrays.asList(this.tags));
+					 for(String t:tgs){
+						 temp.add(t);
+					 }					 
+					 this.tags= temp.toArray(new String[temp.size()]);					 
+				 }				 
+			 }
+			 
+		 }
+		 public BCVideoData(Episode episode,List<ScheduleEvent> schedules,AppConfig appConfig){			 	
+			 this.name=episode.getTitle();		
+			 populateTags(episode);
 			 
 			 buildRefereceId(episode);
 			 this.description=episode.getSynopsis();
