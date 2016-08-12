@@ -9,6 +9,7 @@ import org.mule.module.http.internal.ParameterMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Series;
 
 public class SearchParam {

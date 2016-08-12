@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import uk.co.boxnetwork.components.MetadataService;
-import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.SearchParam;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
@@ -74,8 +74,15 @@ public class SeriesTransformer  extends BoxRestTransformer{
 				objectMapper.setSerializationInclusion(Include.NON_NULL);
 				series = objectMapper.readValue(seriesInJson, uk.co.boxnetwork.data.Series.class);
 	   }
-	   metadataService.update(id,series);	   
-	   return metadataService.publishMetadatatoBCBySeriesId(id);						 
+	   metadataService.update(id,series);
+	   if(appConfig.getBrightcoveStatus()){
+		   return metadataService.publishMetadatatoBCBySeriesId(id);
+	   }
+	   else{
+		   return series;
+	   }
+	   
+	   						 
 	}
     @Override
 	protected Object processDELETE(MuleMessage message, String outputEncoding){	

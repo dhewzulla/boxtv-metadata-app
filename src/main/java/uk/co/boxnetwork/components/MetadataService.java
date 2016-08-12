@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoData;
+import uk.co.boxnetwork.data.s3.FileItem;
 import uk.co.boxnetwork.data.s3.MediaFilesLocation;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.BCNotification;
@@ -1081,6 +1082,28 @@ private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,Str
 		  }
 	 return true;
 	}
+
+  public void notifyMasterImageDelete(String imagefile){
+	  String basename=imagefile;
+		
+		int ib=imagefile.indexOf(".");
+						
+		if(ib!=-1){
+			 basename=imagefile.substring(0,ib);
+			 if(basename.length()<=1){
+				 logger.error("filename too short, so will not be ldeted");
+				 return;
+			 }
+		}
+		
+		List<FileItem> items=s3BucketService.listGenereratedImages(basename);
+		for(FileItem item:items){
+			logger.info("Deleting the file:"+item.getFile());
+			s3BucketService.deleteImagesInImageBucket(item.getFile());
+		}
+		
+	  
+  }
   
   public void notifyMasterImageUploaded(String imagefile){
 	  logger.info("processing mater image notification:"+imagefile);

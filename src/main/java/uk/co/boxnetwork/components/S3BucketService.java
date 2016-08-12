@@ -17,6 +17,8 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
@@ -85,6 +87,25 @@ public class S3BucketService {
 		
 		return videoFilesLocations;
 	}
+	public void deleteImagesInImageBucket(String keyName){
+		if(keyName==null|| keyName.trim().length()<=1){
+			throw new RuntimeException("refuxed to do the delte operation on the s3 bucket:"+keyName);
+		}
+		AmazonS3 s3=getAmazonS3();		
+		s3.deleteObject(new DeleteObjectRequest(s3Configuration.getImageBucket(), keyName));
+	}
+	public void deletePublicImage(String keyName){
+		 deleteImagesInImageBucket(s3Configuration.getImagePublicFolder()+"/"+keyName);
+	}
+	public List<FileItem> listGenereratedImages(String prefix){		
+		String path=s3Configuration.getImagePublicFolder();
+		if(prefix!=null){
+			path=path+"/"+prefix;
+		}		
+		List<FileItem>  files=listFiles(s3Configuration.getImageBucket(),path);
+		return files;
+	}
+	
 	public MediaFilesLocation listMasterImagesInImagesBucket(String prefix){
 		MediaFilesLocation videoFilesLocations=new MediaFilesLocation();
 		videoFilesLocations.setBaseUrl(s3Configuration.getS3imagesURL());

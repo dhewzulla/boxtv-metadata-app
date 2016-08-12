@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.FileIngestRequest;
 import uk.co.boxnetwork.data.bc.AddImageRequest;
 import uk.co.boxnetwork.data.bc.BCAccessToken;
@@ -37,6 +36,7 @@ import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.bc.BCVideoIngestRequest;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.data.bc.BcIngestResponse;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;

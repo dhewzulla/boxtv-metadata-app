@@ -1,6 +1,6 @@
 package uk.co.boxnetwork.data.bc;
 
-import uk.co.boxnetwork.data.AppConfig;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Episode;
 
 public class BCImages {

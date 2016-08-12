@@ -15,7 +15,7 @@ import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.co.boxnetwork.data.AppConfig;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.VideoStatus;
@@ -335,7 +335,7 @@ public class GenericUtilities {
 	  if(title==null||title.length()==0){
 		  return title;
 	  }
-	  return   title.replaceAll("[&\\/\\\\#,\\ +()$~%.'\":*?<>{}]","-");	  	  
+	  return   title.toLowerCase().replaceAll("[&\\/\\\\#,\\ +()$~%.'\":*?<>{}]","-");	  	  
   }
   public static String fromWebsafeTitle(String websafeTitle){
 	  if(websafeTitle==null||websafeTitle.length()==0){
