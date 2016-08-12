@@ -28,6 +28,7 @@ public class SeriesGroup {
 	@Column(name="image_url")
 	private String imageURL;
 	
+	private String tags;
 
 	public Long getId() {
 		return id;
@@ -86,6 +87,16 @@ public class SeriesGroup {
 
 	public void setImageURL(String imageURL) {
 		this.imageURL = imageURL;
+	}
+
+
+	public String getTags() {
+		return tags;
+	}
+
+
+	public void setTags(String tags) {
+		this.tags = tags;
 	}
 	
 

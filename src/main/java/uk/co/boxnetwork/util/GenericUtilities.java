@@ -372,6 +372,45 @@ public class GenericUtilities {
 	  }
 	 return channelName;
   }
+  public static String[] commandDelimitedToArray(String tags){
+	  if(tags==null){
+			return null;			
+	  }
+	  tags=tags.trim();
+	  if(tags.length()==0){
+		  return null;
+	  }
+	  String[] tagArray=tags.split(",");			
+	  for(int i=0;i<tagArray.length;i++){
+		  	tagArray[i]=tagArray[i].trim();						
+	  }
+	  return tagArray;
+  }
+  
+  public static String arrayToCommaSeparated(String tags[]){
+		if(tags==null ||tags.length==0){
+			return null;	
+		}
+		else{
+				String v=tags[0].trim();
+				List<String> added=new ArrayList<String>();
+				added.add(v);			
+				for(int i=1;i<tags.length;i++){
+					 tags[i]=tags[i].trim();
+					 if(added.contains(tags[i])){
+						 	continue;					
+					 }
+					 v=v+", ";
+					 v=v+tags[i];
+					 added.add(v);
+				}
+				return v;
+		}
+  
+  }
+	
+  
+  
 
   public static Date nextYearDate(){
 	    Calendar calendar=Calendar.getInstance();		
@@ -396,5 +435,7 @@ public class GenericUtilities {
 		imgURL=imgURL.replace("{ext}", ext);
 		return imgURL;
 	}
+		
+	
 }
 

@@ -3,6 +3,8 @@ package uk.co.boxnetwork.data;
 import java.util.Date;
 import java.util.List;
 
+import uk.co.boxnetwork.util.GenericUtilities;
+
 
 
 public class Series {
@@ -19,7 +21,7 @@ public class Series {
 	private String imageURL;
 	private Integer seriesNumber;
 	
-	
+	private String[] tags;
 	
 	
 	
@@ -38,6 +40,7 @@ public class Series {
 		this.synopsis=series.getSynopsis();		
 		this.imageURL=series.getImageURL();
 		this.seriesNumber=series.getSeriesNumber();
+		this.tags=GenericUtilities.commandDelimitedToArray(series.getTags());
 	}
 	public void update(uk.co.boxnetwork.model.Series series){		
 		series.setAssetId(this.assetId);
@@ -47,6 +50,7 @@ public class Series {
 		series.setSynopsis(this.synopsis);
 		series.setImageURL(this.imageURL);
 		series.setSeriesNumber(this.seriesNumber);
+		series.setTags(GenericUtilities.arrayToCommaSeparated(this.tags));
 	}
 	public Series(){
 		
@@ -126,6 +130,13 @@ public class Series {
 	public void setSeriesNumber(Integer seriesNumber) {
 		this.seriesNumber = seriesNumber;
 	}
+	public String[] getTags() {
+		return tags;
+	}
+	public void setTags(String[] tags) {
+		this.tags = tags;
+	}
+	
 	
 	
   

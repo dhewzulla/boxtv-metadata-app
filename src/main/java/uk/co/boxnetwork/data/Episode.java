@@ -300,15 +300,7 @@ public Episode(){
 		this.prAuk=episode.getPrAuk();
 		this.numberOfAdsPerBreak=episode.getNumberOfAdsPerBreak();
 		
-		if(episode.getTags()==null){
-			this.tags =null;			
-		}
-		else{
-			this.tags=episode.getTags().split(",");
-			for(int i=0;i<this.tags.length;i++){
-				this.tags[i]=this.tags[i].trim();				
-			}
-		}
+		this.tags=GenericUtilities.commandDelimitedToArray(episode.getTags());		
 		this.adsupport = episode.getAdsupport();
 		this.startDate = episode.getStartDate();
 		this.endDate = episode.getEndDate();
@@ -367,23 +359,8 @@ public Episode(){
 		episode.setCertType(this.certType);
 		episode.setWarningText(this.warningText);
 		episode.setNumberOfAdsPerBreak(numberOfAdsPerBreak);
-		if(this.tags==null ||this.tags.length==0){
-			episode.setTags(null);	
-		}
-		else{
-			String v=this.tags[0].trim();
-			List<String> added=new ArrayList<String>();
-			added.add(v);			
-			for(int i=1;i<this.tags.length;i++){
-				this.tags[i]=this.tags[i].trim();
-				if(added.contains(this.tags[i])){
-					continue;					
-				}
-				v=v+", ";
-				v=v+this.tags[i];		
-			}
-			episode.setTags(v);
-		}
+		
+		episode.setTags(GenericUtilities.arrayToCommaSeparated(this.tags));
 		
 		if("".equals(this.adsupport)){
 			this.adsupport=null;	
