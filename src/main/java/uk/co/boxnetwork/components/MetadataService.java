@@ -894,8 +894,12 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   public void updatePublishedStatus(Episode episode){
 	  EpisodeStatus episodeStatus=episode.getEpisodeStatus();
 	  if(episode.getBrightcoveId()==null){		  
-		  if(episodeStatus.getPublishedStatus()!=PublishedStatus.NOT_PUBLISHED){
+		  
+		  
+		  if(episodeStatus.getPublishedStatus()!=PublishedStatus.NOT_PUBLISHED || episodeStatus.getMetadataStatus()!=MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER){			  
 			  episodeStatus.setPublishedStatus(PublishedStatus.NOT_PUBLISHED);
+			  episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
+			  episodeStatus.setVideoStatus(VideoStatus.NO_PLACEHOLDER);
 			  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
 		  }		  
 	  }

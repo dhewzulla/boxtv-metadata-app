@@ -17,12 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.app.MediaCommand;
+import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
 import uk.co.boxnetwork.model.MetadataStatus;
+import uk.co.boxnetwork.model.PublishedStatus;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.model.SeriesGroup;
@@ -404,6 +406,37 @@ logger.info("pushing all changes to brightcove......");
 			}
 		}     	
     }
+    
+    public void checkAllRecordsConsistency(){
+    	
+
+		
+		int rcordLimit=appConfig.getRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
+		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
+		
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
+				if(episodes.size()==0){
+					break;
+				}
+				for(Episode episode:episodes){
+						EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+						if(episodeStatus.getMetadataStatus()!=MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER && episodeStatus.getPublishedStatus()==PublishedStatus.NOT_PUBLISHED){
+							metataService.updatePublishedStatus(episode);
+					    }		
+				}
+				if(searchParam.isEnd(episodes.size())){
+					break;
+				}
+				else{
+					searchParam.nextBatch();
+				}
+		}
+    }
+    
     @Transactional
     public void updateAppConfig(AppConfig config){
     	TypedQuery<AppConfig> query=entityManager.createQuery("SELECT s FROM app_config s", AppConfig.class);
