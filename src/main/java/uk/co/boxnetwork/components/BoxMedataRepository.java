@@ -30,6 +30,7 @@ import uk.co.boxnetwork.model.MediaTag;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.ProgrammeCertification;
 import uk.co.boxnetwork.model.ProgrammeContentType;
+import uk.co.boxnetwork.model.PublishedStatus;
 import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.model.SeriesGroup;
