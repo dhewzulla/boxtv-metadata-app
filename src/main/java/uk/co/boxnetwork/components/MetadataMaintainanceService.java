@@ -15,10 +15,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.app.MediaCommand;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
@@ -385,6 +385,35 @@ logger.info("pushing all changes to brightcove......");
     		metataService.publishMetadatatoBCByEpisodeId(episode.getId());
     	}
     	
+    }
+    @Transactional
+    public void syncAppConfigWithDatabase(){
+    	TypedQuery<AppConfig> query=entityManager.createQuery("SELECT s FROM app_config s", AppConfig.class);
+		List<AppConfig> configs=query.getResultList();
+		if(configs.size()==0){
+			entityManager.persist(appConfig);
+		}
+		else{
+			AppConfig configInDb=configs.get(0);
+			if(configInDb.getVersion()==null || appConfig.getVersion()>configInDb.getVersion()){
+				configInDb.importConfig(appConfig);
+				entityManager.merge(configInDb);
+			}
+			else{
+				configInDb.exportConfig(appConfig);
+			}
+		}     	
+    }
+    @Transactional
+    public void updateAppConfig(AppConfig config){
+    	TypedQuery<AppConfig> query=entityManager.createQuery("SELECT s FROM app_config s", AppConfig.class);
+		List<AppConfig> configs=query.getResultList();
+		if(configs.size()>0){			
+			AppConfig configInDb=configs.get(0);			
+				configInDb.importConfig(config);
+				entityManager.merge(configInDb);			
+				configInDb.exportConfig(appConfig);
+			}
     }
     
 }

@@ -13,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import uk.co.boxnetwork.components.MetadataMaintainanceService;
 import uk.co.boxnetwork.components.MetadataService;
-import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.SearchParam;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
@@ -78,7 +78,7 @@ public class EpisodeTransformer extends BoxRestTransformer{
 					episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
 		   }
 		   metadataService.update(id,episode);
-		   if(appConfig.getBrightcoveStatus()){
+		   if(appConfig.getBrightcoveStatus()){			   
 			   return metadataService.publishMetadatatoBCByEpisodeId(id);
 		   }
 		   else{

@@ -7,20 +7,9 @@ public class S3Configuration {
     private String imageMasterFolder;
     private String imagePublicFolder;
     private String s3imagesURL;
-    private String convertImage;
     
-	
-	
-
-	public String getConvertImage() {
-		return convertImage;
-	}
-
-	public void setConvertImage(String convertImage) {
-		this.convertImage = convertImage;
-	}
-
-	public String getImagePublicFolder() {
+    
+		public String getImagePublicFolder() {
 		return imagePublicFolder;
 	}
 

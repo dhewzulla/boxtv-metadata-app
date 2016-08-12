@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import uk.co.boxnetwork.components.MetadataService;
-import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.SeriesGroup;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
@@ -71,8 +71,14 @@ public class SeriesGroupTransformer extends BoxRestTransformer{
 				objectMapper.setSerializationInclusion(Include.NON_NULL);
 				seriesgroup = objectMapper.readValue(seriesGroupInJson, uk.co.boxnetwork.data.SeriesGroup.class);
 	   }
-	   metadataService.update(id,seriesgroup);	   
-	   return metadataService.publishMetadatatoBCBySeriesGroupId(id);						 
+	   metadataService.update(id,seriesgroup);	 
+	   if(appConfig.getBrightcoveStatus()){
+		   return metadataService.publishMetadatatoBCBySeriesGroupId(id);   
+	   }
+	   else{
+		   return seriesgroup;
+	   }
+	   						 
 	}
     
     @Override

@@ -11,8 +11,8 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import uk.co.boxnetwork.data.AppConfig;
 import uk.co.boxnetwork.model.AdSuport;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.ScheduleEvent;

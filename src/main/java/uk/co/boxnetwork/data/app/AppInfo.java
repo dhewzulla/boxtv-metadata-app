@@ -1,6 +1,6 @@
 package uk.co.boxnetwork.data.app;
 
-import uk.co.boxnetwork.data.AppConfig;
+import uk.co.boxnetwork.model.AppConfig;
 
 public class AppInfo {
 	private AppConfig appconfig;

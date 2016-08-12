@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 
 import uk.co.boxnetwork.data.s3.S3Configuration;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.util.GenericUtilities;
 
 @Service
@@ -19,7 +20,10 @@ public class NotificationReceiver {
 	private static final Logger logger=LoggerFactory.getLogger(NotificationReceiver.class);
 	
 	@Autowired
-	private S3Configuration s3Configuration;	
+	private S3Configuration s3Configuration;
+	
+	@Autowired
+	private AppConfig appConfig;
 	
 	@Autowired
 	private MetadataService metadataService; 
@@ -27,6 +31,9 @@ public class NotificationReceiver {
 	@Autowired
 	private CommandServices commandService; 
 	
+	
+	@Autowired
+	S3BucketService s3Service;
 	
 	private String getBucketName(Map<String, Object> messageMap){
 		return GenericUtilities.getValueInMap(messageMap,"Records[0].s3.bucket.name");
@@ -115,18 +122,20 @@ public class NotificationReceiver {
 	private void onImageBucketUpload(String file){
 		logger.info("Uploaded to the image bucket"+ file);
 		if(file.startsWith(s3Configuration.getImageMasterFolder())){
-			if(s3Configuration.getConvertImage()!=null && s3Configuration.getConvertImage().equals("False")){
+			
+			if(appConfig.getConvertImage()==null || (!appConfig.getConvertImage())){
+				logger.info("**** will not convert images because of the config");			
+			}
+			else{				
+						    try{
+					    		commandService.convertFromMasterImage(file);
+					    }
+					    catch(Throwable e){
+							logger.error(e+" while setting the image in the metadata on notification"+file,e );
+						}
 				
-				logger.info("**** not converting imagges");
 			}
-			else{							
-			    try{
-			    		commandService.convertFromMasterImage(file);
-			    }
-			    catch(Throwable e){
-					logger.error(e+" while setting the image in the metadata on notification"+file,e );
-				}
-			}
+			
 			try{
 				String imageFile=file.substring(s3Configuration.getImageMasterFolder().length()+1);
 				metadataService.notifyMasterImageUploaded(imageFile);
@@ -144,7 +153,20 @@ public class NotificationReceiver {
 	
 	private void onImageBucketFileDeleted(String file){
 		logger.info("image file is deleted:"+file);
+		if(appConfig.getConvertImage()==null || (!appConfig.getConvertImage())){
+			logger.info("**** ignoring delete because of the config");
+			return;
+		}
 		
+		if(file.startsWith(s3Configuration.getImageMasterFolder())){			
+			try{
+				String imageFile=file.substring(s3Configuration.getImageMasterFolder().length()+1);
+				metadataService.notifyMasterImageDelete(imageFile);
+			}
+			catch(Throwable e){
+				logger.error(e+" while setting the image in the metadata on notification"+file,e );
+			}
+		}
 				
 	}
 	private void onVideoBucketFileDeleted(String file){
