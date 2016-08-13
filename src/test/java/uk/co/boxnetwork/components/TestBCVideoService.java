@@ -2,6 +2,8 @@ package uk.co.boxnetwork.components;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -31,5 +33,23 @@ public class TestBCVideoService {
 		message=message.replaceAll("\\=", "\":\"");
 		message=message.replaceAll("\\, ", "\", \"");
 		System.out.println("result:"+message);
+	}
+	
+	@Test 
+	public void testEpgTitle(){
+		
+		Pattern p = Pattern.compile("S\\d\\d E\\d\\d .*");
+		Matcher m = p.matcher("S01 E06 This ishjkhfdsjaklfdsjk");
+	    assertTrue(m.matches());
+	    m = p.matcher("This ishjkhfdsjaklfdsjk");
+	    assertFalse(m.matches());
+	    
+	    
+	    
+	    
+
+		
+		
+		
 	}
 }

@@ -1,5 +1,7 @@
 package uk.co.boxnetwork.data;
 
+
+
 import java.util.ArrayList;
 
 import java.util.Collections;
@@ -8,7 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.co.boxnetwork.model.AdSuport;
 
@@ -24,6 +27,7 @@ import uk.co.boxnetwork.util.GenericUtilities;
 
 
 public class Episode {
+	private static final Logger logger=LoggerFactory.getLogger(Episode.class);
 	
     private Long id;
 
@@ -123,6 +127,13 @@ public class Episode {
 	 private String geoAllowedCountries;
 	 
 	 private String imageURL;
+	 
+	 private String supplier; 
+	 
+	 private Long firstTXDate;
+	 
+	 private Integer episodeSequenceNumber;
+	 
 	 
 	public Long getId() {
 		return id;
@@ -318,6 +329,9 @@ public Episode(){
 		this.episodeStatus=episode.getEpisodeStatus();
 		this.excludeddevices=episode.getExcludeddevices();
 		this.imageURL=episode.getImageURL();
+		this.supplier=episode.getSupplier();
+		this.firstTXDate=episode.getFirstTXDate();
+		this.episodeSequenceNumber=episode.getEpisodeSequenceNumber();
 		
 		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
@@ -359,7 +373,7 @@ public Episode(){
 		episode.setCertType(this.certType);
 		episode.setWarningText(this.warningText);
 		episode.setNumberOfAdsPerBreak(numberOfAdsPerBreak);
-		
+		episode.setSupplier(supplier);
 		episode.setTags(GenericUtilities.arrayToCommaSeparated(this.tags));
 		
 		if("".equals(this.adsupport)){
@@ -373,6 +387,8 @@ public Episode(){
 		episode.setTxChannel(this.txChannel);	
 		episode.setExcludeddevices(this.excludeddevices);
 		episode.setGeoAllowedCountries(this.geoAllowedCountries);
+		episode.setFirstTXDate(this.firstTXDate);
+		episode.setEpisodeSequenceNumber(this.episodeSequenceNumber);
 	}
 
 
@@ -448,6 +464,19 @@ public Episode(){
 			episode.setImageURL(this.imageURL);
 			changed=true;
 		}
+		if(this.supplier!=null){
+			episode.setSupplier(this.supplier);
+			changed=true;
+		}
+		if(this.firstTXDate!=null){
+			episode.setFirstTXDate(this.firstTXDate);
+			changed=true;
+		}
+		if(this.episodeSequenceNumber!=null){
+			episode.setEpisodeSequenceNumber(this.episodeSequenceNumber);
+			changed=true;
+		}
+		
 		return changed;
 	}
 	
@@ -656,5 +685,37 @@ public void setImageURL(String imageURL) {
 	this.imageURL = imageURL;
 }
 
+
+public String getSupplier() {
+	return supplier;
+}
+
+
+public void setSupplier(String supplier) {
+	this.supplier = supplier;
+}
+
+
+public Long getFirstTXDate() {
+	return firstTXDate;
+}
+
+
+public void setFirstTXDate(Long firstTXDate) {
+	this.firstTXDate = firstTXDate;
+}
+
+
+public Integer getEpisodeSequenceNumber() {
+	return episodeSequenceNumber;
+}
+
+
+public void setEpisodeSequenceNumber(Integer episodeSequenceNumber) {
+	this.episodeSequenceNumber = episodeSequenceNumber;
+}
+
+
+	
 	
 }
