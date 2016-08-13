@@ -1,5 +1,10 @@
 package uk.co.boxnetwork.components;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +58,11 @@ public class MetadataMaintainanceService {
 	
 	@Autowired
 	MetadataService metataService;
+	
+	
+	@Autowired
+	private S3BucketService s3uckerService;
+
 	
 	@Autowired
 	AppConfig appConfig;
@@ -344,9 +354,11 @@ logger.info("adding the default availability window......");
     }
     
     public  MediaCommand processCommand(MediaCommand mediaCommand){
-    	if("publish-all-changes".equals(mediaCommand.getCommand())){
-    		
+    	if("publish-all-changes".equals(mediaCommand.getCommand())){    		
     		pushAllChangesToBrightcove();    		
+    	}
+    	else if("import-brightcove-image".equals(mediaCommand.getCommand())){
+    		importImageFromBrightcove(mediaCommand.getEpisodeid(),mediaCommand.getFilename());
     	}
     	else{
     		logger.info("ignore the command");
@@ -354,7 +366,51 @@ logger.info("adding the default availability window......");
     	return mediaCommand;
      }
     
-    
+    public void importImageFromBrightcove(Long eposodeid, String mediaFileName){
+    	Episode episode=repository.findEpisodeById(eposodeid);
+    	if(episode==null){
+    		logger.error("Episode not found");
+    		throw new RuntimeException("Episode not found");
+    	}
+    	if(episode.getBrightcoveId()==null){
+    		logger.error("Episode does not have brightcoveid:");
+    		
+    		throw new RuntimeException("BrightcoveId is not in the episode");
+    	}
+
+    	BCVideoData video=videoService.getVideo(episode.getBrightcoveId());
+    	if(video==null){
+    		logger.error("failed to get bc video");
+    		throw new RuntimeException("failed to get the media item from bc");
+    	}
+    	if(video.getImages()==null || video.getImages().getPoster()==null){
+    		logger.error("Poster image not found in brightcove:"+episode.getBrightcoveId()+":eposodeid=["+eposodeid+"]");
+    		throw new RuntimeException("Thre is no poster image in bc to import");
+    	}
+    	if(video.getImages().getPoster().getSrc()==null){
+    		logger.error("Src is empty in poster");
+    		throw new RuntimeException("src is empty in the poster in brightcove");
+    	}
+    	String filepath="/data/"+mediaFileName;
+    	try{		    	
+		    	URL url=new URL(video.getImages().getPoster().getSrc());		    	
+		    	ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+		    	FileOutputStream fos = new FileOutputStream(filepath);
+		    	fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+		    	fos.close();		    	
+		    	s3uckerService.uploadMasterImageFile(filepath, mediaFileName);
+    	}
+    	catch(Exception e){
+    		logger.error(e+ "while downloading the image from the brightcove:"+video.getImages().getPoster().getSrc()+":"+filepath,e);
+    		 throw new RuntimeException(e+" while downloading image from brightcove");
+    	}
+    	finally{
+    		File file=new File(filepath);
+			file.delete();
+    	}
+
+    	
+    }
     public void pushAllChangesToBrightcove(){
     	
 logger.info("pushing all changes to brightcove......");
