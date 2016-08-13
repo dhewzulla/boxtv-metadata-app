@@ -1,5 +1,8 @@
 package uk.co.boxnetwork.mule.transformers.metadata;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.mule.api.MuleMessage;
 
 import org.mule.module.http.internal.ParameterMap;
@@ -77,7 +80,9 @@ public class EpisodeTransformer extends BoxRestTransformer{
 					objectMapper.setSerializationInclusion(Include.NON_NULL);
 					episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
 		   }
+		   
 		   metadataService.update(id,episode);
+		   
 		   if(appConfig.getBrightcoveStatus()){			   
 			   return metadataService.publishMetadatatoBCByEpisodeId(id);
 		   }
@@ -96,6 +101,30 @@ public class EpisodeTransformer extends BoxRestTransformer{
 				   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
 				   objectMapper.setSerializationInclusion(Include.NON_NULL);
 				   uk.co.boxnetwork.data.Episode episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
+				   
+				   if(episode.getTitle()!=null){
+						try{
+								Pattern p = Pattern.compile("S\\d\\d E\\d\\d .*");
+								Matcher m = p.matcher(episode.getTitle());
+							    if(m.matches()){
+							    	String seriesNumberString=episode.getTitle().substring(1,3);
+							    	String episodeNumberString=episode.getTitle().substring(5,7);
+							    	int seriesNumber=Integer.parseInt(seriesNumberString);
+							    	int episodeNumber=Integer.parseInt(episodeNumberString);
+							    	episode.setEpisodeSequenceNumber(episodeNumber);
+							    	if(episode.getSeries()!=null){
+							    		episode.getSeries().setSeriesNumber(seriesNumber);
+							    	}
+							    }
+						}
+						catch(Exception e){
+							logger.error(e+" while parsing the epg title to get series number and episode number",e);
+						}
+						
+					}
+				   
+				   
+				   
 				   if(episode.getId()==null){
 					   metadataMaintainanceService.fixTxChannel(episode);
 					   String validationError=GenericUtilities.validateEpisode(episode);

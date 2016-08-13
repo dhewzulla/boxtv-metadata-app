@@ -117,7 +117,14 @@ public class Episode {
 	@Column(name="number_of_ads_per_break")
 	private String numberOfAdsPerBreak;
 	
+	@Column(name="supplier")
+	private String supplier;
 	
+	@Column(name="first_tx_date")
+	private Long firstTXDate;
+	
+	@Column(name="episode_sequence_number")
+	private Integer episodeSequenceNumber;
 	
 	@OneToMany(fetch=FetchType.EAGER)
 	@JoinTable
@@ -511,6 +518,31 @@ public void setPrAuk(String prAuk) {
 	public void setImageURL(String imageURL) {
 		this.imageURL = imageURL;
 	}
+
+	public String getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(String supplier) {
+		this.supplier = supplier;
+	}
+
+	public Long getFirstTXDate() {
+		return firstTXDate;
+	}
+
+	public void setFirstTXDate(Long firstTXDate) {
+		this.firstTXDate = firstTXDate;
+	}
+
+	public Integer getEpisodeSequenceNumber() {
+		return episodeSequenceNumber;
+	}
+
+	public void setEpisodeSequenceNumber(Integer episodeSequenceNumber) {
+		this.episodeSequenceNumber = episodeSequenceNumber;
+	}
+
 
 	
 	
