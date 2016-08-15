@@ -1,18 +1,24 @@
 package uk.co.boxnetwork.components;
 
+import java.io.IOException;
+
+
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.Calendar;
 import java.util.Date;
+
 import java.util.List;
 
-import org.hibernate.validator.jtype.Generic;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import freemarker.template.TemplateException;
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.s3.FileItem;
@@ -28,6 +34,7 @@ import uk.co.boxnetwork.model.ScheduleEvent;
 import uk.co.boxnetwork.model.Series;
 import uk.co.boxnetwork.model.SeriesGroup;
 import uk.co.boxnetwork.model.VideoStatus;
+
 import uk.co.boxnetwork.util.GenericUtilities;
 
 @Service
@@ -131,6 +138,21 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		
 		return ret;		
 	}
+	
+	
+	
+	public Object getSoundMouseHeaderFile(Long id) throws Exception{
+		Episode episode=boxMetadataRepository.findEpisodeById(id);		
+		if(episode==null){
+			logger.warn("not found episode:"+id);
+			return null;
+		}
+	
+		return GenericUtilities.getSoundmouseHeader(episode);
+		
+	}
+	
+	
 	public uk.co.boxnetwork.data.CuePoint getCuePointById(Long id){
 		CuePoint cuepoint=boxMetadataRepository.findCuePoint(id);
 		if(cuepoint==null){

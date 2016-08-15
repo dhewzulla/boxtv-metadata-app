@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.apache.commons.lang.StringEscapeUtils;
 
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -545,7 +546,19 @@ public void setPrAuk(String prAuk) {
 
 
 	
-	
+	public void makeSoundMouseFriendy(){
+		
+		
+		title=GenericUtilities.makeSoundMouseFriendy(title);			
+		
+		if(cuePoints!=null&& cuePoints.size()>0){
+			for(CuePoint cuepoint:cuePoints){
+				cuepoint.makeSoundMouseFriendy();
+				
+			}
+		}
+		
+	}
 
    
 }

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mycompany</groupId>
 	<artifactId>boxtv-metadata-app</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <packaging>mule</packaging>
 	<name>Mule boxtv-metadata-app Application</name>
 
@@ -400,6 +400,11 @@
       <scope>compile</scope>
     </dependency>
 
+  <dependency>
+     <groupId>org.freemarker</groupId>
+     <artifactId>freemarker</artifactId>
+     <version>2.3.23</version>
+  </dependency>
 		
     </dependencies>
 
