@@ -160,6 +160,9 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.CueTransformer" name="cueTransformer" doc:name="Cue Transformer"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.metadata.AvailabilityTransformer" name="availabilityTransformer" doc:name="Availability Transformer"/>
    
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.soundmouse.SoundmouseTransformer" name="soundMouse" doc:name="SoundMouse"/>
+   
+   
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoPublisher" name="bcVideoPublisher" doc:name="BC Video Publisher"/>

@@ -1,19 +1,28 @@
 package uk.co.boxnetwork.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import freemarker.template.Template;
+import freemarker.template.TemplateExceptionHandler;
 
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Episode;
@@ -435,7 +444,40 @@ public class GenericUtilities {
 		imgURL=imgURL.replace("{ext}", ext);
 		return imgURL;
 	}
+	private static freemarker.template.Configuration freemarker_config=null;
+	public static void initFreeMarker() throws IOException{
+		if(freemarker_config!=null){
+			return;
+		}
+		freemarker_config = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_23);
 		
+		//freemarker_config.setDirectoryForTemplateLoading(file);
+		freemarker_config.setClassForTemplateLoading(GenericUtilities.class, "/data/soundmouse");
+		freemarker_config.setDefaultEncoding("UTF-8");
+		freemarker_config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+	}
+	public static Template getTemplate(String templateName) throws IOException{		
+		initFreeMarker();		
+		Template template=freemarker_config.getTemplate(templateName);
+		return template;
+	}
+	public static String getSoundmouseHeader(Episode episode) throws Exception{
+		episode.makeSoundMouseFriendy();
+		Map<String, Object> root = new HashMap<String, Object>();
+		root.put("episode", episode);
+		Template temp = getTemplate("soundmouse-header.xml");
+		StringWriter writer=new StringWriter();
+        temp.process(root, writer);
+        writer.close();
+        return writer.toString();
+	}
+	
+	public static String makeSoundMouseFriendy(String value){
+		if(value==null|| value.length()==0){
+			return null;
+		}
+		return StringEscapeUtils.escapeXml(value);
+	}
 	
 }
 

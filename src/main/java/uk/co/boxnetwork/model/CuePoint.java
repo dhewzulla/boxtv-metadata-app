@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import uk.co.boxnetwork.data.CuepointMetadata;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 @Entity(name="cue_points")
 public class CuePoint {
@@ -187,9 +188,12 @@ public class CuePoint {
 		this.artist=cueMetadata.getArtist();
 		this.track=cueMetadata.getTrack();
 		this.certification=cueMetadata.getCertification();
-		
 	}
 	
-	
+	public void makeSoundMouseFriendy(){
+		this.name=GenericUtilities.makeSoundMouseFriendy(name);
+		this.track=GenericUtilities.makeSoundMouseFriendy(track);
+		this.artist=GenericUtilities.makeSoundMouseFriendy(artist);
+	}
 	
 }
