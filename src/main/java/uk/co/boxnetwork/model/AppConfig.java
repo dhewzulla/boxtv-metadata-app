@@ -27,6 +27,13 @@ public class AppConfig {
   
  @Column(name="convert_image")
  private Boolean convertImage;
+ 
+ 
+ @Column(name="send_update_to_soundmouse")
+ private Boolean sendUpdateToSoundMouse;
+ 
+ 
+ 
 
 public Boolean getBrightcoveStatus() {
 	return brightcoveStatus;
@@ -76,6 +83,7 @@ public void exportConfig(AppConfig config){
      config.setId(config.getId());
      config.setVersion(this.version);
      config.setConvertImage(this.convertImage);
+     config.setSendUpdateToSoundMouse(this.sendUpdateToSoundMouse);
 }
 
 public void importConfig(AppConfig config){	
@@ -84,6 +92,7 @@ public void importConfig(AppConfig config){
     this.recordLimit=config.getRecordLimit();
     this.version=config.getVersion();
     this.convertImage=config.getConvertImage();
+    this.sendUpdateToSoundMouse=config.getSendUpdateToSoundMouse();
     
 }
 
@@ -93,6 +102,14 @@ public Integer getVersion() {
 
 public void setVersion(Integer version) {
 	this.version = version;
+}
+
+public Boolean getSendUpdateToSoundMouse() {
+	return sendUpdateToSoundMouse;
+}
+
+public void setSendUpdateToSoundMouse(Boolean sendUpdateToSoundMouse) {
+	this.sendUpdateToSoundMouse = sendUpdateToSoundMouse;
 }
 
  

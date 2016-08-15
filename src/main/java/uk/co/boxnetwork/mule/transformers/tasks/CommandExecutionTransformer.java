@@ -22,7 +22,7 @@ public class CommandExecutionTransformer extends BoxRestTransformer{
 			   logger.info("*****Posted a new command:"+commandInJson+"****");
 			   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
 			   objectMapper.setSerializationInclusion(Include.NON_NULL);
-			   uk.co.boxnetwork.data.app.MediaCommand command = objectMapper.readValue(commandInJson, uk.co.boxnetwork.data.app.MediaCommand.class);
+			   uk.co.boxnetwork.model.MediaCommand command = objectMapper.readValue(commandInJson, uk.co.boxnetwork.model.MediaCommand.class);
 			   return metadataRepository.processCommand(command);			   
 		}
 		catch(Exception e){

@@ -141,7 +141,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	
 	
 	
-	public Object getSoundMouseHeaderFile(Long id) throws Exception{
+	public String getSoundMouseHeaderFile(Long id) throws Exception{
 		Episode episode=boxMetadataRepository.findEpisodeById(id);		
 		if(episode==null){
 			logger.warn("not found episode:"+id);
@@ -955,6 +955,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	  }	  
 	  return new uk.co.boxnetwork.data.Episode(uptoDateEpisode,null);
   }
+  
   public  uk.co.boxnetwork.data.Series publishMetadatatoBCBySeriesId(Long id){
 	  Series series=boxMetadataRepository.findSeriesById(id);
 	  if(series==null){
