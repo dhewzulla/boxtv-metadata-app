@@ -116,6 +116,7 @@ public class Episode {
 	private List<AvailabilityWindow> availabilities=new ArrayList<AvailabilityWindow>();
 	
 	private Double durationScheduled;
+	private Double durationUploaded;;
 	
 
 	 private String showType;
@@ -332,6 +333,7 @@ public Episode(){
 		this.supplier=episode.getSupplier();
 		this.firstTXDate=episode.getFirstTXDate();
 		this.episodeSequenceNumber=episode.getEpisodeSequenceNumber();
+		this.durationUploaded=episode.getDurationUploaded();
 		
 		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
@@ -389,6 +391,7 @@ public Episode(){
 		episode.setGeoAllowedCountries(this.geoAllowedCountries);
 		episode.setFirstTXDate(this.firstTXDate);
 		episode.setEpisodeSequenceNumber(this.episodeSequenceNumber);
+		episode.setDurationUploaded(this.durationUploaded);
 	}
 
 
@@ -713,6 +716,16 @@ public Integer getEpisodeSequenceNumber() {
 
 public void setEpisodeSequenceNumber(Integer episodeSequenceNumber) {
 	this.episodeSequenceNumber = episodeSequenceNumber;
+}
+
+
+public Double getDurationUploaded() {
+	return durationUploaded;
+}
+
+
+public void setDurationUploaded(Double durationUploaded) {
+	this.durationUploaded = durationUploaded;
 }
 
 

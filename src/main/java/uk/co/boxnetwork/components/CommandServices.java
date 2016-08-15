@@ -45,10 +45,16 @@ public class CommandServices {
     			throw new RuntimeException("filename should not end with slash");
     		}    		
     	}
-    	String result=executeCommand("convert_s3_image",s3Configuration.getImageBucket(),masterImage,destfilename, s3Configuration.getImagePublicFolder());
-    	if(result!=null){
-    		throw new RuntimeException(result);
+    	executeCommand("convert_s3_image",s3Configuration.getImageBucket(),masterImage,destfilename, s3Configuration.getImagePublicFolder());
+    }
+    public String getVideoDuration(String videoURL) throws IOException, InterruptedException{
+        videoURL=videoURL.replace("https","http");
+    	String outputResult=executeCommand("getvideo_duration",videoURL);
+    	if(outputResult!=null){
+    		outputResult=outputResult.trim();    		
     	}
+    	
+    	return outputResult;
     	
     }
     
@@ -72,13 +78,13 @@ public class CommandServices {
     	int errCode = process.waitFor();    	    	
     	 String outputResult=IOUtils.toString(process.getInputStream());
     	 String errorOutput=IOUtils.toString(process.getErrorStream());
-    	 logger.info("**outputResult=["+outputResult+"]");
-    	 logger.info("**errorOutput=["+errorOutput+"]");
+    	 logger.info("**************outputResult=["+outputResult+"]");
+    	 logger.info("*************errorOutput=["+errorOutput+"]");
     	 if(errCode!=0){    		 
     		 return "errorCode="+errCode +" with error message:"+errorOutput;
     	 }
     	 else{
-    		 return null;
+    		 return outputResult;
     	 }
     }
     

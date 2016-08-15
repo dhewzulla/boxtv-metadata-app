@@ -49,6 +49,9 @@ public class MetadataService {
 	@Autowired
 	BCVideoService videoService;
 	
+	@Autowired
+	CommandServices commandService;
+	
 	public List<uk.co.boxnetwork.data.SeriesGroup> getAllSeriesGroups(SearchParam searchParam){
 		List<uk.co.boxnetwork.data.SeriesGroup> seriesgrps=new ArrayList<uk.co.boxnetwork.data.SeriesGroup>();
 		List<SeriesGroup> seriesgroups=boxMetadataRepository.findAllSeriesGroup(searchParam);
@@ -224,11 +227,11 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		String oldIngestProfile=existingEpisode.getIngestProfile();
 		logger.info("Before upating the episode:"+existingEpisode);
 		episode.update(existingEpisode);
-		
 		statusUpdateOnEpisodeUpdated(existingEpisode,oldIngestSource,oldIngestProfile);
 		
 		boxMetadataRepository.saveTags(episode.getTags());
 		logger.info("After upating the episode:"+existingEpisode);
+		
 		checkS3ToUpdateVidoStatus(existingEpisode);
 		if(GenericUtilities.isNotValidCrid(existingEpisode.getImageURL())){
 			String fname=retrieveEpisodeImageFromS3(existingEpisode);
@@ -857,8 +860,12 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	   }
 	   else if(matchedEpisodes.size()==1){
 		   Episode episode=matchedEpisodes.get(0);
-		   episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
+		   episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));		   
 		   statusBoundSourceVideo(episode);
+		   Double durationUploaded=checkVideoDuration(episode);
+		   if(durationUploaded!=null){
+			   episode.setDurationUploaded(durationUploaded);
+		   }
 		   boxMetadataRepository.persist(episode);
 		   
 	   }
@@ -868,6 +875,11 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 			   if(episode.getIngestSource()!=null){
 				   episode.setIngestSource(s3BucketService.getFullVideoURL(ingestFile));
 				   statusBoundSourceVideo(episode);
+				   
+				   Double durationUploaded=checkVideoDuration(episode);
+				   if(durationUploaded!=null){
+					   episode.setDurationUploaded(durationUploaded);
+				   }
 				   boxMetadataRepository.persist(episode);
 			   }
 		   }
@@ -876,6 +888,22 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	   
    }
    
+   public Double checkVideoDuration(Episode episode){
+	   try{
+		   if(GenericUtilities.isNotValidCrid(episode.getIngestSource())){
+			   return null;
+		   }
+		   String url=s3BucketService.generatedPresignedURL(episode.getIngestSource(), 20);
+		   String commandResult=commandService.getVideoDuration(url);
+		   Double duration=Double.valueOf(commandResult);		   
+		   
+		   return duration;
+	   }
+	   catch(Exception e){
+		   logger.error(e+" while getting the duration:"+e,e);
+		   return null;
+	   }
+   }
    
    public void deleteEpisodeById(Long episodeid){	   
 		 boxMetadataRepository.removeEpisode(episodeid);
