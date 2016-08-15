@@ -529,4 +529,36 @@ logger.info("pushing all changes to brightcove......");
 			}
     }
     
+    
+public void calculateUploadedDuration(){
+		int rcordLimit=appConfig.getRecordLimit();
+		if(rcordLimit<1){
+			rcordLimit=Integer.MAX_VALUE;
+		}
+		SearchParam searchParam=new SearchParam(null, 0, rcordLimit);
+		
+		while(true){
+				List<Episode> episodes=repository.findAllEpisodes(searchParam);
+				if(episodes.size()==0){
+					break;
+				}
+				for(Episode episode:episodes){
+					  if(episode.getIngestSource()!=null && episode.getDurationUploaded()==null){
+						  logger.info("*****calculating the duration for the episode:"+episode);
+						   Double durationUploaded=metataService.checkVideoDuration(episode);
+						   if(durationUploaded!=null){
+							   episode.setDurationUploaded(durationUploaded);
+							   repository.updateEpisode(episode);
+						   }
+					  }					  		
+				}
+				if(searchParam.isEnd(episodes.size())){
+					break;
+				}
+				else{
+					searchParam.nextBatch();
+				}
+		}
+    }
+    
 }
