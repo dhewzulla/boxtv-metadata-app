@@ -119,7 +119,10 @@ public class BoxMedataRepository {
     	   
        		}
 		}
-       
+       @Transactional
+       public void updateEpisode(Episode episode){
+    	   persist(episode); 
+       }
        
        
        public void persist(CuePoint cuePoint){
