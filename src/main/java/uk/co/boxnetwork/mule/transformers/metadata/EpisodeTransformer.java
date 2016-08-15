@@ -83,6 +83,14 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		   
 		   metadataService.update(id,episode);
 		   
+		   if(appConfig.getSendUpdateToSoundMouse()!=null && appConfig.getSendUpdateToSoundMouse()){
+			   metadataMaintainanceService.scheduleToDeliverSoundmouseHeaderFile(episode.getId());
+		   }
+		   else{
+			   logger.info("***will not deliver the changes to the soundmouse");
+		   }
+		   
+		   
 		   if(appConfig.getBrightcoveStatus()){			   
 			   return metadataService.publishMetadatatoBCByEpisodeId(id);
 		   }
@@ -90,6 +98,7 @@ public class EpisodeTransformer extends BoxRestTransformer{
 			   logger.info("Skipping the auto publish to brightcove");
 			   return episode;
 		   }
+		   
 		}  
          
          
@@ -137,6 +146,13 @@ public class EpisodeTransformer extends BoxRestTransformer{
 					   episode=metadataService.updateEpisodeById(episode);	
 				   }
 				   if(episode.getEpisodeStatus()!=null && episode.getEpisodeStatus().getMetadataStatus()==MetadataStatus.NEEDS_TO_PUBLISH_CHANGES){
+					  
+					   if(appConfig.getSendUpdateToSoundMouse()!=null && appConfig.getSendUpdateToSoundMouse()){
+						   metadataMaintainanceService.scheduleToDeliverSoundmouseHeaderFile(episode.getId());
+					   }
+					   else{
+						   logger.info("***will not deliver the changes to the soundmouse");
+					   }
 					   if(appConfig.getBrightcoveStatus()){
 						   return metadataService.publishMetadatatoBCByEpisodeId(episode.getId());   
 					   }

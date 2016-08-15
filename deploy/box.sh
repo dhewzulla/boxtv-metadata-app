@@ -5,7 +5,10 @@ muleappname=boxtv-metadata-app
 cd ~/box-config
 git add . --all
 git commit -m "developing"
+git checkout master
+git merge develop
 git push origin
+git checkout develop
 cd -
 
 ssh ec2-user@boxnetwork.co.uk 'cd ~/box-config && git pull origin'

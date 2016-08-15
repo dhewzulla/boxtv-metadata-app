@@ -26,6 +26,7 @@ import uk.co.boxnetwork.model.ComplianceInformation;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
+import uk.co.boxnetwork.model.MediaCommand;
 import uk.co.boxnetwork.model.MediaTag;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.ProgrammeCertification;
@@ -646,6 +647,24 @@ public class BoxMedataRepository {
 		   return entityManager.find(AvailabilityWindow.class, id);
 	   }
 	  
+	   public List<MediaCommand> findAllMediaCommand(){
+		   TypedQuery<MediaCommand> query=entityManager.createQuery("SELECT m FROM media_command m", MediaCommand.class);
+		   return query.getResultList();
+	   }
+	   public List<MediaCommand> findMediaCommandByCommand(String command){
+		   TypedQuery<MediaCommand> query=entityManager.createQuery("SELECT m FROM media_command m where m.command = :command", MediaCommand.class);
+		   query.setParameter("command",command);		   
+		   return query.getResultList();
+	   }
+	   @Transactional
+	   public void removeMediaCommandById(Long id){
+		   MediaCommand mediaCommand=entityManager.find(MediaCommand.class, id);		   
+		   entityManager.remove(mediaCommand);		   
+	   }
+	   @Transactional
+	   public void persistMediaCommand(MediaCommand mediaCommand){		   		   
+		   entityManager.persist(mediaCommand);		   
+	   }
 	   public List<Episode> findAllEpisodes(SearchParam searchParam){
 		   String queryString=searchParam.selectQuery("SELECT e FROM episode e", "SELECT e FROM episode e where e.title LIKE :search OR e.materialId LIKE :search OR e.series.name LIKE :search");		   
 		   TypedQuery<Episode> query=entityManager.createQuery(queryString, Episode.class);

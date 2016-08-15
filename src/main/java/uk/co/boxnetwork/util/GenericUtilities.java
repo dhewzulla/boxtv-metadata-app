@@ -33,6 +33,7 @@ import uk.co.boxnetwork.mule.components.LoadResourceAsInputStream;
 public class GenericUtilities {
 	private static final Logger logger=LoggerFactory.getLogger(GenericUtilities.class);
 	
+	public static String DELIVER_SOUND_MOUSE_HEADER_FILE="deliver_soundmouse_header_file";
 	
 	static {
 	    try {

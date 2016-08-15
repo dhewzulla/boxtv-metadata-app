@@ -21,13 +21,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.co.boxnetwork.data.SearchParam;
-import uk.co.boxnetwork.data.app.MediaCommand;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.EpisodeStatus;
+import uk.co.boxnetwork.model.MediaCommand;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.PublishedStatus;
 import uk.co.boxnetwork.model.ScheduleEvent;
@@ -365,6 +365,30 @@ logger.info("adding the default availability window......");
     	}
     	return mediaCommand;
      }
+    
+    public MediaCommand getMeidaCommandForDeliverSoundMouseHeaderFile(){    	
+    	List<MediaCommand> mediaCommands=repository.findMediaCommandByCommand(GenericUtilities.DELIVER_SOUND_MOUSE_HEADER_FILE);    	
+    	if(mediaCommands.size()==0){
+    		return null;
+    	}
+    	MediaCommand mediaCommand=mediaCommands.get(0);
+    	repository.removeMediaCommandById(mediaCommand.getId());
+    	return mediaCommand;   	
+    }
+    public void scheduleToDeliverSoundmouseHeaderFile(Long episodeid){
+  	  
+    	MediaCommand mediaCommand=new MediaCommand();
+    	mediaCommand.setCommand(GenericUtilities.DELIVER_SOUND_MOUSE_HEADER_FILE);
+    	mediaCommand.setEpisodeid(episodeid);
+    	Episode episode=repository.findEpisodeById(episodeid);
+    	
+    	String matfilepart=GenericUtilities.materialIdToImageFileName(episode.getMaterialId());
+    	String websafetitle=GenericUtilities.toWebsafeTitle(episode.getTitle());
+    	String filename=websafetitle+"_"+matfilepart+"_"+episode.getId()+".xml";
+    	mediaCommand.setFilename(filename);    	
+    	repository.persistMediaCommand(mediaCommand);
+    }
+    
     
     public void importImageFromBrightcove(Long eposodeid, String mediaFileName){
     	Episode episode=repository.findEpisodeById(eposodeid);
