@@ -15,7 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.apache.commons.lang.StringEscapeUtils;
+
 
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -108,6 +108,11 @@ public class Episode {
 	
 	@Column(name="duration_scheduled")
 	private Double durationScheduled;
+	
+	@Column(name="duration_uploaded")
+	private Double durationUploaded;
+	
+	
 	
 	@Column(name="show_type")
 	private String showType;
@@ -546,6 +551,14 @@ public void setPrAuk(String prAuk) {
 
 
 	
+	public Double getDurationUploaded() {
+		return durationUploaded;
+	}
+
+	public void setDurationUploaded(Double durationUploaded) {
+		this.durationUploaded = durationUploaded;
+	}
+
 	public void makeSoundMouseFriendy(){
 		
 		
