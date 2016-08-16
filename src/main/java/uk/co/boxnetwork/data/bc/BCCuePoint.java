@@ -21,7 +21,7 @@ public class BCCuePoint {
 				this.metadata="{\"numberOfAds\":"+cuepoint.getMetadata().getNumberOfAds()+"}";				
 		  }
 		  else if(numberOfBraks!=null && numberOfBraks.trim().length()>0){
-			  this.metadata="{\"numberOfAds\":"+cuepoint.getMetadata().getNumberOfAds()+"}";
+			  this.metadata="{\"numberOfAds\":"+numberOfBraks+"}";
 		  }
 		  
 		  		  
