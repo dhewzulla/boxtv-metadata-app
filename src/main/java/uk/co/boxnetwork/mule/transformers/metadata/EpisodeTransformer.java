@@ -111,19 +111,20 @@ public class EpisodeTransformer extends BoxRestTransformer{
 				   objectMapper.setSerializationInclusion(Include.NON_NULL);
 				   uk.co.boxnetwork.data.Episode episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
 				   
-				   if(episode.getTitle()!=null){
+				   if(episode.getSynopsis()!=null){
 						try{
 								Pattern p = Pattern.compile("S\\d\\d E\\d\\d .*");
-								Matcher m = p.matcher(episode.getTitle());
+								Matcher m = p.matcher(episode.getSynopsis());
 							    if(m.matches()){
-							    	String seriesNumberString=episode.getTitle().substring(1,3);
-							    	String episodeNumberString=episode.getTitle().substring(5,7);
+							    	String seriesNumberString=episode.getSynopsis().substring(1,3);
+							    	String episodeNumberString=episode.getSynopsis().substring(5,7);
 							    	int seriesNumber=Integer.parseInt(seriesNumberString);
 							    	int episodeNumber=Integer.parseInt(episodeNumberString);
 							    	episode.setEpisodeSequenceNumber(episodeNumber);
 							    	if(episode.getSeries()!=null){
 							    		episode.getSeries().setSeriesNumber(seriesNumber);
 							    	}
+							    	episode.setSynopsis(episode.getSynopsis().substring(7));							    	
 							    }
 						}
 						catch(Exception e){

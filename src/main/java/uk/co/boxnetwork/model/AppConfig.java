@@ -32,6 +32,8 @@ public class AppConfig {
  @Column(name="send_update_to_soundmouse")
  private Boolean sendUpdateToSoundMouse;
  
+ @Column(name="visibility_category")
+ private String visibilityCategory;
  
  
 
@@ -84,6 +86,7 @@ public void exportConfig(AppConfig config){
      config.setVersion(this.version);
      config.setConvertImage(this.convertImage);
      config.setSendUpdateToSoundMouse(this.sendUpdateToSoundMouse);
+     config.setVisibilityCategory(this.visibilityCategory);
 }
 
 public void importConfig(AppConfig config){	
@@ -93,6 +96,7 @@ public void importConfig(AppConfig config){
     this.version=config.getVersion();
     this.convertImage=config.getConvertImage();
     this.sendUpdateToSoundMouse=config.getSendUpdateToSoundMouse();
+    this.visibilityCategory=config.getVisibilityCategory();
     
 }
 
@@ -110,6 +114,14 @@ public Boolean getSendUpdateToSoundMouse() {
 
 public void setSendUpdateToSoundMouse(Boolean sendUpdateToSoundMouse) {
 	this.sendUpdateToSoundMouse = sendUpdateToSoundMouse;
+}
+
+public String getVisibilityCategory() {
+	return visibilityCategory;
+}
+
+public void setVisibilityCategory(String visibilityCategory) {
+	this.visibilityCategory = visibilityCategory;
 }
 
  
