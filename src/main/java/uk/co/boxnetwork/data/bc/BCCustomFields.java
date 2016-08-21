@@ -1,6 +1,7 @@
 package uk.co.boxnetwork.data.bc;
 
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 public class BCCustomFields {
   private String contenttype;
@@ -28,7 +29,7 @@ public class BCCustomFields {
 	  
   }
   public BCCustomFields(Episode episode){
-	  if(episode.getSeries()!=null){
+	  if(GenericUtilities.episodeHasSeries(episode)){		  
 		  this.seriestitle= episode.getSeries().getName();	
 		  if(episode.getSeries().getSeriesNumber()!=null){
 			  seriesnumber=String.valueOf(episode.getSeries().getSeriesNumber());
@@ -40,7 +41,7 @@ public class BCCustomFields {
 	  if(episode.getCertType()!=null){
 		  certificationtype=episode.getCertType().getBcName();
 	  }
-	  if(episode.getSeries()!=null && episode.getSeries().getSeriesGroup()!=null){
+	  if(GenericUtilities.episodeHasSeriesGroup(episode)){
 		  programmetitle= episode.getSeries().getSeriesGroup().getTitle();
 		  programmesynopsis=episode.getSeries().getSeriesGroup().getSynopsis();
 	  }

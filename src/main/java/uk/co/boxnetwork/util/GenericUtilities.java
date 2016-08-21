@@ -479,6 +479,35 @@ public class GenericUtilities {
 		}
 		return StringEscapeUtils.escapeXml(value);
 	}
-	
+	public static boolean episodeHasSeries(Episode episode){
+		if(episode==null){
+			return false;			
+		}
+		if(episode.getSeries()==null){
+			return false;
+		}
+		if("Default Series".equals(episode.getSeries().getName())){
+			return false;
+		}
+		return true;
+	}
+	public static boolean episodeHasSeriesGroup(Episode episode){
+		if(episode==null){
+			return false;			
+		}
+		if(episode.getSeries()==null){
+			return false;
+		}
+		if("Default Series".equals(episode.getSeries().getName())){
+			return false;
+		}
+		if(episode.getSeries().getSeriesGroup()==null){
+			return false;
+		}
+		if("Default Series Group".equals(episode.getSeries().getSeriesGroup().getTitle())){
+			return false;
+		}
+		return true;
+	}
 }
 
