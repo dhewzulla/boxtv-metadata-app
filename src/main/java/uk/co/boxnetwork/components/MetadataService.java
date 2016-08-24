@@ -536,7 +536,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 				}
 			}
 		}
-		checks3ToSetSeriesImage(existingSeries);
+		if(existingSeries!=null){
+			checks3ToSetSeriesImage(existingSeries);
+		}
 		
 		if(existingEpisode==null){
 			logger.info("creating a new episode");
