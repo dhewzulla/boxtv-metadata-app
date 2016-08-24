@@ -793,9 +793,11 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		else{
 			logger.info("***number of cue points received:"+cuePoints.size());
 		}
-	    for(CuePoint cp:episodeToUpdate.getCuePoints()){	    	
-	    	boxMetadataRepository.remove(cp);	    	
-	    }
+		if(episodeToUpdate.getCuePoints()!=null){
+		    for(CuePoint cp:episodeToUpdate.getCuePoints()){	    	
+		    	boxMetadataRepository.remove(cp);	    	
+		    }
+		}
 	    episodeToUpdate.clearCuePoints();
 	    
 	    

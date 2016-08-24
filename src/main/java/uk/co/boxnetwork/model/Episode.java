@@ -404,6 +404,9 @@ public class Episode {
   
 		
    public void addCuePoint(CuePoint cuepoint){
+	   if(this.cuePoints==null){
+		   this.cuePoints=new HashSet<CuePoint>();
+	   }
 	   this.cuePoints.add(cuepoint);
    }
    public void addAvailabilityWindow(AvailabilityWindow av){
@@ -418,7 +421,9 @@ public class Episode {
    
 
    public void clearCuePoints(){
-	   this.cuePoints.clear();
+	   if(this.cuePoints!=null){
+		   this.cuePoints.clear();
+	   }
    }
    public void clearAvailabilityWindows(){
 	   this.availabilities.clear();
