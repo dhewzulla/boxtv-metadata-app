@@ -467,8 +467,7 @@ public class BoxMedataRepository {
 		   }
 		   else{
 			   episode.setComplianceInformations(saveComplianceInformations(episode.getComplianceInformations()));
-			   episode.adjustBeforeSave();
-			   if(GenericUtilities.isNotAValidId(episode.getPrimaryId())){
+			   episode.adjustBeforeSave();			   
 				   if(GenericUtilities.isNotValidCrid(episode.getCtrPrg())){
 					   if(GenericUtilities.isNotValidTitle(episode.getTitle())){
 						   if(GenericUtilities.isNotValidTitle(episode.getName())){
@@ -490,14 +489,15 @@ public class BoxMedataRepository {
 				   }
 				   else{
 					   List<Episode> matchedEpisodes=findEpisodesByCtrPrg(episode.getCtrPrg());
-					   return returnExistingEpisodeOrPersist(episode,matchedEpisodes,"ctrprg="+episode.getCtrPrg());
+					   if(matchedEpisodes.size()==0 && (!GenericUtilities.isNotAValidId(episode.getPrimaryId()))){
+						   matchedEpisodes=findEpisodesByPrimaryId(episode.getPrimaryId());
+						   return returnExistingEpisodeOrPersist(episode,matchedEpisodes,"primaryid="+episode.getPrimaryId());
+					   }
+					   else{
+						   return returnExistingEpisodeOrPersist(episode,matchedEpisodes,"ctrprg="+episode.getCtrPrg());
+					   }
 				   }
-			   }
-			   else{
-				
-					   List<Episode> matchedEpisodes=findEpisodesByPrimaryId(episode.getPrimaryId());
-					   return returnExistingEpisodeOrPersist(episode,matchedEpisodes,"primaryid="+episode.getPrimaryId());
-			   }
+			  
 			   
 		   }
 	   }
@@ -669,7 +669,7 @@ public class BoxMedataRepository {
 		   entityManager.persist(mediaCommand);		   
 	   }
 	   public List<Episode> findAllEpisodes(SearchParam searchParam){
-		   String queryString=searchParam.selectQuery("SELECT e FROM episode e", "SELECT e FROM episode e where e.title LIKE :search OR e.materialId LIKE :search OR e.series.name LIKE :search");		   
+		   String queryString=searchParam.selectQuery("SELECT e FROM episode e", "SELECT e FROM episode e where e.title LIKE :search OR e.materialId LIKE :search");		   
 		   TypedQuery<Episode> query=entityManager.createQuery(queryString, Episode.class);
 		   searchParam.config(query);		   		   
 		   return query.getResultList();		   
