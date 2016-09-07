@@ -194,6 +194,7 @@ public class CuePoint {
 		this.name=GenericUtilities.makeSoundMouseFriendy(name);
 		this.track=GenericUtilities.makeSoundMouseFriendy(track);
 		this.artist=GenericUtilities.makeSoundMouseFriendy(artist);
+		this.duration=GenericUtilities.makeDurationMouseFriendy(duration);
 	}
 	
 }

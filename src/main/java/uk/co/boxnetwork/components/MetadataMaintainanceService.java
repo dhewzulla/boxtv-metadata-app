@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -375,6 +377,7 @@ logger.info("adding the default availability window......");
     	repository.removeMediaCommandById(mediaCommand.getId());
     	return mediaCommand;   	
     }
+    
     public void scheduleToDeliverSoundmouseHeaderFile(Long episodeid){
   	  
     	MediaCommand mediaCommand=new MediaCommand();
@@ -384,8 +387,10 @@ logger.info("adding the default availability window......");
     	
     	String matfilepart=GenericUtilities.materialIdToImageFileName(episode.getMaterialId());
     	String websafetitle=GenericUtilities.toWebsafeTitle(episode.getTitle());
-    	String filename=websafetitle+"_"+matfilepart+"_"+episode.getId()+".xml";
-    	mediaCommand.setFilename(filename);    	
+    	//String filename=websafetitle+"_"+matfilepart+"_"+episode.getId()+".xml";
+    	Date today=new Date();
+		SimpleDateFormat formatter=new SimpleDateFormat("ddMMyyHHmmss'CTINT'ddMMyyyy");
+    	mediaCommand.setFilename(formatter.format(today)+".xml");    	
     	repository.persistMediaCommand(mediaCommand);
     }
     
