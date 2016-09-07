@@ -25,6 +25,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 
 import uk.co.boxnetwork.model.AppConfig;
+import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.model.VideoStatus;
@@ -466,7 +467,7 @@ public class GenericUtilities {
 		episode.makeSoundMouseFriendy();
 		Map<String, Object> root = new HashMap<String, Object>();
 		root.put("episode", episode);
-		Template temp = getTemplate("soundmouse-header.xml");
+		Template temp = getTemplate("soundmouse-header.xml");		
 		StringWriter writer=new StringWriter();
         temp.process(root, writer);
         writer.close();
@@ -479,6 +480,17 @@ public class GenericUtilities {
 		}
 		return StringEscapeUtils.escapeXml(value);
 	}
+	public static String makeDurationMouseFriendy(String value){
+		if(value==null|| value.length()==0){
+			return null;			
+		}
+		String parts[]=value.split(":");
+		if(parts.length<4){
+			return value;
+		}
+		return parts[0]+":"+parts[1]+":"+parts[2];
+	}
+	
 	public static boolean episodeHasSeries(Episode episode){
 		if(episode==null){
 			return false;			
@@ -509,5 +521,6 @@ public class GenericUtilities {
 		}
 		return true;
 	}
+	
 }
 
