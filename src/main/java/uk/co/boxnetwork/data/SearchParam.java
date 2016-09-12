@@ -17,6 +17,10 @@ public class SearchParam {
 	private String search=null;
 	private Integer start=null;
 	private Integer limit=null;
+	private String contractNumber=null;
+	private String title=null;
+	
+	
 	
 	public SearchParam(String search, Integer start, Integer limit) {
 		super();
@@ -40,6 +44,7 @@ public class SearchParam {
 							}
 						}
 				}
+				this.contractNumber=queryparams.get("contractNumber");
 				String startParam=queryparams.get("start");
 				if(startParam!=null){
 					startParam=startParam.trim();
@@ -50,6 +55,13 @@ public class SearchParam {
 				    	catch(Exception e){
 				    		logger.error(e+ " while convering the startParam:"+startParam,e);
 				    	}
+					}
+				}
+				this.title=queryparams.get("title");
+				if(this.title!=null){
+					this.title=this.title.trim();
+					if(this.title.length()==0){
+						this.title=null;
 					}
 				}
 		}
@@ -75,6 +87,19 @@ public class SearchParam {
 		this.limit = limit;
 	}	
 
+	
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getContractNumber() {
+		return contractNumber;
+	}
+	public void setContractNumber(String contractNumber) {
+		this.contractNumber = contractNumber;
+	}
 	public String selectQuery(String allquery,String  filterQuery){				   
 		   if(this.search==null){
 			   return allquery;
@@ -83,8 +108,40 @@ public class SearchParam {
 			    return filterQuery;
 		   }
    }
+	
+	public String selectQuery(String allquery,String  filterQuery, String titleQuery){				   
+		if(this.title!=null){
+			return titleQuery;
+		}
+		else if(this.search==null){
+			   return allquery;
+		 }		   
+		   else{			    
+			    return filterQuery;
+		   }
+    }
+	
+
+	
+	public String selectSeriesQuery(String allquery,String  filterQuery, String contractQuery){				   
+			if(this.contractNumber!=null){
+				return contractQuery;
+			}
+			else if(this.search==null){
+			   return allquery;
+		   }
+		   else{			    
+			    return filterQuery;
+		   }
+  }
 	public void config(TypedQuery<?> typedQuery){
-		if(this.search!=null){
+		if(this.title!=null){
+			typedQuery.setParameter("title",this.title);
+		}
+		else if(this.contractNumber!=null){
+			typedQuery.setParameter("contractNumber",this.contractNumber);
+		}
+		else if(this.search!=null){
 			typedQuery.setParameter("search",this.search);
 		   }
 		

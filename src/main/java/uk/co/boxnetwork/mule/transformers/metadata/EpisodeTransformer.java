@@ -18,6 +18,7 @@ import uk.co.boxnetwork.components.MetadataMaintainanceService;
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.SearchParam;
+import uk.co.boxnetwork.data.UpdatePraram;
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
@@ -62,6 +63,7 @@ public class EpisodeTransformer extends BoxRestTransformer{
          @Override
        protected Object processPUT(MuleMessage message, String outputEncoding) throws Exception{
     	   String episodeid=MuleRestUtil.getPathPath(message);
+    	   
     	   if(episodeid==null||episodeid.length()==0){
     		   return new ErrorMessage("The episodeid is missing in DELETE");
     	   }
@@ -80,17 +82,19 @@ public class EpisodeTransformer extends BoxRestTransformer{
 					objectMapper.setSerializationInclusion(Include.NON_NULL);
 					episode = objectMapper.readValue(episodeInJson, uk.co.boxnetwork.data.Episode.class);
 		   }
-		   
-		   metadataService.update(id,episode);
-		   
+		   UpdatePraram updatePraram=new UpdatePraram(message,appConfig);
+		   if(updatePraram.isSwitchEpisodeSeries()){
+			   metadataService.switchEpsiodeSeries(id,episode);			   
+		   }
+		   else{
+			   metadataService.update(id,episode);
+		   }
 		   if(appConfig.getSendUpdateToSoundMouse()!=null && appConfig.getSendUpdateToSoundMouse()){
 			   metadataMaintainanceService.scheduleToDeliverSoundmouseHeaderFile(episode.getId());
 		   }
 		   else{
 			   logger.info("***will not deliver the changes to the soundmouse");
 		   }
-		   
-		   
 		   if(appConfig.getBrightcoveStatus()){			   
 			   return metadataService.publishMetadatatoBCByEpisodeId(id);
 		   }

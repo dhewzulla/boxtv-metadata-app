@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.SearchParam;
+import uk.co.boxnetwork.data.UpdatePraram;
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.Series;
@@ -74,7 +75,15 @@ public class SeriesTransformer  extends BoxRestTransformer{
 				objectMapper.setSerializationInclusion(Include.NON_NULL);
 				series = objectMapper.readValue(seriesInJson, uk.co.boxnetwork.data.Series.class);
 	   }
-	   metadataService.update(id,series);
+	   UpdatePraram updatePraram=new UpdatePraram(message,appConfig);
+	   if(updatePraram.isSwitchEpisodeSeriesGroup()){
+		   metadataService.switchSeriesGroup(id,series);
+		   
+	   }
+	   else{
+		   metadataService.update(id,series);
+	   }
+	   
 	   if(appConfig.getBrightcoveStatus()){
 		   return metadataService.publishMetadatatoBCBySeriesId(id);
 	   }

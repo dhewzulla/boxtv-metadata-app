@@ -94,8 +94,13 @@ public class BoxMedataRepository {
        @Transactional
        public void removeCuePoint(Long cueid){
     	   CuePoint cuepoint=findCuePoint(cueid);
+    	   if(cuepoint==null){
+    		   logger.info("could not find cue point to delete:cueid:"+cueid);
+    		   return;
+    	   }
+    	   cuepoint.getEpisode().rempveCuePoint(cuepoint);
+    	   entityManager.remove(cuepoint);    	   
     	   markMetadataChanged(cuepoint.getEpisode());
-    	   entityManager.remove(cuepoint);
     	   
        }
        @Transactional
@@ -580,7 +585,7 @@ public class BoxMedataRepository {
 		   return entityManager.find(SeriesGroup.class, id);		   
 	   }
 	   public List<Series> findAllSeries(SearchParam searchParam){
-		   String queryString=searchParam.selectQuery("SELECT s FROM series s", "SELECT s FROM series s where s.name LIKE :search OR s.contractNumber LIKE :search");		   
+		   String queryString=searchParam.selectSeriesQuery("SELECT s FROM series s", "SELECT s FROM series s where s.name LIKE :search OR s.contractNumber LIKE :search","SELECT s FROM series s where s.contractNumber = :contractNumber");		   
 		   TypedQuery<Series> query=entityManager.createQuery(queryString, Series.class);
 		   searchParam.config(query);		   		   
 		   return query.getResultList();
@@ -610,7 +615,7 @@ public class BoxMedataRepository {
 		   
 	   }
 	   public List<SeriesGroup> findAllSeriesGroup(SearchParam searchParam){
-		   String queryString=searchParam.selectQuery("SELECT p FROM series_group p order by p.title", "SELECT p FROM series_group p where p.title LIKE :search order by p.title ");		   
+		   String queryString=searchParam.selectQuery("SELECT p FROM series_group p order by p.title", "SELECT p FROM series_group p where p.title LIKE :search order by p.title", "SELECT p FROM series_group p where p.title = :title");		   
 		   TypedQuery<SeriesGroup> query=entityManager.createQuery(queryString, SeriesGroup.class);
 		   searchParam.config(query);		   		   
 		   return query.getResultList();

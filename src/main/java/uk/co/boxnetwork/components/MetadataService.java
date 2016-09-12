@@ -241,6 +241,21 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		}		
 		boxMetadataRepository.persist(existingEpisode);		
 	}
+	@Transactional
+	public void switchEpsiodeSeries(long id, uk.co.boxnetwork.data.Episode episode){
+		Episode existingEpisode=boxMetadataRepository.findEpisodeById(id);
+		if(existingEpisode==null){
+			logger.warn("not found episode:"+id);
+			return;
+		}
+		Series series=boxMetadataRepository.findSeriesById(episode.getSeries().getId());
+		if(series==null){
+			logger.warn("not found series:"+episode.getSeries().getId());
+			return;
+		}
+		existingEpisode.setSeries(series);
+		boxMetadataRepository.persist(existingEpisode);		
+	}
 	
 	public void update(long id, uk.co.boxnetwork.data.SeriesGroup seriesGroup){
 		SeriesGroup existingSeriesGroup=boxMetadataRepository.findSeriesGroupById(id);		
@@ -839,6 +854,34 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		}
 		
 	}
+	@Transactional
+	public void switchSeriesGroup(long id, uk.co.boxnetwork.data.Series series){
+		String seriesGroupTitle="Default Series Group";
+		if(series.getSeriesGroup()!=null && series.getSeriesGroup().getTitle()!=null && series.getSeriesGroup().getTitle().trim().length()>0){
+			seriesGroupTitle=series.getSeriesGroup().getTitle().trim();
+		}
+		Series existingSeries=boxMetadataRepository.findSeriesById(id);
+		if(existingSeries==null){
+			return;
+		}		
+		SeriesGroup seriesGroup=null;
+		if(series.getSeriesGroup()!=null && series.getSeriesGroup().getId()!=null){
+			seriesGroup=boxMetadataRepository.findSeriesGroupById(series.getSeriesGroup().getId());			
+		}
+		if(seriesGroup==null){
+			List<SeriesGroup> matchedSeriesGroups=boxMetadataRepository.findSeriesGroupByTitle(seriesGroupTitle);
+			if(matchedSeriesGroups.size()>0){
+				seriesGroup=matchedSeriesGroups.get(0);
+			}
+		}
+		if(seriesGroup==null){
+			seriesGroup=new SeriesGroup();
+			seriesGroup.setTitle(seriesGroupTitle);
+			boxMetadataRepository.persisSeriesGroup(seriesGroup);
+		}
+		existingSeries.setSeriesGroup(seriesGroup);
+		boxMetadataRepository.update(existingSeries);
+	}
 		
 	public List<uk.co.boxnetwork.data.ScheduleEvent> getAllScheduleEventFrom(Date fromDate){
 		List<ScheduleEvent> schedules= boxMetadataRepository.findScheduleEventsFrom(fromDate);
@@ -1070,7 +1113,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   }
   public uk.co.boxnetwork.data.CuePoint deleteCuepoint(Long episodeid, Long cueid){	  	  
 	  CuePoint cue=boxMetadataRepository.findCuePoint(cueid);
-	  
+	  if(cue==null){
+		  logger.error("could not find the cue point to delete cueid=["+cueid+"]");
+		  return null;
+	  }
 	  if(cue.getEpisode().getId()!=null && cue.getEpisode().getId().equals(episodeid)){
 		  boxMetadataRepository.removeCuePoint(cueid);		  
 		  return new uk.co.boxnetwork.data.CuePoint(cue);

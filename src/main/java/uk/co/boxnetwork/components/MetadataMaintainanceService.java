@@ -390,7 +390,8 @@ logger.info("adding the default availability window......");
     	//String filename=websafetitle+"_"+matfilepart+"_"+episode.getId()+".xml";
     	Date today=new Date();
 		SimpleDateFormat formatter=new SimpleDateFormat("ddMMyyHHmmss'CTINT'ddMMyyyy");
-    	mediaCommand.setFilename(formatter.format(today)+".xml");    	
+    	mediaCommand.setFilename(formatter.format(today)+".xml");
+    	logger.info("Scheduled to deliver the soumdmouse header file:"+mediaCommand);
     	repository.persistMediaCommand(mediaCommand);
     }
     
