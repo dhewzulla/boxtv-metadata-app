@@ -36,6 +36,7 @@ public class BCVideoData {
 		  private Integer duration;
 		  private String economics;
 		  private String folder_id;
+		  private Boolean has_digital_master;		  
 		  private BCGeo geo;
 		  private BCImages images;
 		  private String link;
@@ -411,6 +412,14 @@ public class BCVideoData {
 
 		public void setDelivery_type(String delivery_type) {
 			this.delivery_type = delivery_type;
+		}
+
+		public Boolean getHas_digital_master() {
+			return has_digital_master;
+		}
+
+		public void setHas_digital_master(Boolean has_digital_master) {
+			this.has_digital_master = has_digital_master;
 		}
 		
 		 
