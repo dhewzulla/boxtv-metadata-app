@@ -129,6 +129,10 @@ public class Episode {
 	@Column(name="first_tx_date")
 	private Long firstTXDate;
 	
+	@Column(name="recorded_at")
+	private Long recordedAt;
+	
+	
 	@Column(name="episode_sequence_number")
 	private Integer episodeSequenceNumber;
 	
@@ -562,6 +566,14 @@ public void setPrAuk(String prAuk) {
 
 	public void setDurationUploaded(Double durationUploaded) {
 		this.durationUploaded = durationUploaded;
+	}
+
+	public Long getRecordedAt() {
+		return recordedAt;
+	}
+
+	public void setRecordedAt(Long recordedAt) {
+		this.recordedAt = recordedAt;
 	}
 
 	public void makeSoundMouseFriendy(){

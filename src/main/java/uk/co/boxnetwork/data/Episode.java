@@ -132,6 +132,7 @@ public class Episode {
 	 private String supplier; 
 	 
 	 private Long firstTXDate;
+	 private Long recordedAt;
 	 
 	 private Integer episodeSequenceNumber;
 	 
@@ -291,6 +292,16 @@ public class Episode {
 	}
 
 
+public Long getRecordedAt() {
+		return recordedAt;
+	}
+
+
+	public void setRecordedAt(Long recordedAt) {
+		this.recordedAt = recordedAt;
+	}
+
+
 public Episode(){
 	   
    }
@@ -327,6 +338,7 @@ public Episode(){
 		this.ingestProfile=episode.getIngestProfile();
 		this.ingestSource=episode.getIngestSource();
 		this.txChannel=episode.getTxChannel();
+		this.recordedAt=episode.getRecordedAt();
 		this.episodeStatus=episode.getEpisodeStatus();
 		this.excludeddevices=episode.getExcludeddevices();
 		this.imageURL=episode.getImageURL();
@@ -390,6 +402,7 @@ public Episode(){
 		episode.setExcludeddevices(this.excludeddevices);
 		episode.setGeoAllowedCountries(this.geoAllowedCountries);
 		episode.setFirstTXDate(this.firstTXDate);
+		episode.setRecordedAt(this.recordedAt);
 		episode.setEpisodeSequenceNumber(this.episodeSequenceNumber);
 		episode.setDurationUploaded(this.durationUploaded);
 	}
@@ -477,6 +490,10 @@ public Episode(){
 		}
 		if(this.episodeSequenceNumber!=null){
 			episode.setEpisodeSequenceNumber(this.episodeSequenceNumber);
+			changed=true;
+		}
+		if(this.recordedAt!=null){
+			episode.setRecordedAt(this.recordedAt);
 			changed=true;
 		}
 		
