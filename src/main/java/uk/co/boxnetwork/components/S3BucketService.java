@@ -168,7 +168,7 @@ public class S3BucketService {
 					Double scheduledDuration=matchedEpisodes.get(0).getDurationScheduled();
 					Double uploadedDuration=matchedEpisodes.get(0).getDurationUploaded();
 					if(scheduledDuration!=null && uploadedDuration!=null){
-						Double errorValue=(scheduledDuration-uploadedDuration);
+						Double errorValue=(uploadedDuration-scheduledDuration);
 						vitem.setDurationError(errorValue.longValue());
 					}
 				}
