@@ -6,7 +6,11 @@ public class VideoFileItem {
 	private  String file;    
     private  String episodeTitle;
     private  Long episodeId;
-    private Date lastModifidDate;
+    private  Date lastModifidDate;
+    private  Long durationError;
+    
+    
+    
 	public String getFile() {
 		return file;
 	}
@@ -31,6 +35,12 @@ public class VideoFileItem {
 	}
 	public void setLastModifidDate(Date lastModifidDate) {
 		this.lastModifidDate = lastModifidDate;
+	}
+	public Long getDurationError() {
+		return durationError;
+	}
+	public void setDurationError(Long durationError) {
+		this.durationError = durationError;
 	}
 	
     

@@ -165,6 +165,12 @@ public class S3BucketService {
 				if(matchedEpisodes.size()>0){
 					vitem.setEpisodeTitle(matchedEpisodes.get(0).getTitle());
 					vitem.setEpisodeId(matchedEpisodes.get(0).getId());
+					Double scheduledDuration=matchedEpisodes.get(0).getDurationScheduled();
+					Double uploadedDuration=matchedEpisodes.get(0).getDurationUploaded();
+					if(scheduledDuration!=null && uploadedDuration!=null){
+						Double errorValue=(scheduledDuration-uploadedDuration);
+						vitem.setDurationError(errorValue.longValue());
+					}
 				}
 				
 				
