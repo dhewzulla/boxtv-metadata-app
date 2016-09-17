@@ -1,12 +1,14 @@
 {
   "id" : "5036964227001",
   "account_id" : "4821467243001",
+  "unknown_fields":"ddd",
   "ad_keys" : null,
   "complete" : true,
   "created_at" : "2016-07-15T12:31:20.638Z",
   "cue_points" : [ ],
   "custom_fields" : {
     "programmetitle" : "Sun, Sex & Suspicious Parents",
+     "newfields":"ddd",
     "certificationtype" : "Post Watershed",
     "txchannel" : "4Music",
     "drm" : "True",
