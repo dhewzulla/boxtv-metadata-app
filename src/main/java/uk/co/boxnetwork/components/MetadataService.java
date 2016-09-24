@@ -441,6 +441,10 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		else{			
 				requestS3(episode);
 				if(!GenericUtilities.isNotValidName(episode.getIngestSource())){
+					   Double durationUploaded=checkVideoDuration(episode);
+					   if(durationUploaded!=null){
+						   episode.setDurationUploaded(durationUploaded);
+					   }					   
 					whenVideoAvailable(episode.getEpisodeStatus(),episode.getIngestProfile());
 				}
 		}
