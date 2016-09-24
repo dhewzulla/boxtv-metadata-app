@@ -101,6 +101,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                             <spring:property name="ingesturl" value="${brightcove.ingest.url}"/>
                             
                             <spring:property name="mediaapiurl" value="${brightcove.mediaapi.url}"/>
+                            <spring:property name="analyticsapiurl" value="${brightcove.analytics.url}"/>
                             
                             <spring:property name="accountId" value="${brightcove.account_id}"/>
                             <spring:property name="clientId" value="${brightcove.client_id}"/>                            
@@ -109,6 +110,9 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
                              <spring:property name="defaltIngestProfile" value="${brightcove.ingest.profile}"/>
                              <spring:property name="ingestCallback" value="${brightcove.ingest.callback}"/>
                              
+                             
+                             <spring:property name="analyticsDimension" value="${brightcove.analytics.dimensions}"/>
+                             <spring:property name="analyticsFields" value="${brightcove.analytics.fields}"/>
                                                           
          </spring:bean>
          <spring:bean id="c4ScheduleConfiguration"  class="uk.co.boxnetwork.data.BasicAuthenticatedURLConfiguration">
@@ -164,12 +168,15 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.soundmouse.SoundmouseTransformer" name="soundMouse" doc:name="SoundMouse"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.soundmouse.EpisodeIdToSoundMouseHeader" name="episodeIdToSoundMouseHeader" doc:name="EpisodeIdToSoundMouseHeader"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.soundmouse.CreateSoundmouseSmurfFile" name="createSoundmouseSmurfFile" doc:name="CreateSoundmouseSmurfFile"/>
+   
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoPublisher" name="bcVideoPublisher" doc:name="BC Video Publisher"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCIngestTransformer" name="bcVideoIngestTransformer" doc:name="BC Video Ingest"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCIngestNotificationTransformer" name="bcNotification" doc:name="BC Ingest Notification"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCAnalyticsDataTransformer" name="bcAnalyticsData" doc:name="BC Analytics Data"/>
    
    
    

@@ -2,6 +2,7 @@ package uk.co.boxnetwork.components;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -118,6 +119,8 @@ public class BCVideoService {
 		    logger.info(":::::::::statuscode:"+statusCode);
 		    return responseEntity.getBody();
 	}
+	
+	
 	public String  getViodeInJson(String videoid){			
 	    BCAccessToken accessToken=bcAccessToenService.getAccessToken();
 		RestTemplate rest=new RestTemplate();

@@ -9,16 +9,29 @@
 	http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd 
 	http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
     <flow name="deliver-soundmouse-header-fileFlow"> 
-        <vm:inbound-endpoint exchange-pattern="one-way" path="soundmouse.deliver.header" doc:name="VM"></vm:inbound-endpoint>  
+        <vm:inbound-endpoint exchange-pattern="one-way" path="deliver_soundmouse_header_file" doc:name="VM"></vm:inbound-endpoint>  
         <transformer ref="episodeIdToSoundMouseHeader" doc:name="Transformer Episode Service"></transformer>  
-        <choice doc:name="Choice"> 
-            <when expression="#[payload is String]"> 
-                <logger message="****delivering the file to the sound mouse ftp host****" level="INFO" doc:name="Logger"></logger>  
-     
+        <choice doc:name="Choice">             
+            <when expression="#[payload is uk.co.boxnetwork.model.MediaCommand]"> 
+                  <logger message="****delivering the file to the sound mouse ftp host****" level="INFO" doc:name="Logger"></logger>       
                   <transformer ref="soudmouseFTPTransformer" doc:name="FTP"/>
             </when>  
             <otherwise> 
-                <logger message="payload is not type of string, will not deliver to soundmouse" level="INFO" doc:name="Logger"></logger>  
+                <logger message="payload is not type of uk.co.boxnetwork.model.MediaCommand] will not deliver to soundmouse:#[payload]" level="INFO" doc:name="Logger"></logger>  
+            </otherwise>  
+        </choice>  
+    </flow>
+    <flow name="deliver-soundmouse-smurf-fileFlow"> 
+        <vm:inbound-endpoint exchange-pattern="one-way" path="deliver_soundmouse_smurf_file" doc:name="VM"></vm:inbound-endpoint>  
+        <transformer ref="createSoundmouseSmurfFile" doc:name="Transformer Episode Service"></transformer>  
+        
+        <choice doc:name="Choice">             
+            <when expression="#[payload is uk.co.boxnetwork.model.MediaCommand]"> 
+                  <logger message="****delivering the smurf file to the sound mouse ftp host****" level="INFO" doc:name="Logger"></logger>       
+                  <transformer ref="soudmouseFTPTransformer" doc:name="FTP"/>
+            </when>  
+            <otherwise> 
+                <logger message="payload is not type of uk.co.boxnetwork.model.MediaCommand] will not deliver to soundmouse:#[payload]" level="INFO" doc:name="Logger"></logger>  
             </otherwise>  
         </choice>  
     </flow>

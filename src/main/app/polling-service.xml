@@ -21,9 +21,14 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
         <when expression="#[payload is String]">
             <logger level="INFO" message="the type is string from checkTimedTask " doc:name="Logger"/>
         </when>
-        <when expression="#[payload is uk.co.boxnetwork.model.MediaCommand]">
-            <logger level="INFO" message="the type is mediacommand from checkTimedTask, ****Delivering to the vmqueue" doc:name="Logger"/>
-                <vm:outbound-endpoint exchange-pattern="one-way"  doc:name="VM queue for delivering the soundmouse header file" path="soundmouse.deliver.header"/>
+        <when expression="#[payload is uk.co.boxnetwork.model.MediaCommand and payload.command=='deliver_soundmouse_header_file']">
+            <logger level="INFO" message="the type is mediacommand from checkTimedTask:deliver_soundmouse_header_file" doc:name="Logger"/>                             
+            <vm:outbound-endpoint exchange-pattern="one-way"  doc:name="VM queue for delivering the soundmouse header file" path="deliver_soundmouse_header_file"/>                
+        </when>
+        
+        <when expression="#[payload is uk.co.boxnetwork.model.MediaCommand and payload.command=='deliver_soundmouse_smurf_file']">
+            <logger level="INFO" message="the type is mediacommand from checkTimedTask:deliver_soundmouse_smurf_file" doc:name="Logger"/>                             
+            <vm:outbound-endpoint exchange-pattern="one-way"  doc:name="VM queue for delivering the soundmouse header file" path="deliver_soundmouse_smurf_file"/>                
         </when>
         
         <otherwise> 

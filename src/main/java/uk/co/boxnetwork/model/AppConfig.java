@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import uk.co.boxnetwork.util.GenericUtilities;
+
 @Entity(name="app_config")
 public class AppConfig {
 	@Id
@@ -124,5 +126,16 @@ public void setVisibilityCategory(String visibilityCategory) {
 	this.visibilityCategory = visibilityCategory;
 }
 
- 
+ public boolean shouldSendSoundmouseHeaderFile(uk.co.boxnetwork.data.Episode episode){
+	 if(sendUpdateToSoundMouse==null){
+		 return false;
+	 }
+	 if(!sendUpdateToSoundMouse){
+		 return false;
+	 }	 
+	 if(GenericUtilities.isNotAValidId(episode.getBrightcoveId())){
+		 return false;
+	 }	 
+	 return true;
+ }
 }

@@ -679,6 +679,10 @@ public class BoxMedataRepository {
 		   searchParam.config(query);		   		   
 		   return query.getResultList();		   
 	   }
+	   public List<Episode> findEpisodeToReport(){		   
+		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.brightcoveId IS NOT NULL and LENGTH(e.brightcoveId) >2", Episode.class);
+		   return query.getResultList();
+	   }
 	   public List<Episode> findEpisodesByMatId(String matid){
 		   TypedQuery<Episode> query=entityManager.createQuery("SELECT e FROM episode e where e.materialId LIKE :matid", Episode.class);
 		   return query.setParameter("matid",matid).getResultList();

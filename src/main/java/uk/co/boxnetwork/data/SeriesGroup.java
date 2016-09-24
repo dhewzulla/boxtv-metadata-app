@@ -31,7 +31,7 @@ public class SeriesGroup {
 		seriesgroup.setTitle(this.title);
 		seriesgroup.setSynopsis(this.synopsis);
 		seriesgroup.setImageURL(this.imageURL);
-		seriesgroup.setTags(GenericUtilities.arrayToCommaSeparated(this.tags));
+		seriesgroup.setTags(GenericUtilities.arrayToSeparatedString(this.tags,", "));
 	}
 	public SeriesGroup(){
 		

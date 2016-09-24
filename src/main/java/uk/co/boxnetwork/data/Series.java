@@ -50,7 +50,7 @@ public class Series {
 		series.setSynopsis(this.synopsis);
 		series.setImageURL(this.imageURL);
 		series.setSeriesNumber(this.seriesNumber);
-		series.setTags(GenericUtilities.arrayToCommaSeparated(this.tags));
+		series.setTags(GenericUtilities.arrayToSeparatedString(this.tags,", "));
 	}
 	public Series(){
 		
