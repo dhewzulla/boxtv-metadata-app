@@ -40,7 +40,7 @@ public class SoundMouseData {
 	    this.now=new Date();
 	    this.from=GenericUtilities.toStandardDateFormat(fromDate);
 		this.to=GenericUtilities.toStandardDateFormat(toDate);
-		this.smurfFilename="SMURF_BOX_CH4001_"+GenericUtilities.toSoundMouseSmurfFileFormat(now)+"_version00001.xml";
+		this.smurfFilename="SMURF_BOX_CH4001_"+GenericUtilities.toSoundMouseSmurfFileFormat(now).toUpperCase()+"_version00001.xml";
 		this.smurfFilePath="/data/"+smurfFilename;
 		this.createdAt=GenericUtilities.toUTCFormat(this.now);
 		this.reportStartDate=GenericUtilities.toUTCFormat(fromDate);
