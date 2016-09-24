@@ -1,7 +1,13 @@
 package uk.co.boxnetwork.components;
 
-import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.File;
 
+import java.io.FileOutputStream;
+
+import java.io.OutputStreamWriter;
+
+import java.io.Writer;
 
 import java.util.ArrayList;
 
@@ -9,7 +15,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import java.util.List;
-
 
 
 import org.slf4j.Logger;
@@ -20,9 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import uk.co.boxnetwork.data.SearchParam;
+
+import uk.co.boxnetwork.data.bc.BCAnalyticsResponse;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.s3.FileItem;
 import uk.co.boxnetwork.data.s3.MediaFilesLocation;
+import uk.co.boxnetwork.data.soundmouse.SoundMouseData;
+import uk.co.boxnetwork.data.soundmouse.SoundMouseItem;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.BCNotification;
 import uk.co.boxnetwork.model.CuePoint;
@@ -51,7 +60,10 @@ public class MetadataService {
 	
 	@Autowired
 	CommandServices commandService;
-	
+
+	@Autowired
+	BCAnalyticService bcAnalyticService;
+
 	public List<uk.co.boxnetwork.data.SeriesGroup> getAllSeriesGroups(SearchParam searchParam){
 		List<uk.co.boxnetwork.data.SeriesGroup> seriesgrps=new ArrayList<uk.co.boxnetwork.data.SeriesGroup>();
 		List<SeriesGroup> seriesgroups=boxMetadataRepository.findAllSeriesGroup(searchParam);
@@ -154,7 +166,83 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		return GenericUtilities.getSoundmouseHeader(episode);
 		
 	}
+	public String getSoundMouseSmurfFile(Long id) throws Exception{
+		Episode episode=boxMetadataRepository.findEpisodeById(id);		
+		if(episode==null){
+			logger.warn("not found episode:"+id);
+			throw new RuntimeException("episode not found");
+		}
+		
+		if(GenericUtilities.isNotAValidId(episode.getBrightcoveId())){
+			logger.warn("not found episode:"+id);
+			throw new RuntimeException("episode is not published");
+		}
+		SoundMouseData soundMouseData=new SoundMouseData();				
+		String itemContent=buildSoundmouseSmurfItem(soundMouseData,episode);
+		String smurfContent=GenericUtilities.getSoundmouseSmurf(soundMouseData);
+		return GenericUtilities.createFullSmurfContent(smurfContent,itemContent);
+		
+	}
+	public String buildSoundmouseSmurfItem(SoundMouseData soundMouseData,Episode episode) throws Exception{
+		StringBuilder builder=new StringBuilder();
+		logger.info("getting report for the range "+soundMouseData+" for id=["+episode.getId()+"]["+episode.getTitle()+"]:"+episode.getBrightcoveId());
+		BCAnalyticsResponse bcAnalyticResponse=bcAnalyticService.getMediaItemReport(soundMouseData.getFrom(), soundMouseData.getTo(), episode.getBrightcoveId());
+		if(bcAnalyticResponse.getItems()==null|| bcAnalyticResponse.getItems().length==0){
+			logger.info("empty analytic response returned for the range "+soundMouseData+" for id=["+episode.getId()+"]["+episode.getTitle()+"]:"+episode.getBrightcoveId());
+			return null;
+		}				
+		if(soundMouseData.init(episode,bcAnalyticResponse.getItems()[0])){
+			for(CuePoint cuePoint:episode.getCuePoints()){
+				SoundMouseItem soundMouseItem=new SoundMouseItem();
+				soundMouseItem.init(cuePoint);
+				soundMouseItem.setAnalyticData(bcAnalyticResponse.getItems()[0]);
+				builder.append(GenericUtilities.getSoundmouseSmurfForCuepoint(soundMouseData, soundMouseItem));				
+			}
+		}
+		else{
+			SoundMouseItem soundMouseItem=new SoundMouseItem();
+			soundMouseItem.init(episode);
+			soundMouseItem.setAnalyticData(bcAnalyticResponse.getItems()[0]);
+			builder.append(GenericUtilities.getSoundmouseSmurfForCuepoint(soundMouseData, soundMouseItem));
+		}
+		return builder.toString();
+	}
 	
+	
+	public SoundMouseData createSoundMouseSmurfFile() throws Exception{
+		List<Episode> episodes=boxMetadataRepository.findEpisodeToReport();
+		if(episodes.size()==0){
+			logger.warn("there is no episode to report");
+			return null;
+		}		
+		SoundMouseData soundMouseData=new SoundMouseData();				
+		File smurfItemFile=new File("/tmp/box_"+System.currentTimeMillis()+".txt");
+		
+		Writer writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(smurfItemFile), "utf-8"));
+		try{
+				for(Episode episode:episodes){
+					String itemContent=buildSoundmouseSmurfItem(soundMouseData,episode);
+					if(itemContent!=null && itemContent.length()>0){
+						writer.write(itemContent);
+					}
+				}
+		}
+		finally{
+			writer.close();
+		}
+		try{
+				String smurfContent=GenericUtilities.getSoundmouseSmurf(soundMouseData);
+				logger.info("smurfContent::::"+smurfContent);
+				logger.info("creating the smurf file:"+soundMouseData.getSmurfFilePath());
+				File smurffile=new File(soundMouseData.getSmurfFilePath());
+				GenericUtilities.createFullSmurfContent(smurfContent, smurfItemFile, smurffile);
+				
+		}
+		finally{
+			smurfItemFile.delete();
+		}
+		return  soundMouseData;		
+	}
 	
 	public uk.co.boxnetwork.data.CuePoint getCuePointById(Long id){
 		CuePoint cuepoint=boxMetadataRepository.findCuePoint(id);

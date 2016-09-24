@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mule.api.MuleMessage;
+import org.mule.module.http.internal.ParameterMap;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -15,6 +16,7 @@ import uk.co.boxnetwork.components.MetadataService;
 import uk.co.boxnetwork.data.ErrorMessage;
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.model.AppConfig;
+import uk.co.boxnetwork.model.MediaCommand;
 import uk.co.boxnetwork.model.MetadataStatus;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
 import uk.co.boxnetwork.mule.util.MuleRestUtil;
@@ -51,6 +53,9 @@ public class SoundmouseTransformer extends BoxRestTransformer{
 				   if(type==null|| type.equals("header")){					   					   	
 						return metadataService.getSoundMouseHeaderFile(id);
 				   }
+				   else if(type.equals("smurf")){					   	  
+					   return metadataService.getSoundMouseSmurfFile(id);
+				   }
 				   else{
 					   return returnError("not supported",message);
 				   }
@@ -65,7 +70,28 @@ public class SoundmouseTransformer extends BoxRestTransformer{
 	}
 	
 	
-	
+	@Override
+	protected Object processPOST(MuleMessage message, String outputEncoding){
+		try{
+		    String commandInJson=(String)message.getPayloadAsString();		   
+		   logger.info("*****Received soudmouse command:"+commandInJson+"****");
+		   com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();								
+		   objectMapper.setSerializationInclusion(Include.NON_NULL);
+		   MediaCommand mediaCommand = objectMapper.readValue(commandInJson, MediaCommand.class);
+		   if(MediaCommand.DELIVER_SOUND_MOUSE_SMURF_FILE.equals(mediaCommand.getCommand())){
+			   metadataMaintainanceService.scheduleToDeliverSoundmouseSmurfFile();
+		   }
+		   else{
+			   throw new RuntimeException("not supported command:"+mediaCommand);
+		   }
+		   return mediaCommand;
+		}
+		   catch(Exception e){
+   			throw new RuntimeException("proesing post:"+e,e);    			
+   		}
+		   
+		
+	}
      	
 	
              

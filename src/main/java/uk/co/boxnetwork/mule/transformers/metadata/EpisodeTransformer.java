@@ -89,7 +89,7 @@ public class EpisodeTransformer extends BoxRestTransformer{
 		   else{
 			   metadataService.update(id,episode);
 		   }
-		   if(appConfig.getSendUpdateToSoundMouse()!=null && appConfig.getSendUpdateToSoundMouse()){
+		   if(appConfig.shouldSendSoundmouseHeaderFile(episode)){			  
 			   metadataMaintainanceService.scheduleToDeliverSoundmouseHeaderFile(episode.getId());
 		   }
 		   else{
@@ -152,7 +152,7 @@ public class EpisodeTransformer extends BoxRestTransformer{
 				   }
 				   if(episode.getEpisodeStatus()!=null && episode.getEpisodeStatus().getMetadataStatus()==MetadataStatus.NEEDS_TO_PUBLISH_CHANGES){
 					  
-					   if(appConfig.getSendUpdateToSoundMouse()!=null && appConfig.getSendUpdateToSoundMouse()){
+					   if(appConfig.shouldSendSoundmouseHeaderFile(episode)){
 						   metadataMaintainanceService.scheduleToDeliverSoundmouseHeaderFile(episode.getId());
 					   }
 					   else{

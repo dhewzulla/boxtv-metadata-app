@@ -25,13 +25,13 @@ public class CheckTimedTaskTransformer extends AbstractMessageTransformer{
 		logger.info("checking the timed tasks");
 		timedTaskService.checkAndRunTasks();
 		
-		MediaCommand mediaCommand=metadataMaintainService.getMeidaCommandForDeliverSoundMouseHeaderFile();
+		MediaCommand mediaCommand=metadataMaintainService.getMeidaCommandForProcess();
 		if(mediaCommand!=null){
-			logger.info("******should be sent to tg the vm queue"+mediaCommand);
+			logger.info("******should be sent to the vm queue"+mediaCommand);
 			return mediaCommand;
 		}
 		else{
-			logger.info("No media command for deliver soundmouse file");
+			logger.info("No media command for process");
 			return message.getPayload();
 		}
 	}

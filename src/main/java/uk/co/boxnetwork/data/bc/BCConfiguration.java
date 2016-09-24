@@ -6,7 +6,9 @@ public class BCConfiguration {
 	private String oauthurl;
 	private String cmsurl;
 	private String ingesturl;
-	private String mediaapiurl;	
+	private String mediaapiurl;
+	private String analyticsapiurl;
+	
 	private String accountId;
 	private String clientId;
 	private String clientSecret;
@@ -14,6 +16,10 @@ public class BCConfiguration {
 	
 	private String defaltIngestProfile;
 	private String ingestCallback;
+	
+	private String analyticsDimension;
+	private String analyticsFields;
+	
 	public String getAccountId() {
 		return accountId;
 	}
@@ -43,6 +49,35 @@ public class BCConfiguration {
 	}
 	public String videoURL(Integer limit, Integer offset, String sort,String q){
 		return queryURL(cmsurl+"/accounts/"+accountId+"/videos",limit,offset,sort,q);
+	}
+	public String analyticsURL(Integer limit, Integer offset, String dimensions,String fields,String from, String to, String filter){
+		StringBuilder builder=new StringBuilder();
+		builder.append(analyticsapiurl);
+		builder.append("?");
+		builder.append("accounts="+accountId);
+		if(dimensions!= null){
+			builder.append("&dimensions="+dimensions);
+		}
+		
+		if(fields!=null){
+			builder.append("&fields="+fields);
+		}
+		if(from!=null){
+			builder.append("&from="+from);
+		}
+		if(to!=null){
+			builder.append("&to="+to);
+		}		
+		if(limit!=null){
+			builder.append("&limit="+limit);				
+		}
+		if(offset!=null){			
+				builder.append("&offset="+offset);				
+		}
+		if(filter!=null){
+			builder.append("&where="+filter);
+		}
+		return builder.toString();
 	}
 	public String queryURL(String baseURL, Integer limit, Integer offset, String sort,String q){
 		StringBuilder builder=new StringBuilder();
@@ -147,6 +182,24 @@ public class BCConfiguration {
 	}
 	public void setMediaapiurl(String mediaapiurl) {
 		this.mediaapiurl = mediaapiurl;
+	}
+	public String getAnalyticsapiurl() {
+		return analyticsapiurl;
+	}
+	public void setAnalyticsapiurl(String analyticsapiurl) {
+		this.analyticsapiurl = analyticsapiurl;
+	}
+	public String getAnalyticsDimension() {
+		return analyticsDimension;
+	}
+	public void setAnalyticsDimension(String analyticsDimension) {
+		this.analyticsDimension = analyticsDimension;
+	}
+	public String getAnalyticsFields() {
+		return analyticsFields;
+	}
+	public void setAnalyticsFields(String analyticsFields) {
+		this.analyticsFields = analyticsFields;
 	}
 	
   

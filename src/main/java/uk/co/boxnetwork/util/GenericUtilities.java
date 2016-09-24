@@ -1,14 +1,21 @@
 package uk.co.boxnetwork.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,8 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-
+import uk.co.boxnetwork.data.bc.BCAnalyticData;
+import uk.co.boxnetwork.data.soundmouse.SoundMouseData;
+import uk.co.boxnetwork.data.soundmouse.SoundMouseItem;
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
@@ -34,7 +44,7 @@ import uk.co.boxnetwork.mule.components.LoadResourceAsInputStream;
 public class GenericUtilities {
 	private static final Logger logger=LoggerFactory.getLogger(GenericUtilities.class);
 	
-	public static String DELIVER_SOUND_MOUSE_HEADER_FILE="deliver_soundmouse_header_file";
+	
 	
 	static {
 	    try {
@@ -398,7 +408,7 @@ public class GenericUtilities {
 	  return tagArray;
   }
   
-  public static String arrayToCommaSeparated(String tags[]){
+  public static String arrayToSeparatedString(String tags[], String separator){
 		if(tags==null ||tags.length==0){
 			return null;	
 		}
@@ -411,7 +421,7 @@ public class GenericUtilities {
 					 if(added.contains(tags[i])){
 						 	continue;					
 					 }
-					 v=v+", ";
+					 v=v+separator;
 					 v=v+tags[i];
 					 added.add(v);
 				}
@@ -467,11 +477,78 @@ public class GenericUtilities {
 		episode.makeSoundMouseFriendy();
 		Map<String, Object> root = new HashMap<String, Object>();
 		root.put("episode", episode);
-		Template temp = getTemplate("soundmouse-header.xml");		
+		return executeTemplateFile("soundmouse-header.xml",root);		
+	}
+	public static String getSoundmouseSmurf(SoundMouseData soundMouseData)  throws Exception{
+		Map<String, Object> root = new HashMap<String, Object>();
+		root.put("soundMouseData", soundMouseData);
+		return executeTemplateFile("soundmouse-smurf.xml",root);
+	}
+	public static String getSoundmouseSmurfForCuepoint(SoundMouseData soundMouseData, SoundMouseItem soundMouseItem)  throws Exception{
+		Map<String, Object> root = new HashMap<String, Object>();
+		root.put("soundMouseData", soundMouseData);
+		root.put("soundMouseItem", soundMouseItem);
+		return executeTemplateFile("soundmouse-smurf-item.xml",root);
+	}
+	public static String createFullSmurfContent(String smurfContent, String smurfItemsContent){
+		String beginIdentifier="<mediaList>";
+		String endIdentifier="</mediaList>";
+		int ib=smurfContent.indexOf(beginIdentifier);
+		if(ib==-1){
+			throw new RuntimeException("wrong format in the smurffile template, could not find mediaList");
+		}
+		ib+=beginIdentifier.length();
+		int ie=smurfContent.indexOf(endIdentifier,ib);
+		if(ie==-1){
+			throw new RuntimeException("wrong format in the smurffile template, could not find the ending mediaList tag");
+		}
+		return smurfContent.substring(0,ib)+smurfItemsContent+smurfContent.substring(ie);		
+	}
+	public static void createFullSmurfContent(String smurfContent,File smurfItemFile, File smurFile) throws Exception{
+		BufferedReader reader=null;
+		BufferedWriter writer=null;
+		try{		
+				reader=new BufferedReader(new FileReader(smurfItemFile));
+				writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(smurFile), "utf-8"));
+				String beginIdentifier="<mediaList>";
+				String endIdentifier="</mediaList>";
+				int ib=smurfContent.indexOf(beginIdentifier);
+				if(ib==-1){
+					throw new RuntimeException("wrong format in the smurffile template, could not find mediaList");
+				}
+				ib+=beginIdentifier.length();
+				int ie=smurfContent.indexOf(endIdentifier,ib);
+				if(ie==-1){
+					throw new RuntimeException("wrong format in the smurffile template, could not find the ending mediaList tag");
+				}
+				
+				writer.write(smurfContent.substring(0,ib));
+				String line;
+				
+				while((line=reader.readLine())!=null){
+					writer.write(line);
+					writer.write("\n");
+				}
+				reader.close();
+				writer.write(smurfContent.substring(ie));
+				writer.close();
+				logger.info("succesfully created:"+smurFile);
+		}
+		finally{
+			if(reader!=null){
+				reader.close();				
+			}
+			if(writer!=null){
+				writer.close();				
+			}
+		}
+	}
+	public static String executeTemplateFile(String templateFileName,Map<String, Object> root) throws Exception{
+		Template temp = getTemplate(templateFileName);		
 		StringWriter writer=new StringWriter();
-        temp.process(root, writer);
-        writer.close();
-        return writer.toString();
+	    temp.process(root, writer);
+	    writer.close();
+	    return writer.toString();
 	}
 	
 	public static String makeSoundMouseFriendy(String value){
@@ -522,5 +599,34 @@ public class GenericUtilities {
 		return true;
 	}
 	
+	static SimpleDateFormat standardDateFormatter=new SimpleDateFormat("yyyy-MM-dd");	
+	public static String toStandardDateFormat(Date datevalue){
+		return standardDateFormatter.format(datevalue);
+	}
+	
+	static SimpleDateFormat soundMouseSmurfFileDateFormatter=new SimpleDateFormat("yyyyMMdd-HHmmss_MMMyyyy");	
+	public static String toSoundMouseSmurfFileFormat(Date datevalue){
+		return soundMouseSmurfFileDateFormatter.format(datevalue);
+	}
+	
+	static SimpleDateFormat utcformatter=new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
+	public static String toUTCFormat(Date datevalue){
+		return utcformatter.format(datevalue);
+	}
+	public static boolean shouldReportOnCuepoint(Episode episode){
+		if(episode.getCuePoints()==null){
+			return false;
+		}
+		if(episode.getCuePoints().size()==0){
+			return false;
+		}
+		boolean shouldReportOnCuepoint=false;
+		for(CuePoint cuepoint:episode.getCuePoints()){
+			if(!isNotValidCrid(cuepoint.getMateriaId())){
+				shouldReportOnCuepoint=true;
+			}
+		}
+		return shouldReportOnCuepoint;
+	}
 }
 

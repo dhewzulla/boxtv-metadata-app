@@ -28,33 +28,24 @@ public class FtpToSoundMouseTransformer extends AbstractMessageTransformer{
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		Object obj=message.getPayload();
-		MediaCommand mediaCommand=(MediaCommand)message.getInvocationProperty("mediaCommand");		
-		String filepath="/data/"+mediaCommand.getFilename();
-		if(!(obj instanceof String)){
-			return obj;
-		}
-		String bb=(String)obj;
-		logger.info("Sending the following message to the ftp channel:"+bb);
-		
-		try {
-			PrintWriter out = new PrintWriter(filepath);
-			out.write(bb);
-			out.close();
-			File file=new File(filepath);
+
+		if(obj instanceof MediaCommand){
+			return processMediaCommand((MediaCommand)obj,message);
+		}		
+		return obj;
+	}
+	private Object processMediaCommand(MediaCommand mediaCommand,MuleMessage message){
+		logger.info("Sending the following message to the ftp channel:"+mediaCommand.getCommand()+":"+mediaCommand.getFilepath());		
+		try {			
+			File file=new File(mediaCommand.getFilepath());
 			Message<File> mess=MessageBuilder.withPayload(file).build();
 			ftpChannel.send(mess);
 			
 		} catch (Exception e) {
 			logger.error(e+"While sending to the ftp channel",e);
 		}
-		
-		
-		
-		
-		
-		
 		//Thread.sleep(2000);
-		return bb;		
+		return mediaCommand;		
 	}
 	
 }

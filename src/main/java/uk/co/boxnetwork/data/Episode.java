@@ -388,7 +388,7 @@ public Episode(){
 		episode.setWarningText(this.warningText);
 		episode.setNumberOfAdsPerBreak(numberOfAdsPerBreak);
 		episode.setSupplier(supplier);
-		episode.setTags(GenericUtilities.arrayToCommaSeparated(this.tags));
+		episode.setTags(GenericUtilities.arrayToSeparatedString(this.tags,", "));
 		
 		if("".equals(this.adsupport)){
 			this.adsupport=null;	
