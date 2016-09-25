@@ -26,7 +26,7 @@ private MetadataMaintainanceService metadataMaintainanceService;
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		logger.info("Application initialization");
 		metadataMaintainanceService.syncAppConfigWithDatabase();
-		metadataMaintainanceService.calculateUploadedDuration();
+		//metadataMaintainanceService.calculateUploadedDuration();
 		//metadataMaintainanceService.checkAllRecordsConsistency();
 		//metadataMaintainanceService.fixTxChannel();
 		//metadataMaintainanceService.deleteAllTasls();
