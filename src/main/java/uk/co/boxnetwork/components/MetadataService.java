@@ -525,30 +525,48 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		if(episodeStatus.getPublishedStatus()==PublishedStatus.ACTIVE){
 			
 			if(episodeInDB.getBrightcoveId()==null){
-				logger.info("bcid is null");
-				return;
+				   logger.error("brigtcoveid is null when trying to activate the epsideo");
+					throw new RuntimeException("Needs to create the place holder first");
 			}
-			
-			BCVideoData videodata=videoService.changeVideoStatus(episodeInDB.getBrightcoveId(),"ACTIVE");
-			
-			logger.info("*****"+videodata);
-			episodeStatusInDB.setPublishedStatus(PublishedStatus.ACTIVE);
-			boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+			else if(episodeStatusInDB.canActivate()){				   
+				BCVideoData videodata=videoService.changeVideoStatus(episodeInDB.getBrightcoveId(),"ACTIVE");			
+				logger.info("*****"+videodata);
+				episodeStatusInDB.setPublishedStatus(PublishedStatus.ACTIVE);
+				boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+			}
+			else{
+				logger.error("trying to activate the epsideo not approved");
+				throw new RuntimeException("Needs to approve the episode first");
+			}
 		}
 		else if(episodeStatus.getPublishedStatus()==PublishedStatus.INACTIVE){
-			if(episodeInDB.getBrightcoveId()==null){
-				episodeStatusInDB.setPublishedStatus(PublishedStatus.INACTIVE);
-				boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
-				logger.info("INACTIVE because bcid is null");
-				return;
+			if(episodeInDB.getBrightcoveId()==null){				
+				if(episodeStatusInDB.getPublishedStatus()==PublishedStatus.ACTIVE){
+					episodeStatusInDB.setPublishedStatus(PublishedStatus.INACTIVE);
+					boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+					logger.info("INACTIVE because bcid is null");
+					
+				}
+				else{
+					logger.info("ignoring deactivation command because bcid is null");
+					
+				}
 			}
-			BCVideoData videodata=videoService.changeVideoStatus(episodeInDB.getBrightcoveId(),"INACTIVE");
-			logger.info("INACTIVE is set");
-			episodeStatusInDB.setPublishedStatus(PublishedStatus.INACTIVE);
-			boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+			else{
+					BCVideoData videodata=videoService.changeVideoStatus(episodeInDB.getBrightcoveId(),"INACTIVE");
+					logger.info("INACTIVE is set");
+					if(episodeStatusInDB.getPublishedStatus()==PublishedStatus.ACTIVE){
+						episodeStatusInDB.setPublishedStatus(PublishedStatus.INACTIVE);
+						boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+					}
+			}			
 		}
+		else if(episodeStatus.getPublishedStatus()!=episodeStatusInDB.getPublishedStatus()){
+			episodeStatusInDB.setPublishedStatus(episodeStatus.getPublishedStatus());
+			boxMetadataRepository.persistEpisodeStatus(episodeStatusInDB);
+		}		
 		else{
-			logger.info("****:"+episodeStatus.getPublishedStatus());
+			logger.info("****publish status not changed:"+episodeStatus.getPublishedStatus());
 		}
 		
 //		if(episodeStatus.update(episodeStatusInDB)){        	
@@ -1083,30 +1101,34 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
   public void updatePublishedStatus(Episode episode){
 	  EpisodeStatus episodeStatus=episode.getEpisodeStatus();
 	  if(episode.getBrightcoveId()==null){		  
-		  
-		  
-		  if(episodeStatus.getPublishedStatus()!=PublishedStatus.NOT_PUBLISHED || episodeStatus.getMetadataStatus()!=MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER){			  
-			  episodeStatus.setPublishedStatus(PublishedStatus.NOT_PUBLISHED);
+		  if(episodeStatus.getMetadataStatus()!=MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER){			  			 
 			  episodeStatus.setMetadataStatus(MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER);
 			  episodeStatus.setVideoStatus(VideoStatus.NO_PLACEHOLDER);
 			  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
-		  }		  
+		  }
+		  else if(episodeStatus.getVideoStatus()!=VideoStatus.NO_PLACEHOLDER){
+			  episodeStatus.setVideoStatus(VideoStatus.NO_PLACEHOLDER);
+			  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
+		  }
 	  }
 	  else{
-		  BCVideoData videoData=videoService.getVideo(episode.getBrightcoveId());
-		  if("INACTIVE".equals(videoData.getState())){
-			  if(episodeStatus.getPublishedStatus()!=PublishedStatus.INACTIVE){
-				  episodeStatus.setPublishedStatus(PublishedStatus.INACTIVE);
+			  BCVideoData videoData=videoService.getVideo(episode.getBrightcoveId());
+			  if("INACTIVE".equals(videoData.getState())){
+				  if(episodeStatus.getPublishedStatus()==PublishedStatus.ACTIVE){					  
+					  episodeStatus.setPublishedStatus(PublishedStatus.INACTIVE);
+					  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
+				  }	  
+			  }
+			  if("ACTIVE".equals(videoData.getState())){
+				  if(episodeStatus.getPublishedStatus()!=PublishedStatus.ACTIVE){
+					  episodeStatus.setPublishedStatus(PublishedStatus.ACTIVE);
+					  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
+				  }	  
+			  }
+			  if(episodeStatus.getMetadataStatus()==MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER){
+				  episodeStatus.setMetadataStatus(MetadataStatus.PUBLISHED);				  
 				  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
-			  }	  
-		  }
-		  if("ACTIVE".equals(videoData.getState())){
-			  if(episodeStatus.getPublishedStatus()!=PublishedStatus.ACTIVE){
-				  episodeStatus.setPublishedStatus(PublishedStatus.ACTIVE);
-				  boxMetadataRepository.persistEpisodeStatus(episodeStatus);
-			  }	  
-		  }
-		  
+			  }
 	  }
   }
   public  uk.co.boxnetwork.data.Episode publishMetadatatoBCByEpisodeId(Long id){

@@ -147,6 +147,7 @@ public class BoxMedataRepository {
     	  }
       }
       
+      
       @Transactional
       public void remove(EpisodeStatus episodeStatus){
     	  EpisodeStatus st=entityManager.find(EpisodeStatus.class, episodeStatus.getId());
@@ -847,6 +848,13 @@ public class BoxMedataRepository {
 		   		epstatus.setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
 		   	}		   
        }
+	   @Transactional
+       public void markTranscodeAsCompleteByEpisodeId(Long episodeId){
+		   	Episode episode=findEpisodeById(episodeId);
+		   	episode.getEpisodeStatus().setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
+		   	persistEpisodeStatus(episode.getEpisodeStatus());  	   
+       }
+	   
 	   @Transactional
 	   public void updateCue(uk.co.boxnetwork.data.CuePoint cuePoint){
 		   CuePoint cue=findCuePoint(cuePoint.getId());

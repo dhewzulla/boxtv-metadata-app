@@ -1,7 +1,9 @@
 package uk.co.boxnetwork.model;
 
 public enum PublishedStatus {
-  NOT_PUBLISHED,
+  NOT_APPROVED,
   INACTIVE,
-  ACTIVE
+  ACTIVE,
+  APPROVED,
+  IN_PROGRESS
 }
