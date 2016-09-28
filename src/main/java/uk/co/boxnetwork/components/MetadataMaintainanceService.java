@@ -237,6 +237,31 @@ logger.info("adding the default availability window......");
     }
     
     
+    public EpisodeStatus checkEpisoderanscodeStatus(Long episodeid){    	
+    	logger.info("checing the transcoding status for:"+episodeid);
+    	Episode episode=repository.findEpisodeById(episodeid);
+    	
+    	if(episode==null){
+    		throw new RuntimeException("epsode not found");    		
+    	}
+    	EpisodeStatus status=episode.getEpisodeStatus();
+    	if(status==null){
+    		throw new RuntimeException("epsode status is null");
+    	}
+    	
+    	
+         if(status.getVideoStatus()!=VideoStatus.TRANSCODING){
+        	 logger.info("Video status is not TRANSCODING");
+        	 return status;        	 
+         }         
+    	 BCVideoSource[] videos=videoService.getVideoSource(episode.getBrightcoveId());    			
+    	  if(videos!=null && videos.length>=2){    		  
+    		  repository.markTranscodeAsCompleteByEpisodeId(episode.getId());
+    	  }    	
+    	  return status;
+    }
+    
+    
     @Transactional     
     public void replaceIngestProfiles(String oldIngestProfile,String newIngestProfile){
     	logger.info("repacing the episode ingestProfile:oldIngestProfile="+oldIngestProfile+" newIngestProfile="+newIngestProfile);
@@ -355,12 +380,17 @@ logger.info("adding the default availability window......");
     	metataService.updatePublishedStatus(episode);
     }
     
-    public  MediaCommand processCommand(MediaCommand mediaCommand){
+    
+    public  Object processCommand(MediaCommand mediaCommand){
     	if("publish-all-changes".equals(mediaCommand.getCommand())){    		
     		pushAllChangesToBrightcove();    		
     	}
     	else if("import-brightcove-image".equals(mediaCommand.getCommand())){
     		importImageFromBrightcove(mediaCommand.getEpisodeid(),mediaCommand.getFilename());
+    	}
+    	else if("check-transcode-inprogress".equals(mediaCommand.getCommand())){
+    		return checkEpisoderanscodeStatus(mediaCommand.getEpisodeid());
+    		
     	}
     	else{
     		logger.info("ignore the command");
@@ -519,9 +549,11 @@ logger.info("pushing all changes to brightcove......");
 				}
 				for(Episode episode:episodes){
 						EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+						/*
 						if(episodeStatus.getMetadataStatus()!=MetadataStatus.NEEDS_TO_CREATE_PLACEHOLDER && episodeStatus.getPublishedStatus()==PublishedStatus.NOT_PUBLISHED){
 							metataService.updatePublishedStatus(episode);
-					    }		
+					    }
+					    */		
 				}
 				if(searchParam.isEnd(episodes.size())){
 					break;

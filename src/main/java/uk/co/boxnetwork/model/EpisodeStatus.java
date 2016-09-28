@@ -25,7 +25,7 @@ public class EpisodeStatus {
 	private String transcodeJobId;
 	
 	@Column(name="published_status")
-	private PublishedStatus publishedStatus=PublishedStatus.INACTIVE;
+	private PublishedStatus publishedStatus=PublishedStatus.NOT_APPROVED;
 	
 	public Long getId() {
 		return id;
@@ -94,5 +94,7 @@ public class EpisodeStatus {
 		return changed;
 	}
 	
-   
+	public boolean canActivate(){
+		return this.publishedStatus==PublishedStatus.ACTIVE || this.publishedStatus==PublishedStatus.INACTIVE || this.publishedStatus==PublishedStatus.APPROVED;		
+	}
 }
