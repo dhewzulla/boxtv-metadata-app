@@ -172,6 +172,9 @@ public class Episode {
 	private String imageURL;
 	
 	
+	@Column(name="editor_notes")
+	private String editorNotes;
+	
 	public EpisodeStatus getEpisodeStatus() {
 		return episodeStatus;
 	}
@@ -574,6 +577,15 @@ public void setPrAuk(String prAuk) {
 
 	public void setRecordedAt(Long recordedAt) {
 		this.recordedAt = recordedAt;
+	}
+
+	
+	public String getEditorNotes() {
+		return editorNotes;
+	}
+
+	public void setEditorNotes(String editorNotes) {
+		this.editorNotes = editorNotes;
 	}
 
 	public void makeSoundMouseFriendy(){

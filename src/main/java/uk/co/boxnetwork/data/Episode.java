@@ -136,6 +136,7 @@ public class Episode {
 	 
 	 private Integer episodeSequenceNumber;
 	 
+	 private String editorNotes;
 	 
 	public Long getId() {
 		return id;
@@ -273,6 +274,16 @@ public class Episode {
 
 	
 
+	public String getEditorNotes() {
+		return editorNotes;
+	}
+
+
+	public void setEditorNotes(String editorNotes) {
+		this.editorNotes = editorNotes;
+	}
+
+
 	public List<ScheduleEvent> getScheduleEvents() {
 		return scheduleEvents;
 	}
@@ -346,6 +357,7 @@ public Episode(){
 		this.firstTXDate=episode.getFirstTXDate();
 		this.episodeSequenceNumber=episode.getEpisodeSequenceNumber();
 		this.durationUploaded=episode.getDurationUploaded();
+		this.editorNotes=episode.getEditorNotes();
 		
 		this.setComplianceInformations(episode.getComplianceInformations());
 		if(episode.getCuePoints()!=null){
@@ -405,6 +417,7 @@ public Episode(){
 		episode.setRecordedAt(this.recordedAt);
 		episode.setEpisodeSequenceNumber(this.episodeSequenceNumber);
 		episode.setDurationUploaded(this.durationUploaded);
+		episode.setEditorNotes(this.editorNotes);
 	}
 
 
@@ -494,6 +507,13 @@ public Episode(){
 		}
 		if(this.recordedAt!=null){
 			episode.setRecordedAt(this.recordedAt);
+			changed=true;
+		}
+		if(this.editorNotes!=null){
+			if(this.editorNotes.equals("null")){
+				this.editorNotes=null;
+			}
+			episode.setEditorNotes(this.editorNotes);
 			changed=true;
 		}
 		
