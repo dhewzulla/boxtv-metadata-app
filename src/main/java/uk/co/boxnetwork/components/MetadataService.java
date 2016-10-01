@@ -515,7 +515,9 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 		if(episode.updateWhenReceivedByMaterialId(episodeInDB)){
 			boxMetadataRepository.persist(episodeInDB);
 		}
-		changeEpisodeStatus(episode,episodeInDB);
+		if(episode.getEpisodeStatus()!=null){
+			changeEpisodeStatus(episode,episodeInDB);
+		}
 		return new uk.co.boxnetwork.data.Episode(episodeInDB,null);
 	}
 	public void  changeEpisodeStatus(uk.co.boxnetwork.data.Episode episode,Episode episodeInDB){
