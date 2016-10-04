@@ -91,11 +91,15 @@ public class S3BucketService {
 		if(keyName==null|| keyName.trim().length()<=1){
 			throw new RuntimeException("refuxed to do the delte operation on the s3 bucket:"+keyName);
 		}
+		logger.info("deleting the image in the ImageBucket:"+keyName);
 		AmazonS3 s3=getAmazonS3();		
 		s3.deleteObject(new DeleteObjectRequest(s3Configuration.getImageBucket(), keyName));
 	}
 	public void deletePublicImage(String keyName){
 		 deleteImagesInImageBucket(s3Configuration.getImagePublicFolder()+"/"+keyName);
+	}
+	public void deleteMasterImage(String keyName){
+		 deleteImagesInImageBucket(s3Configuration.getImageMasterFolder()+"/"+keyName);
 	}
 	public List<FileItem> listGenereratedImages(String prefix){		
 		String path=s3Configuration.getImagePublicFolder();
