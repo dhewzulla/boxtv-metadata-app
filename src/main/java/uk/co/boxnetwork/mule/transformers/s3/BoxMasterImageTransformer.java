@@ -14,15 +14,20 @@ import org.mule.api.MuleMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StreamUtils;
 
+import uk.co.boxnetwork.components.MetadataMaintainanceService;
 import uk.co.boxnetwork.components.S3BucketService;
 import uk.co.boxnetwork.mule.transformers.BoxRestTransformer;
+import uk.co.boxnetwork.mule.util.MuleRestUtil;
 
 public class BoxMasterImageTransformer extends BoxRestTransformer{
 	
 	@Autowired
 	private S3BucketService s3uckerService;
 	
-	
+	@Autowired
+	MetadataMaintainanceService metadataMaintainanceService;
+		
+	@Override
 	protected Object processGET(MuleMessage message, String outputEncoding){
 		logger.info("boximage.get request is received");
 		Map<String, String> queryprarams=message.getInboundProperty("http.query.params");
@@ -32,6 +37,7 @@ public class BoxMasterImageTransformer extends BoxRestTransformer{
 		}
 		return s3uckerService.listMasterImageItem(prefix);		
 	}
+	@Override
 	protected Object processPOST(MuleMessage message, String outputEncoding){
 		Set<String> attachementnames=message.getInboundAttachmentNames();
 				
@@ -73,6 +79,29 @@ public class BoxMasterImageTransformer extends BoxRestTransformer{
 		logger.info("*******Completed***");
 		return message.getPayload();		
 	}
-		
+	 
+	protected Object processDELETE(MuleMessage message, String outputEncoding){			
+		String path=MuleRestUtil.getPathPath(message);
+		String pathcomonents[]=path.split("/");
+		logger.info("path::::"+path);
+		if(pathcomonents.length>2 && pathcomonents[0].equals("series")){
+			return deleteSeriesImage(pathcomonents[1], pathcomonents[2]);
+		}
+		else if(pathcomonents.length>2 && pathcomonents[0].equals("episode")){
+			return deleteEpisodeImage(pathcomonents[1], pathcomonents[2]);
+		}
+		else{
+			return returnError("The Method DELETE for this path not supported",message);
+		}
+	}
+	private Object deleteSeriesImage(String seriesid, String imagefilename){
+  		Long id=Long.valueOf(seriesid);
+  		return metadataMaintainanceService.deleteSeriesImage(id, imagefilename);  		
+	}
+	private Object deleteEpisodeImage(String episodeid, String imagefilename){
+  		Long id=Long.valueOf(episodeid);
+  		return metadataMaintainanceService.deleteEpisodeImage(id, imagefilename);  		
+	}
+			
 	
 }

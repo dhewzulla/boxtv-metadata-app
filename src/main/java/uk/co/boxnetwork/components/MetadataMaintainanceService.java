@@ -607,5 +607,55 @@ public void calculateUploadedDuration(){
 				}
 		}
     }
-    
+
+  	
+	public uk.co.boxnetwork.data.Series deleteSeriesImage(Long serisid, String imagefilename){	
+  		uk.co.boxnetwork.data.Series series=metataService.getSeriesById(serisid);
+  		if(series==null){
+  			logger.error("not found series, not deleting the series image serisid=["+serisid+"]imagefilename=["+imagefilename+"]");
+  			return null;
+  		}
+  		if(imagefilename==null){
+  			logger.error("imagefile is null, not deleting the series image serisid=["+serisid+"]imagefilename=["+imagefilename+"]");
+  			return series;
+  		}
+  		imagefilename=imagefilename.trim();
+  		if(imagefilename.length()==0){
+  			logger.error("imagefile is empty, not deleting the series image serisid=["+serisid+"]imagefilename=["+imagefilename+"]");  			
+  		}  	
+  		else if(imagefilename.equals(series.getImageURL())){
+  			s3uckerService.deleteMasterImage(imagefilename);
+  			metataService.setSeriesImage(serisid, null);
+  			series.setImageURL(null);
+  			
+  		}
+  		else{
+  			logger.error("imagefile is different, not deleting the series image serisid=["+serisid+"]imagefilename=["+imagefilename+"]");
+  		}
+  		return series;
+	}
+	public uk.co.boxnetwork.data.Episode deleteEpisodeImage(Long episodeid, String imagefilename){	
+  		uk.co.boxnetwork.data.Episode episode=metataService.getEpisodeById(episodeid);
+  		if(episode==null){
+  			logger.error("not found series, not deleting the episode image episodeid=["+episodeid+"]imagefilename=["+imagefilename+"]");
+  			return null;
+  		}
+  		if(imagefilename==null){
+  			logger.error("imagefile is null, not deleting the episode image episodeid=["+episodeid+"]imagefilename=["+imagefilename+"]");
+  			return episode;
+  		}
+  		imagefilename=imagefilename.trim();
+  		if(imagefilename.length()==0){
+  			logger.error("imagefile is empty, not deleting the episode image episodeid=["+episodeid+"]imagefilename=["+imagefilename+"]");  			
+  		}  	
+  		else if(imagefilename.equals(episode.getImageURL())){
+  			s3uckerService.deleteMasterImage(imagefilename);
+  			metataService.setEpisodeImage(episodeid, null);  			
+  			episode.setImageURL(null);  			
+  		}
+  		else{
+  			logger.error("imagefile is different, not deleting the series image serisid=["+episodeid+"]imagefilename=["+imagefilename+"]");
+  		}
+  		return episode;
+	}
 }

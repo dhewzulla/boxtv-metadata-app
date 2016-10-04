@@ -1325,6 +1325,22 @@ private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,Str
 		
 	  
   }
+  @Transactional
+  public void setSeriesImage(Long seriesid, String imageURL){
+	  Series series=boxMetadataRepository.findSeriesById(seriesid);
+	  series.setImageURL(imageURL);
+	  boxMetadataRepository.persisSeries(series);	  
+	  logger.info("clearing the image in the series");
+	  
+	  
+  }
+  @Transactional
+  public void setEpisodeImage(Long episodeid, String imageURL){
+	  Episode episode=boxMetadataRepository.findEpisodeById(episodeid);
+	  episode.setImageURL(imageURL);
+	  boxMetadataRepository.persist(episode);	  
+	  logger.info("clearing the image in the episode");
+  }
   
   public void notifyMasterImageUploaded(String imagefile){
 	  logger.info("processing mater image notification:"+imagefile);
