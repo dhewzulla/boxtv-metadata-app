@@ -968,7 +968,7 @@ public uk.co.boxnetwork.data.Series getSeriesById(Long id){
 	}
 	@Transactional
 	public void switchSeriesGroup(long id, uk.co.boxnetwork.data.Series series){
-		String seriesGroupTitle="Default Series Group";
+		String seriesGroupTitle=SeriesGroup.DEFAULT_SERIES_GROUP_TITLE;
 		if(series.getSeriesGroup()!=null && series.getSeriesGroup().getTitle()!=null && series.getSeriesGroup().getTitle().trim().length()>0){
 			seriesGroupTitle=series.getSeriesGroup().getTitle().trim();
 		}
@@ -1399,5 +1399,82 @@ private boolean matchImageToSeriesGroup(List<SeriesGroup> matchedSeriesGroup,Str
     	  matchedEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(matid);
     	  matchImageToEpisodes(matchedEpisodes, imagefile);
       }      
+  }
+  
+  
+  @Transactional
+  public Episode importEpisode(Episode episode){
+	  Series series=null;  
+	  SeriesGroup seriesGroup=null;
+	  
+	  String contractNumber=null;
+	  
+	  String progrimeId=episode.getCtrPrg();
+	  if(GenericUtilities.isNotValidCrid(progrimeId)){
+		  throw new RuntimeException("Episode does not have a valid programmeId");
+	  }
+	  if(GenericUtilities.isNotValidTitle(episode.getTitle())){
+		  throw new RuntimeException("Episode does not have a valid title");
+	  }
+	  List<Episode> matchedEpisodes=boxMetadataRepository.findEpisodesByCtrPrg(progrimeId);
+	  if(matchedEpisodes.size()>0){
+		  throw new RuntimeException("The episode with programmeId:["+progrimeId+"] already exists");
+	  }
+	  
+	  if(episode.getSeries()!=null){
+		  contractNumber=episode.getSeries().getContractNumber();
+	  }
+	  if(GenericUtilities.isEmpty(contractNumber)){
+		  series=boxMetadataRepository.retrieveDefaultSeries();		  
+	  }
+	  else{
+		    List<Series> matchedSeries=boxMetadataRepository.findSeriesByContractNumber(contractNumber);
+		    if(matchedSeries.size()==0){
+		    	series=episode.getSeries();		    	
+		    	if(series.getSeriesGroup()!=null && (!GenericUtilities.isNotValidTitle(series.getSeriesGroup().getTitle()))){
+		    		boxMetadataRepository.persisSeriesGroup(series.getSeriesGroup());
+		    	}
+		    	else{
+		    		series.setSeriesGroup(boxMetadataRepository.retrieveDefaultSeriesGroup());
+		    	}		    	
+		    	boxMetadataRepository.persisSeries(series);
+		    }
+		    else{		    	
+		    	series=matchedSeries.get(0);		    	
+		    }
+		    
+	  }
+	  episode.setSeries(series);
+	  
+	  if(!GenericUtilities.isEmpty(episode.getTags())){
+		  String atgs[]=GenericUtilities.commandDelimitedToArray(episode.getTags());
+		  boxMetadataRepository.saveTags(atgs);
+	  }
+	  episode.setIngestSource(null);
+	  boxMetadataRepository.persist(episode);
+	  if(episode.getCuePoints()!=null && episode.getCuePoints().size()>0){
+		  for(CuePoint cuepoint:episode.getCuePoints()){
+			  boxMetadataRepository.persist(cuepoint);
+		  }
+	  }
+	  if(episode.getAvailabilities()!=null && episode.getAvailabilities().size()>0){
+		  for(AvailabilityWindow availabilityWindow:episode.getAvailabilities()){
+			  boxMetadataRepository.persist(availabilityWindow);
+		  }
+	  }
+	  boxMetadataRepository.persistEpisodeStatus(episode.getEpisodeStatus());
+	  
+		checkS3ToUpdateVidoStatus(episode);
+		if(GenericUtilities.isNotValidCrid(episode.getImageURL())){
+			String fname=retrieveEpisodeImageFromS3(episode);
+			if(fname!=null){
+				episode.setImageURL(fname);
+				boxMetadataRepository.persist(episode);
+			}
+		}	
+
+		
+	  
+	  return episode;
   }
 }

@@ -1,7 +1,12 @@
 package uk.co.boxnetwork.components;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -25,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.co.boxnetwork.data.SearchParam;
 import uk.co.boxnetwork.data.bc.BCVideoData;
 import uk.co.boxnetwork.data.bc.BCVideoSource;
+import uk.co.boxnetwork.data.s3.FileItem;
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.AvailabilityWindow;
 import uk.co.boxnetwork.model.Episode;
@@ -214,18 +220,7 @@ logger.info("adding the default availability window......");
     		episodeStatus.setVideoStatus(videoStatus);
     	}
     	else{
-    			BCVideoSource[] videos=videoService.getVideoSource(episode.getBrightcoveId());
-    			
-    			if(videos!=null && videos.length>=2){
-    				episodeStatus.setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
-    				episodeStatus.setNumberOfTranscodedFiles(videos.length);
-    			}
-    			else{
-    				episodeStatus.setVideoStatus(VideoStatus.NEEDS_TRANSCODE);
-    				if(videos!=null){
-    					episodeStatus.setNumberOfTranscodedFiles(videos.length);
-    				}
-    			}
+    		    importTranscodeStatusFromBrightcove(episode.getBrightcoveId(),episodeStatus);    		    
     	}
     	if(episodeStatus.getId()==null){
     		repository.persistEpisodeStatus(episodeStatus);
@@ -235,7 +230,19 @@ logger.info("adding the default availability window......");
     	}
     	episode.setEpisodeStatus(episodeStatus);    	
     }
-    
+    public void importTranscodeStatusFromBrightcove(String brightcoveid,EpisodeStatus episodeStatus){
+    	BCVideoSource[] videos=videoService.getVideoSource(brightcoveid);		
+		if(videos!=null && videos.length>=2){
+			episodeStatus.setVideoStatus(VideoStatus.TRANSCODE_COMPLETE);
+			episodeStatus.setNumberOfTranscodedFiles(videos.length);
+		}
+		else{
+			episodeStatus.setVideoStatus(VideoStatus.NEEDS_TRANSCODE);
+			if(videos!=null){
+				episodeStatus.setNumberOfTranscodedFiles(videos.length);
+			}
+		}
+    }
     
     public EpisodeStatus checkEpisoderanscodeStatus(Long episodeid){    	
     	logger.info("checing the transcoding status for:"+episodeid);
@@ -382,16 +389,20 @@ logger.info("adding the default availability window......");
     
     
     public  Object processCommand(MediaCommand mediaCommand){
-    	if("publish-all-changes".equals(mediaCommand.getCommand())){    		
+    	if(MediaCommand.PUBLISH_ALL_CHANGES.equals(mediaCommand.getCommand())){    		
     		pushAllChangesToBrightcove();    		
     	}
-    	else if("import-brightcove-image".equals(mediaCommand.getCommand())){
+    	else if(MediaCommand.IMPORT_BRIGHCOVE_IMAGE.equals(mediaCommand.getCommand())){
     		importImageFromBrightcove(mediaCommand.getEpisodeid(),mediaCommand.getFilename());
     	}
-    	else if("check-transcode-inprogress".equals(mediaCommand.getCommand())){
-    		return checkEpisoderanscodeStatus(mediaCommand.getEpisodeid());
-    		
+    	else if(MediaCommand.CHECK_TRANSCODE_IN_PRGRESS.equals(mediaCommand.getCommand())){
+    		return checkEpisoderanscodeStatus(mediaCommand.getEpisodeid());    		
     	}
+    	
+    	else if(MediaCommand.IMPORT_BRIGHTCOVE_EPISODE.equals(mediaCommand.getCommand())){
+    		return importEpisodeFromBrightcove(mediaCommand); 
+    	}
+    	
     	else{
     		logger.info("ignore the command");
     	}
@@ -479,6 +490,66 @@ logger.info("adding the default availability window......");
     	}
 
     	
+    }
+    
+    public Episode importEpisodeFromBrightcove(MediaCommand mediaCommand){
+    	String brigthcoveid=mediaCommand.getBrightcoveId();
+    	if(brigthcoveid==null){
+    		logger.error("brightcoveid is not provided");
+    		return null;
+    	}
+    	brigthcoveid=brigthcoveid.trim();
+    	String episodenumber=mediaCommand.getEpisodeNumber();
+    	if(episodenumber!=null)
+    		episodenumber=episodenumber.trim();
+    	if(brigthcoveid.length()==0){
+    		logger.error("brightcoveid is not provided");
+    		return null;
+    	}
+    	String contractNumber=mediaCommand.getContractNumber();
+    	if(contractNumber!=null){
+    		contractNumber=contractNumber.trim();
+    	}
+    	Episode episode=bcVideoToEpisode(brigthcoveid);
+    	if(!GenericUtilities.isEmpty(contractNumber)){
+    		if(episode.getSeries()==null){
+    			episode.setSeries(new Series());
+    		}
+    		episode.getSeries().setContractNumber(contractNumber);
+        	if(!GenericUtilities.isEmpty(episodenumber)){
+        		episode.setCtrPrg(GenericUtilities.composeCtrPrg(contractNumber, episodenumber));
+        		episode.setNumber(GenericUtilities.toInteter(episodenumber, "parsing episde number error"));        		
+        	}
+        	else{
+        		episode.setCtrPrg(GenericUtilities.composeCtrPrg(contractNumber, "1"));
+        		episode.setNumber(1);        		
+        	}
+
+    	}
+    	return metataService.importEpisode(episode);    	
+    }
+    
+    public Episode bcVideoToEpisode(String brightcoveid){
+        if(GenericUtilities.isEmpty(brightcoveid)){
+        	logger.error("brightcoveid is null, will not import");
+        	return null;
+        }
+    	BCVideoData video=videoService.getVideo(brightcoveid);
+    	Episode episode=new Episode();
+    	video.export(episode);
+    	if(episode.getEpisodeStatus()==null){
+			episode.setEpisodeStatus(new EpisodeStatus());
+		}
+    	importTranscodeStatusFromBrightcove(brightcoveid,episode.getEpisodeStatus());
+    	
+//    	if(!GenericUtilities.isEmpty(originalVideoFilename)){
+//    		List<FileItem> items=s3uckerService.listFiles("digital-content-boxplus", "Video/");
+//    		for(FileItem itm:items){
+//    			logger.info("::"+itm.getFile());
+//    		}
+//    	}
+    		
+    	return episode;
     }
     public void pushAllChangesToBrightcove(){
     	
@@ -658,4 +729,30 @@ public void calculateUploadedDuration(){
   		}
   		return episode;
 	}
+	
+	public String createCSVBeBoxEpisodesFrom() throws UnsupportedEncodingException, FileNotFoundException{
+		StringBuilder builder=new StringBuilder();
+		builder.append("BC Media ID,Title/Name,Contract Number,Episode Number,Series Title,Series Group Title, Video S3 folder, Video S3 file name\n");
+		
+		SearchParam searchParam=new SearchParam(null, 0, appConfig.getRecordLimit());
+    	while(true){
+    		BCVideoData[] videos=videoService.getVideoList(searchParam.getLimit(), searchParam.getStart(), null, null);
+    		
+		    	if(videos==null || videos.length==0){
+		    		logger.info("completed retrieving all the bc video");
+					break;
+				}
+		    	logger.info("returned records:"+videos.length+":"+videos[0].getId()+":"+videos[0].getName());			    	
+		    	for(BCVideoData video:videos){		    		
+		    		if( video.getReference_id()==null  || ((!video.getReference_id().startsWith("V_")) && (!video.getReference_id().startsWith("v_"))) ){
+		    			builder.append(video.getId()+","+video.getName()+",,,,,,\n");
+		    		}
+		    	}
+		    	searchParam.nextBatch(videos.length);	    		
+    	  }
+	    
+    	return builder.toString();    	
+	}
+	
+	
 }

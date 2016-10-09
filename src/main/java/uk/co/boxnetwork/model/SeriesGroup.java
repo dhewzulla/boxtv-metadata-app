@@ -9,6 +9,8 @@ import javax.persistence.Id;
 
 @Entity(name="series_group")
 public class SeriesGroup {
+	public static String DEFAULT_SERIES_GROUP_TITLE="Default Series Group";
+	
 	@Id
 	@GeneratedValue
     private Long id;

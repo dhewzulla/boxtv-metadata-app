@@ -103,6 +103,9 @@ public class BCVideoService {
 	public String  listVideo(String limit, String offset, String sort,String q){
 		return listVideo(GenericUtilities.bcInteger(limit),GenericUtilities.bcInteger(offset),GenericUtilities.bcString(sort),GenericUtilities.bcString(q));		
 	}
+	public  BCVideoData[] getVideoList(String limit, String offset, String sort,String q){
+		return getVideoList(GenericUtilities.bcInteger(limit),GenericUtilities.bcInteger(offset),GenericUtilities.bcString(sort),GenericUtilities.bcString(q));		
+	}
 	public String  listVideo(Integer limit, Integer offset, String sort,String q){			
 		    BCAccessToken accessToken=bcAccessToenService.getAccessToken();
 			RestTemplate rest=new RestTemplate();
@@ -119,9 +122,22 @@ public class BCVideoService {
 		    logger.info(":::::::::statuscode:"+statusCode);
 		    return responseEntity.getBody();
 	}
+	public BCVideoData[] getVideoList(Integer limit, Integer offset, String sort,String q){
+		String videoInJson=listVideo(limit,offset,sort,q);
+		com.fasterxml.jackson.databind.ObjectMapper objectMapper=GenericUtilities.createObjectMapper();
+	    BCVideoData video;
+		try {
+			BCVideoData[] videos = objectMapper.readValue(videoInJson, BCVideoData[].class);
+			return videos;			
+		} catch (IOException e) {
+			logger.error("error while parsing the brightcove video data",e);
+			logger.error(videoInJson);
+			throw new RuntimeException(e.getMessage(),e);
+		}
+	}
 	
-	
-	public String  getViodeInJson(String videoid){			
+	public String  getViodeInJson(String videoid){	
+		
 	    BCAccessToken accessToken=bcAccessToenService.getAccessToken();
 		RestTemplate rest=new RestTemplate();
 		//rest.setErrorHandler(new RestResponseHandler());
@@ -129,7 +145,9 @@ public class BCVideoService {
 	    headers.add("Accept", "*/*");
 		headers.add("Authorization", "Bearer " + accessToken.getAccess_token());
 		HttpEntity<String> requestEntity = new HttpEntity<String>("", headers);		
-	    ResponseEntity<String> responseEntity = rest.exchange(configuration.videoURL(videoid), HttpMethod.GET, requestEntity, String.class);
+		String url=configuration.videoURL(videoid);
+		logger.info("getting video details from bc url:"+url);
+	    ResponseEntity<String> responseEntity = rest.exchange(url, HttpMethod.GET, requestEntity, String.class);
 	    responseEntity.getStatusCode();	    
 	    HttpStatus statusCode=responseEntity.getStatusCode();
 	    logger.info("::::::getViodeInJson:::statuscode:"+statusCode);
@@ -381,15 +399,9 @@ public class BCVideoService {
 		
 		
 	}
-	
+	 
 	public  BCVideoData jsonToBCVideoData(String videoInJson){
-		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
-		objectMapper.setSerializationInclusion(Include.NON_NULL);	
-		objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-		objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
-		objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
-		objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false);
-		objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		com.fasterxml.jackson.databind.ObjectMapper objectMapper=GenericUtilities.createObjectMapper();
 	    BCVideoData video;
 		try {
 			video = objectMapper.readValue(videoInJson, BCVideoData.class);

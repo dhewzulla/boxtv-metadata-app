@@ -10,4 +10,14 @@ public enum CertType {
 	public String getBcName(){
 		return this.bcName;
 	}
+	public static CertType fromString(String textValue) {
+	    if (textValue != null) {
+	      for (CertType c : CertType.values()) {
+	        if (textValue.equalsIgnoreCase(c.bcName)) {
+	          return c;
+	        }
+	      }
+	    }
+	    return null;
+	  }
 }

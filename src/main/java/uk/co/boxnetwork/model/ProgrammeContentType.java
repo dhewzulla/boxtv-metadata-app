@@ -20,4 +20,14 @@ public enum ProgrammeContentType {
 	public String toString() {
 	     return this.name;
 	}
+	public static ProgrammeContentType fromString(String textValue) {
+	    if (textValue != null) {
+	      for (ProgrammeContentType p : ProgrammeContentType.values()) {
+	        if (textValue.equalsIgnoreCase(p.toString())) {
+	          return p;
+	        }
+	      }
+	    }
+	    return null;
+	  }
 }

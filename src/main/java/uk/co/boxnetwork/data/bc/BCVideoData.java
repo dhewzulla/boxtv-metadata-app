@@ -15,8 +15,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import uk.co.boxnetwork.model.AdSuport;
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.AvailabilityWindow;
+import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.EpisodeStatus;
+import uk.co.boxnetwork.model.MetadataStatus;
+import uk.co.boxnetwork.model.PublishedStatus;
 import uk.co.boxnetwork.model.ScheduleEvent;
+import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.VideoStatus;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 
 
@@ -113,9 +120,12 @@ public class BCVideoData {
 			 }
 			 
 		 }
+		 
 		 public BCVideoData(Episode episode,List<ScheduleEvent> schedules,AppConfig appConfig){			 	
 			 this.name=episode.getTitle();		
 			 populateTags(episode);
+			 
+			 
 			 
 			 buildRefereceId(episode);
 			 this.description=episode.getSynopsis();
@@ -132,8 +142,84 @@ public class BCVideoData {
 				geo=new BCGeo(episode);				
 			}	
 			calculateSchedule(episode, schedules);
+		 }
+		 public void export(Episode episode){
+			 episode.setBrightcoveId(this.id);
+			 episode.setTitle(this.name);
+			 episode.setTags(GenericUtilities.arrayToSeparatedString(this.tags,","));
+			 episode.setSynopsis(this.description);
+			 if("Free".equals(this.economics)){
+				 episode.setAdsupport(AdSuport.FREE);
+			 }
+			 else{
+				 episode.setAdsupport(AdSuport.AD_SUPPORTED);
+			 }
+			 
+			 
+			 if(custom_fields!=null){
+				 custom_fields.export(episode);				 
+			 }
+			 if(this.cue_points!=null && this.cue_points.length>0){
+				 for(int i=0;i<this.cue_points.length;i++){
+					 BCCuePoint bcCuepoint=this.cue_points[i];	
+					 CuePoint cuepoint=new CuePoint();
+					 bcCuepoint.export(cuepoint);
+					 episode.addCuePoint(cuepoint);
+				 }
+				 
+				 
+			 }
+			 if(this.geo!=null){
+				 this.geo.export(episode);				 
+			 }
+			 if(schedule!=null){
+				schedule.export(episode);				
+			 }	
+			 
+			 if(!GenericUtilities.isEmpty(original_filename)){
+					episode.setIngestSource(original_filename);
+			}
+			if(!GenericUtilities.isEmpty(this.reference_id)){
+				String materialId=GenericUtilities.fileNameToMaterialID(this.reference_id);
+				if(materialId==null){
+					episode.setMaterialId(this.reference_id);
+				}
+				else{
+					  String[] materialParts=materialId.split("/");
+					  if(materialParts.length>1){
+						  episode.setCtrPrg(materialParts[0]+"/"+materialParts[1]);
+						  if(episode.getSeries()==null){
+							  episode.setSeries(new Series());
+						  }
+						  episode.getSeries().setContractNumber(materialParts[0]);
+						  Integer secondpart=GenericUtilities.toInteter(materialParts[1], "erro parsing the episode number from the matrial in in bc");
+						  episode.setEpisodeSequenceNumber(secondpart);
+						  episode.setNumber(secondpart);
+						 
+					  }
+					  else{
+						  episode.setCtrPrg(materialId);
+					  }
+				}
+				
+			}
 			
-			
+			if(episode.getEpisodeStatus()==null){
+				episode.setEpisodeStatus(new EpisodeStatus());
+			}
+			EpisodeStatus episodeStatus=episode.getEpisodeStatus();
+			episodeStatus.setMetadataStatus(MetadataStatus.PUBLISHED);
+			episodeStatus.setVideoStatus(VideoStatus.NEEDS_TRANSCODE);
+			if("ACTIVE".equals(this.state)){
+				episodeStatus.setPublishedStatus(PublishedStatus.ACTIVE);
+			}
+			else{
+				episodeStatus.setPublishedStatus(PublishedStatus.INACTIVE);
+			}	
+			if(this.duration!=null){
+				episode.setDurationUploaded(Double.valueOf(this.duration).doubleValue()/1000);
+				episode.setDurationScheduled(Double.valueOf(this.duration).doubleValue()/1000);
+			}
 		 }
 		 
 		 public void populateCuePoints(Episode episode){
@@ -397,6 +483,7 @@ public class BCVideoData {
 			}
 			schedule =new BCSchedule(fromDate,toDate);			
 		}
+		
 
 		public Boolean getComplete() {
 			return complete;

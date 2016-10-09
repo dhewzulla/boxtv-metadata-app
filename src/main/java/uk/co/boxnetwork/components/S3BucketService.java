@@ -61,22 +61,27 @@ public class S3BucketService {
 		ListObjectsRequest request=new ListObjectsRequest().withBucketName(bucketname);
 		if(prefix!=null){
 			request.withPrefix(prefix);			
-		}		        
+		}		    
+		
 		ObjectListing objectListing = s3.listObjects(request);
 		
-		List<FileItem> ret=new ArrayList<FileItem>();        
-        for (S3ObjectSummary objectSummary : objectListing.getObjectSummaries()) {
-            String key=objectSummary.getKey();
-            if(key.endsWith("/")){
-            	continue;
-            	
-            }                            
-            FileItem itm=new FileItem();
-            itm.setFile(key);
-            itm.setLastModifiedDate(objectSummary.getLastModified());
-            objectSummary.getLastModified();
-            ret.add(itm);                    	
-        }
+		
+		List<FileItem> ret=new ArrayList<FileItem>(); 
+		do{
+		        for (S3ObjectSummary objectSummary : objectListing.getObjectSummaries()) {
+		            String key=objectSummary.getKey();
+		            if(key.endsWith("/")){
+		            	continue;
+		            	
+		            }                            
+		            FileItem itm=new FileItem();
+		            itm.setFile(key);
+		            itm.setLastModifiedDate(objectSummary.getLastModified());
+		            objectSummary.getLastModified();
+		            ret.add(itm);                    	
+		        }
+		        objectListing=s3.listNextBatchOfObjects(objectListing);
+		}while(objectListing.isTruncated());
         return ret;
 	}
 	public MediaFilesLocation listFilesInVideoBucket(String prefix){

@@ -28,6 +28,8 @@ import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
@@ -38,6 +40,8 @@ import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.CuePoint;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.model.MetadataStatus;
+import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.SeriesGroup;
 import uk.co.boxnetwork.model.VideoStatus;
 import uk.co.boxnetwork.mule.components.LoadResourceAsInputStream;
 
@@ -305,6 +309,9 @@ public class GenericUtilities {
 	  }
 	  String matParts[]=pid.split("/");
 	  return matParts[0];
+  }
+  public static String composeCtrPrg(String contractNumber, String episodeNumber){
+	  return contractNumber+"/"+episodeNumber;
   }
   public static VideoStatus calculateVideoStatus(Episode episode){
 	   return  calculateVideoStatus(episode, episode.getIngestSource(), episode.getIngestProfile());  
@@ -575,7 +582,7 @@ public class GenericUtilities {
 		if(episode.getSeries()==null){
 			return false;
 		}
-		if("Default Series".equals(episode.getSeries().getName())){
+		if(Series.DEFAULT_SERIES_TITLE.equals(episode.getSeries().getName())){
 			return false;
 		}
 		return true;
@@ -587,13 +594,13 @@ public class GenericUtilities {
 		if(episode.getSeries()==null){
 			return false;
 		}
-		if("Default Series".equals(episode.getSeries().getName())){
+		if(Series.DEFAULT_SERIES_TITLE.equals(episode.getSeries().getName())){
 			return false;
 		}
 		if(episode.getSeries().getSeriesGroup()==null){
 			return false;
 		}
-		if("Default Series Group".equals(episode.getSeries().getSeriesGroup().getTitle())){
+		if(SeriesGroup.DEFAULT_SERIES_GROUP_TITLE.equals(episode.getSeries().getSeriesGroup().getTitle())){
 			return false;
 		}
 		return true;
@@ -627,6 +634,31 @@ public class GenericUtilities {
 			}
 		}
 		return shouldReportOnCuepoint;
+	}
+	public static Integer toInteter(String value, String errormesage){
+		if(value==null){
+			return null;			
+		}		
+		try{
+			return Integer.valueOf(value.trim());
+		}
+		catch(Exception e){
+			logger.error(e+" "+errormesage +"value=["+value+"]",e);
+			return null;
+		}
+	}
+	public static com.fasterxml.jackson.databind.ObjectMapper createObjectMapper(){
+		com.fasterxml.jackson.databind.ObjectMapper objectMapper=new com.fasterxml.jackson.databind.ObjectMapper();
+			objectMapper.setSerializationInclusion(Include.NON_NULL);	
+			objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+			objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+			objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+			objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false);
+			objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			return objectMapper;
+			
+			
+			
 	}
 }
 

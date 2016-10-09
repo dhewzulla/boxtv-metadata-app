@@ -158,5 +158,8 @@ public class SearchParam {
    public void nextBatch(){
 	   this.start+=this.limit;
    }
+   public void nextBatch(int videoSize){
+	   this.start+=videoSize;
+   }
 
 }

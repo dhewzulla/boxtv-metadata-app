@@ -1,8 +1,19 @@
 package uk.co.boxnetwork.data.bc;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import uk.co.boxnetwork.data.CuepointMetadata;
+import uk.co.boxnetwork.util.GenericUtilities;
 
 public class BCCuePoint {
+	private static final Logger logger=LoggerFactory.getLogger(BCCuePoint.class);
 	  private String id;
 	  private String name;
 	  private String type;
@@ -22,9 +33,27 @@ public class BCCuePoint {
 		  }
 		  else if(numberOfBraks!=null && numberOfBraks.trim().length()>0){
 			  this.metadata="{\"numberOfAds\":"+numberOfBraks+"}";
+			  
 		  }
 		  
 		  		  
+	  }
+	  public void export(uk.co.boxnetwork.model.CuePoint cuepoint){
+		  cuepoint.setName(this.name);
+		  cuepoint.setType(this.type);
+		  cuepoint.setTime(this.time);
+		  cuepoint.setForce_stop(this.force_stop);
+		  if(!GenericUtilities.isEmpty(this.metadata)){
+			  com.fasterxml.jackson.databind.ObjectMapper objectMapper=GenericUtilities.createObjectMapper();
+			  try {
+				CuepointMetadata metadata = objectMapper.readValue(this.metadata, CuepointMetadata.class);
+				cuepoint.setNumberOfAds(metadata.getNumberOfAds());
+			} catch (Exception e) {
+				logger.error(e+" while parsing the cue metadta:"+this.metadata,e);
+			} 
+			  
+		  }
+		  
 	  }
 	public String getId() {
 		return id;

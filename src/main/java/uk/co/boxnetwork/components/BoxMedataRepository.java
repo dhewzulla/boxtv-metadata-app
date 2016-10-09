@@ -91,6 +91,9 @@ public class BoxMedataRepository {
     	  persist(episode);
     	  markMetadataChanged(episode);
        }
+       public void persist(AvailabilityWindow availabilityWindow){
+    	   entityManager.persist(availabilityWindow);
+       }
        @Transactional
        public void removeCuePoint(Long cueid){
     	   CuePoint cuepoint=findCuePoint(cueid);
@@ -604,17 +607,29 @@ public class BoxMedataRepository {
 		   return query.setParameter("title",title).getResultList();
 	   }
 	   public SeriesGroup retrieveDefaultSeriesGroup(){
-		   String defaultSeriesGroupTitle="Default Series Group";
-		   List<SeriesGroup> matchedSeriesGroups=findSeriesGroupByTitle(defaultSeriesGroupTitle);
+		   
+		   List<SeriesGroup> matchedSeriesGroups=findSeriesGroupByTitle(SeriesGroup.DEFAULT_SERIES_GROUP_TITLE);
 		   if(matchedSeriesGroups.size()>0){
 			   return matchedSeriesGroups.get(0);			   
 		   }
 		   SeriesGroup defaultSeriesGroup=new SeriesGroup();
-		   defaultSeriesGroup.setTitle(defaultSeriesGroupTitle);
+		   defaultSeriesGroup.setTitle(SeriesGroup.DEFAULT_SERIES_GROUP_TITLE);
 		   persisSeriesGroup(defaultSeriesGroup);
 		   return defaultSeriesGroup;
 		   
 	   }
+	   public Series retrieveDefaultSeries(){
+			  List<Series> series= findSeriesByName(Series.DEFAULT_SERIES_TITLE);
+			  if(series.size()==0){
+				  SeriesGroup seriesgroup=retrieveDefaultSeriesGroup();
+				  Series defaultSerie=new Series();
+				  defaultSerie.setName(Series.DEFAULT_SERIES_TITLE);
+				  persisSeries(defaultSerie);
+				  return defaultSerie;
+			  }
+			  else
+				  return series.get(0);
+	  }
 	   public List<SeriesGroup> findAllSeriesGroup(SearchParam searchParam){
 		   String queryString=searchParam.selectQuery("SELECT p FROM series_group p order by p.title", "SELECT p FROM series_group p where p.title LIKE :search order by p.title", "SELECT p FROM series_group p where p.title = :title");		   
 		   TypedQuery<SeriesGroup> query=entityManager.createQuery(queryString, SeriesGroup.class);

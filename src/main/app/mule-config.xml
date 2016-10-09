@@ -171,7 +171,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.soundmouse.CreateSoundmouseSmurfFile" name="createSoundmouseSmurfFile" doc:name="CreateSoundmouseSmurfFile"/>
    
    
-   <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.VideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
+   <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoTransmer" name="bcVideoService" doc:name="BC Video Service"/>
    
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCVideoPublisher" name="bcVideoPublisher" doc:name="BC Video Publisher"/>
    <custom-transformer class="uk.co.boxnetwork.mule.transformers.bc.BCIngestTransformer" name="bcVideoIngestTransformer" doc:name="BC Video Ingest"/>
