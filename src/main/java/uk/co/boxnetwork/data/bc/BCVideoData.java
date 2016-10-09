@@ -200,6 +200,7 @@ public class BCVideoData {
 					  else{
 						  episode.setCtrPrg(materialId);
 					  }
+					  episode.setMaterialId(GenericUtilities.arrayToSeparatedString(materialParts,"/"));
 				}
 				
 			}
