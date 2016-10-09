@@ -84,16 +84,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          
          
          
-         <spring:bean id="s3Configuration"  class="uk.co.boxnetwork.data.s3.S3Configuration">
-         	   <spring:property name="s3videoURL"    value="${s3.ingest.url}"/>
-         	   <spring:property name="s3imagesURL" value="${s3.images.url}"/>
-         	   
-         	   <spring:property name="videoBucket" value="${s3.video.bucket}"/>
-         	   <spring:property name="imageBucket" value="${s3.images.bucket}"/>
-         	   <spring:property name="imageMasterFolder" value="${s3.images.master.folder}"/>
-         	   <spring:property name="imagePublicFolder" value="${s3.images.public.folder}"/>
-         	   
-         </spring:bean>
+         
          
          <spring:bean id="bcConfiguration"  class="uk.co.boxnetwork.data.bc.BCConfiguration">
                             <spring:property name="oauthurl" value="${brightcove.oauth.url}"/>
@@ -137,7 +128,13 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
          	  <spring:property name="imagetemplateurl" value="${image.templateurl}"/>
          	  <spring:property name="brightcoveStatus" value="${brightcove.status}"/>
          	  <spring:property name="convertImage" value="${convertImage.status}"/>
-         	  <spring:property name="version" value="${app.config.version}"/>         	  
+         	  <spring:property name="version" value="${app.config.version}"/>
+         	  <spring:property name="s3videoURL"    value="${s3.ingest.url}"/>
+         	   <spring:property name="s3imagesURL" value="${s3.images.url}"/>         	   
+         	   <spring:property name="videoBucket" value="${s3.video.bucket}"/>
+         	   <spring:property name="imageBucket" value="${s3.images.bucket}"/>
+         	   <spring:property name="imageMasterFolder" value="${s3.images.master.folder}"/>
+         	   <spring:property name="imagePublicFolder" value="${s3.images.public.folder}"/>         	  
          </spring:bean>
          
          

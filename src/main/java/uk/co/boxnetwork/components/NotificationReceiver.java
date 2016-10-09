@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 
-import uk.co.boxnetwork.data.s3.S3Configuration;
+
 import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -19,8 +19,6 @@ import uk.co.boxnetwork.util.GenericUtilities;
 public class NotificationReceiver {	
 	private static final Logger logger=LoggerFactory.getLogger(NotificationReceiver.class);
 	
-	@Autowired
-	private S3Configuration s3Configuration;
 	
 	@Autowired
 	private AppConfig appConfig;
@@ -101,19 +99,19 @@ public class NotificationReceiver {
 		
 	}
 	private void onFileUpload(String bucketName, String file){
-		if(s3Configuration.getImageBucket().equals(bucketName)){
+		if(appConfig.getImageBucket().equals(bucketName)){
 			onImageBucketUpload(file);
 		}
-		else if(s3Configuration.getVideoBucket().equals(bucketName)){
+		else if(appConfig.getVideoBucket().equals(bucketName)){
 			onVideoBucketUpload(file);
 		}
 	}
 	
 	private void onFileDeleted(String bucketName, String file){
-		if(s3Configuration.getImageBucket().equals(bucketName)){
+		if(appConfig.getImageBucket().equals(bucketName)){
 			onImageBucketFileDeleted(file);
 		}
-		else if(s3Configuration.getVideoBucket().equals(bucketName)){
+		else if(appConfig.getVideoBucket().equals(bucketName)){
 			onVideoBucketFileDeleted(file);
 		}
 	}
@@ -121,7 +119,7 @@ public class NotificationReceiver {
 	
 	private void onImageBucketUpload(String file){
 		logger.info("Uploaded to the image bucket"+ file);
-		if(file.startsWith(s3Configuration.getImageMasterFolder())){
+		if(file.startsWith(appConfig.getImageMasterFolder())){
 			
 			if(appConfig.getConvertImage()==null || (!appConfig.getConvertImage())){
 				logger.info("**** will not convert images because of the config");			
@@ -137,7 +135,7 @@ public class NotificationReceiver {
 			}
 			
 			try{
-				String imageFile=file.substring(s3Configuration.getImageMasterFolder().length()+1);
+				String imageFile=file.substring(appConfig.getImageMasterFolder().length()+1);
 				metadataService.notifyMasterImageUploaded(imageFile);
 			}
 			catch(Throwable e){
@@ -158,9 +156,9 @@ public class NotificationReceiver {
 			return;
 		}
 		
-		if(file.startsWith(s3Configuration.getImageMasterFolder())){			
+		if(file.startsWith(appConfig.getImageMasterFolder())){			
 			try{
-				String imageFile=file.substring(s3Configuration.getImageMasterFolder().length()+1);
+				String imageFile=file.substring(appConfig.getImageMasterFolder().length()+1);
 				metadataService.notifyMasterImageDelete(imageFile);
 			}
 			catch(Throwable e){

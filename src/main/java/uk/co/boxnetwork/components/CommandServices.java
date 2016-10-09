@@ -1,12 +1,12 @@
 package uk.co.boxnetwork.components;
 
-import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.python.jline.internal.InputStreamReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +14,15 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.util.IOUtils;
 
-import uk.co.boxnetwork.data.s3.S3Configuration;
+
+import uk.co.boxnetwork.model.AppConfig;
 
 @Service
 public class CommandServices {
 	private static final Logger logger=LoggerFactory.getLogger(CommandServices.class);
      
 	@Autowired
-	private S3Configuration s3Configuration;	
+	private AppConfig appConfig;
 	
 	public void convertFromMasterImage(String masterImage){
     	 logger.info("converting the master image:"+masterImage);   
@@ -45,7 +46,7 @@ public class CommandServices {
     			throw new RuntimeException("filename should not end with slash");
     		}    		
     	}
-    	executeCommand("convert_s3_image",s3Configuration.getImageBucket(),masterImage,destfilename, s3Configuration.getImagePublicFolder());
+    	executeCommand("convert_s3_image",appConfig.getImageBucket(),masterImage,destfilename, appConfig.getImagePublicFolder());
     }
     public String getVideoDuration(String videoURL) throws IOException, InterruptedException{
         videoURL=videoURL.replace("https","http");
