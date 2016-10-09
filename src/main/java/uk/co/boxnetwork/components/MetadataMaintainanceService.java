@@ -518,13 +518,14 @@ logger.info("adding the default availability window......");
     		episode.getSeries().setContractNumber(contractNumber);
         	if(!GenericUtilities.isEmpty(episodenumber)){
         		episode.setCtrPrg(GenericUtilities.composeCtrPrg(contractNumber, episodenumber));
-        		episode.setNumber(GenericUtilities.toInteter(episodenumber, "parsing episde number error"));        		
+        		episode.setNumber(GenericUtilities.toInteter(episodenumber, "parsing episde number error"));
+        		
         	}
         	else{
         		episode.setCtrPrg(GenericUtilities.composeCtrPrg(contractNumber, "1"));
         		episode.setNumber(1);        		
         	}
-
+        	episode.setMaterialId(episode.getCtrPrg()+"/001");
     	}
     	return metataService.importEpisode(episode);    	
     }
