@@ -18,7 +18,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
@@ -27,10 +26,11 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 
 import uk.co.boxnetwork.data.s3.FileItem;
-import uk.co.boxnetwork.data.s3.S3Configuration;
+
 import uk.co.boxnetwork.data.s3.VideoFileItem;
 import uk.co.boxnetwork.data.s3.VideoFileList;
 import uk.co.boxnetwork.data.s3.MediaFilesLocation;
+import uk.co.boxnetwork.model.AppConfig;
 import uk.co.boxnetwork.model.Episode;
 import uk.co.boxnetwork.util.GenericUtilities;
 
@@ -40,7 +40,7 @@ public class S3BucketService {
 	
 	
 	@Autowired
-	private S3Configuration s3Configuration;	
+	private AppConfig appConfig;	
 
 	@Autowired
 	private BoxMedataRepository boxMetadataRepository;
@@ -86,8 +86,8 @@ public class S3BucketService {
 	}
 	public MediaFilesLocation listFilesInVideoBucket(String prefix){
 		MediaFilesLocation videoFilesLocations=new MediaFilesLocation();
-		videoFilesLocations.setBaseUrl(s3Configuration.getS3videoURL());
-		videoFilesLocations.setFiles(listFiles(s3Configuration.getVideoBucket(),prefix));
+		videoFilesLocations.setBaseUrl(appConfig.getS3videoURL());
+		videoFilesLocations.setFiles(listFiles(appConfig.getVideoBucket(),prefix));
 		logger.info("******number of s3 file for prefix=["+prefix+"]:"+videoFilesLocations.getFiles().size());
 		
 		return videoFilesLocations;
@@ -98,36 +98,36 @@ public class S3BucketService {
 		}
 		logger.info("deleting the image in the ImageBucket:"+keyName);
 		AmazonS3 s3=getAmazonS3();		
-		s3.deleteObject(new DeleteObjectRequest(s3Configuration.getImageBucket(), keyName));
+		s3.deleteObject(new DeleteObjectRequest(appConfig.getImageBucket(), keyName));
 	}
 	public void deletePublicImage(String keyName){
-		 deleteImagesInImageBucket(s3Configuration.getImagePublicFolder()+"/"+keyName);
+		 deleteImagesInImageBucket(appConfig.getImagePublicFolder()+"/"+keyName);
 	}
 	public void deleteMasterImage(String keyName){
-		 deleteImagesInImageBucket(s3Configuration.getImageMasterFolder()+"/"+keyName);
+		 deleteImagesInImageBucket(appConfig.getImageMasterFolder()+"/"+keyName);
 	}
 	public List<FileItem> listGenereratedImages(String prefix){		
-		String path=s3Configuration.getImagePublicFolder();
+		String path=appConfig.getImagePublicFolder();
 		if(prefix!=null){
 			path=path+"/"+prefix;
 		}		
-		List<FileItem>  files=listFiles(s3Configuration.getImageBucket(),path);
+		List<FileItem>  files=listFiles(appConfig.getImageBucket(),path);
 		return files;
 	}
 	
 	public MediaFilesLocation listMasterImagesInImagesBucket(String prefix){
 		MediaFilesLocation videoFilesLocations=new MediaFilesLocation();
-		videoFilesLocations.setBaseUrl(s3Configuration.getS3imagesURL());
-		String path=s3Configuration.getImageMasterFolder();
+		videoFilesLocations.setBaseUrl(appConfig.getS3imagesURL());
+		String path=appConfig.getImageMasterFolder();
 		if(prefix!=null){
 			path=path+"/"+prefix;
 		}
-		List<FileItem>  files=listFiles(s3Configuration.getImageBucket(),path);
+		List<FileItem>  files=listFiles(appConfig.getImageBucket(),path);
 		videoFilesLocations.setFiles(files);
 		if(files.size()>0){			
 			for(FileItem item:files){
-				if(item.getFile().length() > ( s3Configuration.getImageMasterFolder().length()+1) ){
-					item.setFile(item.getFile().substring(s3Configuration.getImageMasterFolder().length()+1));
+				if(item.getFile().length() > ( appConfig.getImageMasterFolder().length()+1) ){
+					item.setFile(item.getFile().substring(appConfig.getImageMasterFolder().length()+1));
 				}				
 			}
 			
@@ -143,7 +143,7 @@ public class S3BucketService {
 		}
 		AmazonS3 s3Client=getAmazonS3();
 		File file=new File(filepath);
-		s3Client.putObject(new PutObjectRequest(s3Configuration.getVideoBucket(), destFilename, file));
+		s3Client.putObject(new PutObjectRequest(appConfig.getVideoBucket(), destFilename, file));
 		videoFileLocation.addFilename(destFilename);
 		return videoFileLocation;		
 	}
@@ -155,7 +155,7 @@ public class S3BucketService {
 		AmazonS3 s3Client=getAmazonS3();
 		File file=new File(filepath);
 		
-		s3Client.putObject(new PutObjectRequest(s3Configuration.getImageBucket(), s3Configuration.getImageMasterFolder()+"/"+destFilename, file));
+		s3Client.putObject(new PutObjectRequest(appConfig.getImageBucket(), appConfig.getImageMasterFolder()+"/"+destFilename, file));
 		imageFileLocation.addFilename(destFilename);
 		return imageFileLocation;		
 	}
@@ -197,10 +197,10 @@ public class S3BucketService {
 	}
 	
 	public String getFullVideoURL(String fileName){
-		return s3Configuration.getS3videoURL()+"/"+fileName;
+		return appConfig.getS3videoURL()+"/"+fileName;
 	}
 	public String getMasterImageFullURL(String fileName){
-		return s3Configuration.getS3imagesURL()+"/"+s3Configuration.getImageMasterFolder()+"/"+fileName;		
+		return appConfig.getS3imagesURL()+"/"+appConfig.getImageMasterFolder()+"/"+fileName;		
 	}
 	
 	
@@ -212,7 +212,7 @@ public class S3BucketService {
 		if(url.length()==0){
 			return null;
 		}
-		String baseURL=s3Configuration.getS3videoURL();
+		String baseURL=appConfig.getS3videoURL();
 		
 		
 		if(!url.startsWith(baseURL)){
@@ -227,7 +227,7 @@ public class S3BucketService {
 		long milliSeconds = expiration.getTime();
 		milliSeconds += 1000 * expiredInSeconds; // Add 1 hour.
 		expiration.setTime(milliSeconds);
-		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(s3Configuration.getVideoBucket(), filename);
+		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(appConfig.getVideoBucket(), filename);
 		generatePresignedUrlRequest.setMethod(HttpMethod.GET); 
 		generatePresignedUrlRequest.setExpiration(expiration);
 		AmazonS3 s3=getAmazonS3();

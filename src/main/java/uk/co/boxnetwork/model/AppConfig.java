@@ -37,6 +37,27 @@ public class AppConfig {
  @Column(name="visibility_category")
  private String visibilityCategory;
  
+ @Column(name="s3_video_url")
+ private String s3videoURL;
+ 
+ @Column(name="video_bucket")
+private String videoBucket;
+ 
+ @Column(name="image_bucket")
+private String imageBucket;
+ 
+ @Column(name="image_master_folder")
+ private String imageMasterFolder;
+ 
+ @Column(name="image_public_folder")
+ private String imagePublicFolder;
+ 
+ @Column(name="s3_images_url")
+ private String s3imagesURL;
+ 
+ 
+ 
+ 
  
 
 public Boolean getBrightcoveStatus() {
@@ -80,6 +101,55 @@ public void setConvertImage(Boolean convertImage) {
 	this.convertImage = convertImage;
 }
 
+
+public String getS3videoURL() {
+	return s3videoURL;
+}
+
+public void setS3videoURL(String s3videoURL) {
+	this.s3videoURL = s3videoURL;
+}
+
+public String getVideoBucket() {
+	return videoBucket;
+}
+
+public void setVideoBucket(String videoBucket) {
+	this.videoBucket = videoBucket;
+}
+
+public String getImageBucket() {
+	return imageBucket;
+}
+
+public void setImageBucket(String imageBucket) {
+	this.imageBucket = imageBucket;
+}
+
+public String getImageMasterFolder() {
+	return imageMasterFolder;
+}
+
+public void setImageMasterFolder(String imageMasterFolder) {
+	this.imageMasterFolder = imageMasterFolder;
+}
+
+public String getImagePublicFolder() {
+	return imagePublicFolder;
+}
+
+public void setImagePublicFolder(String imagePublicFolder) {
+	this.imagePublicFolder = imagePublicFolder;
+}
+
+public String getS3imagesURL() {
+	return s3imagesURL;
+}
+
+public void setS3imagesURL(String s3imagesURL) {
+	this.s3imagesURL = s3imagesURL;
+}
+
 public void exportConfig(AppConfig config){
      config.setBrightcoveStatus(this.brightcoveStatus);
      config.setImagetemplateurl(this.imagetemplateurl);
@@ -89,6 +159,14 @@ public void exportConfig(AppConfig config){
      config.setConvertImage(this.convertImage);
      config.setSendUpdateToSoundMouse(this.sendUpdateToSoundMouse);
      config.setVisibilityCategory(this.visibilityCategory);
+     
+     config.setS3videoURL(this.s3videoURL);
+     config.setVideoBucket(this.videoBucket);
+     config.setImageBucket(this.imageBucket);
+     config.setImageMasterFolder(this.imageMasterFolder);
+     config.setImagePublicFolder(this.imagePublicFolder);
+     config.setS3imagesURL(this.s3imagesURL);
+     
 }
 
 public void importConfig(AppConfig config){	
@@ -100,6 +178,13 @@ public void importConfig(AppConfig config){
     this.sendUpdateToSoundMouse=config.getSendUpdateToSoundMouse();
     this.visibilityCategory=config.getVisibilityCategory();
     
+    
+    this.s3videoURL=config.getS3videoURL();
+    this.videoBucket=config.getVideoBucket();
+    this.imageBucket=config.getImageBucket();
+    this.imageMasterFolder=config.getImageMasterFolder();
+    this.imagePublicFolder=config.getImagePublicFolder();
+    this.s3imagesURL=config.getS3imagesURL();    
 }
 
 public Integer getVersion() {
