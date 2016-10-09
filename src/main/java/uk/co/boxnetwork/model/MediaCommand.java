@@ -9,6 +9,10 @@ import javax.persistence.Id;
 public class MediaCommand {
 	public static String DELIVER_SOUND_MOUSE_HEADER_FILE="deliver_soundmouse_header_file";
 	public static String DELIVER_SOUND_MOUSE_SMURF_FILE="deliver_soundmouse_smurf_file";
+	public static String PUBLISH_ALL_CHANGES="publish-all-changes";
+	public static String IMPORT_BRIGHCOVE_IMAGE="import-brightcove-image";
+	public static String CHECK_TRANSCODE_IN_PRGRESS="check-transcode-inprogress";
+	public static String IMPORT_BRIGHTCOVE_EPISODE="import-brightcove-episode";
 	@Id
 	@GeneratedValue
     private Long id;
@@ -24,7 +28,12 @@ public class MediaCommand {
 	  
 	  private String filepath;
 	  
-	
+	  private String brightcoveId; 
+	  
+	  private String contractNumber;
+	  
+	  private String episodeNumber;
+	  
 	  public String getCommand() {
 		return command;
 	}
@@ -63,6 +72,30 @@ public class MediaCommand {
 
 	public void setFilepath(String filepath) {
 		this.filepath = filepath;
+	}
+
+	public String getBrightcoveId() {
+		return brightcoveId;
+	}
+
+	public void setBrightcoveId(String brightcoveId) {
+		this.brightcoveId = brightcoveId;
+	}
+
+	public String getContractNumber() {
+		return contractNumber;
+	}
+
+	public void setContractNumber(String contractNumber) {
+		this.contractNumber = contractNumber;
+	}
+
+	public String getEpisodeNumber() {
+		return episodeNumber;
+	}
+
+	public void setEpisodeNumber(String episodeNumber) {
+		this.episodeNumber = episodeNumber;
 	}
 
 	@Override

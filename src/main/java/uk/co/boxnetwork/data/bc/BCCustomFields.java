@@ -1,6 +1,10 @@
 package uk.co.boxnetwork.data.bc;
 
+import uk.co.boxnetwork.model.CertType;
 import uk.co.boxnetwork.model.Episode;
+import uk.co.boxnetwork.model.ProgrammeContentType;
+import uk.co.boxnetwork.model.Series;
+import uk.co.boxnetwork.model.SeriesGroup;
 import uk.co.boxnetwork.util.GenericUtilities;
 
 public class BCCustomFields {
@@ -69,6 +73,54 @@ public class BCCustomFields {
 		  drm="False";		  
 	  }
 	  
+  }
+  public void export(Episode episode){
+	  if((!GenericUtilities.isEmpty(this.seriesnumber)) || (!GenericUtilities.isEmpty(this.seriestitle))){
+		  if(episode.getSeries()==null){
+			  episode.setSeries(new Series());
+		  }
+		  Series series=episode.getSeries();
+		  series.setName(this.seriestitle);		  
+		  series.setSeriesNumber(GenericUtilities.toInteter(this.seriesnumber, "failed parsing the seriesnumber imported from bc"));
+	  }
+	  if(this.certificationtype!=null){		  
+		   episode.setCertType(CertType.fromString(this.certificationtype));
+	  }
+	  if((!GenericUtilities.isEmpty(this.programmetitle)) || (!GenericUtilities.isEmpty(this.programmesynopsis))){
+		  if(episode.getSeries()==null){
+			  episode.setSeries(new Series());			  
+		  }
+		  Series series=episode.getSeries();
+		  if(series.getSeriesGroup()==null){
+			  series.setSeriesGroup(new SeriesGroup());
+		  }
+		  SeriesGroup seriesgroup=series.getSeriesGroup();	
+		  seriesgroup.setTitle(this.programmetitle);
+		  seriesgroup.setSynopsis(this.programmesynopsis);		 		  	  
+	  }
+	  if(!GenericUtilities.isEmpty(this.warningtext)){
+		  episode.setWarningText(this.warningtext);			  
+	  }
+	  if(!GenericUtilities.isEmpty(this.episodenumber)){
+		  episode.setNumber(GenericUtilities.toInteter(this.episodenumber, "failed parsing the episodenumber imported from bc"));			  
+	  }
+	  if(!GenericUtilities.isEmpty(this.txchannel)){
+		  episode.setTxChannel(this.txchannel);			  
+	  }
+	  if(!GenericUtilities.isEmpty(this.contenttype)){
+		  episode.setContentType(ProgrammeContentType.fromString(this.contenttype));			  
+	  }
+	  if(!GenericUtilities.isEmpty(this.excludeddevices)){
+		  episode.setExcludeddevices(this.excludeddevices);			  
+	  }
+	  if(this.drm!=null && this.drm.equals("True")){
+		  episode.setIngestProfile("box-plus-network-DRM-profile");
+	  }
+	  else{
+		  episode.setIngestProfile("box-plus-network-1080p-profile");
+	  }
+	  
+		  
   }
   public String getContenttype() {
 	return contenttype;

@@ -14,6 +14,8 @@ import uk.co.boxnetwork.util.GenericUtilities;
 
 @Entity(name="series")
 public class Series {
+	public static String DEFAULT_SERIES_TITLE="Default Series";
+	
 	@Id
 	@GeneratedValue
     private Long id;
