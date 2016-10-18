@@ -4,13 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mycompany</groupId>
 	<artifactId>boxtv-metadata-app</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <packaging>mule</packaging>
 	<name>Mule boxtv-metadata-app Application</name>
 
     
 	<scm>            
-        <connection>scm:ssh://git@github.com:dhewzulla/boxtv-metadata-app.git</connection>
+        <connection>scm:ssh://git@github.com:boxmediapp/box-mule-api.git</connection>
     </scm>
     <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
